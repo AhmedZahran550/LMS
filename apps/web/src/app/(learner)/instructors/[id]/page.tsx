@@ -1,0 +1,140 @@
+'use client';
+
+import React from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams, useRouter } from 'next/navigation';
+import { courseApis } from '@/lib/courseApis';
+import { instructorApis } from '@/lib/instructorApis';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { GraduationCap, Users, ChevronLeft, Mail } from 'lucide-react';
+import { CourseDto } from '@lms/shared-types';
+import Link from 'next/link';
+
+export default function InstructorProfilePage() {
+  const { id } = useParams() as { id: string };
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const { data: instructorData, isLoading: isInstructorLoading } = useQuery({
+    queryKey: ['instructor', id],
+    queryFn: async () => {
+      return await instructorApis.getInstructor(id);
+    },
+  });
+
+  const { data: coursesData, isLoading: isCoursesLoading } = useQuery({
+    queryKey: ['instructor-courses', id],
+    queryFn: async () => {
+      return await courseApis.getCourses({ 'filter.instructorId': `$eq:${id}` });
+    },
+  });
+
+  const enrollMutation = useMutation({
+    mutationFn: async (courseId: string) => {
+      return await courseApis.enrollInCourse(courseId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-enrollments'] });
+      alert('Enrollment requested successfully! Waiting for instructor approval.');
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || 'Failed to request enrollment');
+    }
+  });
+
+  if (isInstructorLoading || isCoursesLoading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  const instructor = instructorData;
+  const courses: CourseDto[] = coursesData?.data || [];
+
+  if (!instructor) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-semibold text-slate-900">Instructor not found</h2>
+        <Button className="mt-4" onClick={() => router.push('/courses')}>Back to Catalog</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <Link href="/courses" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 mb-6 transition-colors">
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back to Catalog
+        </Link>
+        
+        {/* Profile Header */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div className="h-32 w-32 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 overflow-hidden ring-4 ring-indigo-50">
+            {instructor.profileImageUrl ? (
+              <img src={instructor.profileImageUrl} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <GraduationCap className="h-16 w-16" />
+            )}
+          </div>
+          <div className="text-center md:text-left pt-2">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              {instructor.firstName} {instructor.lastName}
+            </h1>
+            <div className="flex items-center justify-center md:justify-start text-slate-500 mt-2 space-x-2">
+              <Mail className="h-4 w-4" />
+              <span>{instructor.email}</span>
+            </div>
+            <div className="mt-4 inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
+              Instructor Profile
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Courses Section */}
+      <div>
+        <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-6">Courses by this Instructor</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-slate-500 bg-white rounded-xl border border-dashed border-slate-300">
+              This instructor hasn't published any public courses yet.
+            </div>
+          ) : (
+            courses.map((course) => (
+              <Card key={course.id} className="flex flex-col">
+                {course.thumbnailUrl && (
+                  <div className="h-40 w-full bg-slate-100 rounded-t-lg overflow-hidden">
+                    <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle>{course.title}</CardTitle>
+                  <CardDescription className="line-clamp-2 mt-2">{course.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <div className="flex items-center text-sm text-slate-500">
+                    <Users className="mr-2 h-4 w-4" />
+                    Instructor: {instructor.firstName} {instructor.lastName}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => enrollMutation.mutate(course.id)}
+                    isLoading={enrollMutation.isPending}
+                  >
+                    Request to Join
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

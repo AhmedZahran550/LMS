@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { AdminUsersController } from './controllers/admin-users.controller';
 import { ProfileController } from './controllers/profile.controller';
+import { LearnerInstructorsController } from './controllers/learner-instructors.controller';
 import { User } from './entities/user.entity';
 import { StorageModule } from '../storage/storage.module';
 
@@ -11,7 +12,7 @@ import { StorageModule } from '../storage/storage.module';
     TypeOrmModule.forFeature([User]),
     StorageModule,
   ],
-  controllers: [AdminUsersController, ProfileController],
+  controllers: [AdminUsersController, ProfileController, LearnerInstructorsController],
   providers: [UsersService],
   exports: [UsersService],
 })
