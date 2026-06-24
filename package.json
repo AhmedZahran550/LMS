@@ -27,7 +27,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@nestjs/core",
-      "bcrypt"
+      "argon2"
     ]
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcryptjs';
+import * as argon2 from 'argon2';
 import { UsersService } from '../../modules/users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -22,7 +22,7 @@ export class AuthService {
       throw new ConflictException('Email already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const hashedPassword = await argon2.hash(registerDto.password);
     const user = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
@@ -37,7 +37,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordValid = await argon2.verify(user.password, loginDto.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -60,9 +60,9 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      const isRefreshTokenValid = await bcrypt.compare(
-        refreshTokenDto.refreshToken,
+      const isRefreshTokenValid = await argon2.verify(
         user.hashedRefreshToken,
+        refreshTokenDto.refreshToken,
       );
 
       if (!isRefreshTokenValid) {
@@ -89,7 +89,7 @@ export class AuthService {
       expiresIn: this.configService.get<string>('jwt.refreshExpiry'),
     });
 
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
 
     const userProfile = {
