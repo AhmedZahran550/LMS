@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { courseApis } from '@/lib/courseApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Video, Users, BookOpen } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -12,10 +12,10 @@ export default function InstructorDashboard() {
   const { data: coursesData } = useQuery({
     queryKey: ['instructor-courses'],
     queryFn: async () => {
-      const res = await api.get('/courses');
-      return res.data;
+      return await courseApis.getCourses();
     },
   });
+
 
   const courses = coursesData?.data || [];
 

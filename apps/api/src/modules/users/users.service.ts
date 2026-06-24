@@ -65,6 +65,19 @@ export class UsersService {
     await this.usersRepository.update(id, { hashedRefreshToken });
   }
 
+  async updateProfile(id: string, firstName: string, lastName: string): Promise<User> {
+    const user = await this.findById(id);
+    user.firstName = firstName;
+    user.lastName = lastName;
+    return this.usersRepository.save(user);
+  }
+
+  async updateProfileImage(id: string, profileImageUrl: string): Promise<User> {
+    const user = await this.findById(id);
+    user.profileImageUrl = profileImageUrl;
+    return this.usersRepository.save(user);
+  }
+
   async remove(id: string): Promise<void> {
     const user = await this.findById(id);
     user.isActive = false;

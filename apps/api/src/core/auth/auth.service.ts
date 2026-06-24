@@ -40,11 +40,15 @@ export class AuthService {
     user.isEmailVerified = false;
     user.emailVerificationToken = emailVerificationToken;
     await this.usersService.save(user);
-
+try {
     const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
     const verifyUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}`;
-    await this.mailService.sendVerificationEmail(user.email, verifyUrl);
+     this.mailService.sendVerificationEmail(user.email, verifyUrl);
 
+} catch (error) {
+  
+}
+  
     return { message: 'Registration successful. Please check your email to verify your account.' };
   }
 
@@ -190,6 +194,7 @@ export class AuthService {
       lastName: user.lastName,
       role: user.role,
       isActive: user.isActive,
+      profileImageUrl: user.profileImageUrl,
       createdAt: user.createdAt.toISOString(),
     };
 

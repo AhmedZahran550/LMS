@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { BookOpen, Compass, LayoutDashboard, LogOut, Settings, Video } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole } from '@lms/shared-types';
+import { Avatar } from '@/components/ui/Avatar';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -19,12 +20,14 @@ export function Sidebar() {
         return [
           { name: 'Dashboard', href: '/instructor', icon: LayoutDashboard },
           { name: 'My Courses', href: '/instructor/courses', icon: Video },
+          { name: 'Profile', href: '/instructor/profile', icon: Settings },
         ];
       case UserRole.LEARNER:
       default:
         return [
           { name: 'Browse Courses', href: '/courses', icon: Compass },
           { name: 'My Learning', href: '/my-courses', icon: BookOpen },
+          { name: 'Profile', href: '/profile', icon: Settings },
         ];
     }
   };
@@ -65,9 +68,15 @@ export function Sidebar() {
 
       <div className="border-t border-slate-200 p-4">
         <div className="flex items-center pb-4">
-          <div className="ml-3">
-            <p className="text-sm font-medium text-slate-700">{user.firstName} {user.lastName}</p>
-            <p className="text-xs text-slate-500">{user.email}</p>
+          <Avatar
+            src={user.profileImageUrl}
+            firstName={user.firstName}
+            lastName={user.lastName}
+            size="sm"
+          />
+          <div className="ml-3 overflow-hidden">
+            <p className="text-sm font-semibold text-slate-700 truncate">{user.firstName} {user.lastName}</p>
+            <p className="text-xs text-slate-500 truncate">{user.email}</p>
           </div>
         </div>
         <button

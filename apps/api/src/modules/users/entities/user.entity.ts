@@ -45,6 +45,9 @@ export class User {
   isActive!: boolean;
 
   @Column({ type: 'varchar', nullable: true })
+  profileImageUrl?: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
   @Exclude()
   hashedRefreshToken?: string | null;
 

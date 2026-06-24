@@ -5,17 +5,19 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter, usePathname } from 'next/navigation';
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthStore();
+  const { user, _hasHydrated } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
 
   React.useEffect(() => {
+    if (!_hasHydrated) return;
     if (!user && !pathname.includes('/login') && !pathname.includes('/register')) {
       router.push('/login');
     }
-  }, [user, router, pathname]);
+  }, [user, _hasHydrated, router, pathname]);
 
-  if (!user) return null;
+  if (!_hasHydrated || !user) return null;
 
   return <>{children}</>;
 }
+

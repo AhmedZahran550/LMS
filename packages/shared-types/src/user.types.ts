@@ -7,5 +7,7 @@ export interface UserProfile {
   lastName: string;
   role: UserRole;
   isActive: boolean;
+  profileImageUrl?: string | null;
   createdAt: string;
 }
+
