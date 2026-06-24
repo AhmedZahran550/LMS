@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { UserRole } from '@lms/shared-types';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -10,6 +11,7 @@ export class User {
   email!: string;
 
   @Column()
+  @Exclude()
   password!: string;
 
   @Column()
@@ -29,9 +31,11 @@ export class User {
   isEmailVerified!: boolean;
 
   @Column({ type: 'varchar', nullable: true })
+  @Exclude()
   emailVerificationToken?: string | null;
 
   @Column({ type: 'varchar', nullable: true })
+  @Exclude()
   resetPasswordToken?: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -41,6 +45,7 @@ export class User {
   isActive!: boolean;
 
   @Column({ type: 'varchar', nullable: true })
+  @Exclude()
   hashedRefreshToken?: string | null;
 
   @CreateDateColumn()

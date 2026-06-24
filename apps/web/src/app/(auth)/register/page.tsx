@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { z } from 'zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +10,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { useAuthStore } from '@/store/useAuthStore';
 import { api } from '@/lib/api';
 import { UserRole } from '@lms/shared-types';
+
+const registerSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Invalid email address'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .max(50, 'Password must be at most 50 characters long')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
+      'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character'
+    ),
+  role: z.nativeEnum(UserRole),
+});
 
 export default function RegisterPage() {
   const [firstName, setFirstName] = useState('');
@@ -28,6 +44,15 @@ export default function RegisterPage() {
     setError('');
 
     try {
+      // Frontend Validation using Zod
+      registerSchema.parse({
+        firstName,
+        lastName,
+        email,
+        password,
+        role,
+      });
+
       const response = await api.post('/auth/register', {
         firstName,
         lastName,
@@ -45,7 +70,11 @@ export default function RegisterPage() {
         router.push('/courses');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed.');
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0].message);
+      } else {
+        setError(err.response?.data?.message || 'Registration failed.');
+      }
     } finally {
       setIsLoading(false);
     }
