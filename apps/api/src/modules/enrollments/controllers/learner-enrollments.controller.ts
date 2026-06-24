@@ -8,7 +8,7 @@ import { UserRole } from '@lms/shared-types';
 import { CoursesService } from '../../courses/courses.service';
 import { VideosService } from '../../videos/videos.service';
 
-@Controller() // Routes prefixed by learner module
+@Controller('learner')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.LEARNER)
 export class LearnerEnrollmentsController {

@@ -5,7 +5,7 @@ import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { UserRole, PaginatedResponse } from '@lms/shared-types';
 
-@Controller('courses') // Bound by RouterModule to /api/learner/courses
+@Controller('learner/courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.LEARNER)
 export class LearnerCoursesController {

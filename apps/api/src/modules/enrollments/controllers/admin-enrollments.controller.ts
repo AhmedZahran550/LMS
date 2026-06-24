@@ -8,7 +8,7 @@ import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { UserRole, PaginatedResponse } from '@lms/shared-types';
 
-@Controller('enrollments') // Bound by RouterModule to /api/admin/enrollments
+@Controller('admin/enrollments')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminEnrollmentsController {

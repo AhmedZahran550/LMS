@@ -8,7 +8,7 @@ import { Roles } from '../../../core/decorators/roles.decorator';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole } from '@lms/shared-types';
 
-@Controller() // Prefix handled by module setup or route mappings
+@Controller('instructor')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.INSTRUCTOR)
 export class InstructorEnrollmentsController {

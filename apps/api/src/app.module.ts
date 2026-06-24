@@ -1,6 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { RouterModule } from '@nestjs/core';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppDataSource } from './db/datasource';
 import { AuthModule } from './core/auth/auth.module';
@@ -35,11 +35,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
     AdminApiModule,
     InstructorApiModule,
     LearnerApiModule,
-    RouterModule.register([
-      { path: 'admin', module: AdminApiModule },
-      { path: 'instructor', module: InstructorApiModule },
-      { path: 'learner', module: LearnerApiModule },
-    ]),
+
   ],
   controllers: [AppController],
   providers: [],
