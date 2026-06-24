@@ -8,17 +8,23 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { CourseVisibility } from '@lms/shared-types';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 
 export default function InstructorCoursesPage() {
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
+  const [search, setSearch] = useState('');
+  const [visibilityFilter, setVisibilityFilter] = useState('ALL');
 
   const { data: coursesData, isLoading } = useQuery({
-    queryKey: ['instructor-courses'],
+    queryKey: ['instructor-courses', search, visibilityFilter],
     queryFn: async () => {
-      return await courseApis.getCourses();
+      const params: any = {};
+      if (search) params.search = search;
+      if (visibilityFilter !== 'ALL') params['filter.visibility'] = `$eq:${visibilityFilter}`;
+      return await courseApis.getCourses(params);
     },
   });
 
@@ -38,8 +44,6 @@ export default function InstructorCoursesPage() {
     }
   });
 
-  if (isLoading) return <div>Loading...</div>;
-
   const courses = coursesData?.data || [];
 
   return (
@@ -52,6 +56,27 @@ export default function InstructorCoursesPage() {
         <Button onClick={() => setIsCreating(!isCreating)}>
           {isCreating ? 'Cancel' : 'Create New Course'}
         </Button>
+      </div>
+
+      <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Input 
+            className="pl-9" 
+            placeholder="Search your courses..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <select 
+          className="border-slate-300 rounded-md text-sm sm:w-48"
+          value={visibilityFilter}
+          onChange={(e) => setVisibilityFilter(e.target.value)}
+        >
+          <option value="ALL">All Visibility</option>
+          <option value={CourseVisibility.PUBLIC}>Public</option>
+          <option value={CourseVisibility.PRIVATE}>Private</option>
+        </select>
       </div>
 
       {isCreating && (
@@ -80,30 +105,36 @@ export default function InstructorCoursesPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course: any) => (
-          <Card key={course.id} className="flex flex-col">
-            <CardHeader>
-              <div className="flex justify-between items-start mb-2">
-                <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                  course.visibility === CourseVisibility.PUBLIC 
-                    ? 'bg-green-50 text-green-700 ring-green-600/20' 
-                    : 'bg-slate-50 text-slate-600 ring-slate-500/10'
-                }`}>
-                  {course.visibility}
-                </span>
-              </div>
-              <CardTitle>{course.title}</CardTitle>
-              <CardDescription className="line-clamp-2 mt-2">{course.description}</CardDescription>
-            </CardHeader>
-            <CardFooter className="mt-auto pt-6">
-              <Link href={`/instructor/courses/${course.id}`} className="w-full">
-                <Button variant="outline" className="w-full">Manage Content</Button>
-              </Link>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course: any) => (
+            <Card key={course.id} className="flex flex-col">
+              <CardHeader>
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ${
+                    course.visibility === CourseVisibility.PUBLIC 
+                      ? 'bg-green-50 text-green-700 ring-green-600/20' 
+                      : 'bg-slate-50 text-slate-600 ring-slate-500/10'
+                  }`}>
+                    {course.visibility}
+                  </span>
+                </div>
+                <CardTitle>{course.title}</CardTitle>
+                <CardDescription className="line-clamp-2 mt-2">{course.description}</CardDescription>
+              </CardHeader>
+              <CardFooter className="mt-auto pt-6">
+                <Link href={`/instructor/courses/${course.id}`} className="w-full">
+                  <Button variant="outline" className="w-full">Manage Content</Button>
+                </Link>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

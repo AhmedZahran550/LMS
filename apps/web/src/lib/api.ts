@@ -50,3 +50,17 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export const getRoleUrl = (path: string) => {
+  const { user } = useAuthStore.getState();
+  const prefix =
+    user?.role?.toLowerCase() === "instructor" ? "/instructor" : "/learner";
+  return `${prefix}${path}`;
+};
+
+export const roleApi = {
+  get: <T = any>(url: string, config?: any) => api.get<T>(getRoleUrl(url), config),
+  post: <T = any>(url: string, data?: any, config?: any) => api.post<T>(getRoleUrl(url), data, config),
+  patch: <T = any>(url: string, data?: any, config?: any) => api.patch<T>(getRoleUrl(url), data, config),
+  delete: <T = any>(url: string, config?: any) => api.delete<T>(getRoleUrl(url), config),
+};
