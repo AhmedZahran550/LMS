@@ -6,6 +6,7 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
 import { QueryFailedExceptionFilter } from './core/filters/query-failed-exception.filter';
+import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -37,8 +38,11 @@ async function bootstrap() {
     new QueryFailedExceptionFilter(),
   );
 
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
   const port = configService.get<number>('app.port', 5000);
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();
+

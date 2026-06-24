@@ -46,7 +46,7 @@ try {
      this.mailService.sendVerificationEmail(user.email, verifyUrl);
 
 } catch (error) {
-  
+  console.log("error in verification email",error);
 }
   
     return { message: 'Registration successful. Please check your email to verify your account.' };
