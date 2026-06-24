@@ -11,9 +11,23 @@ interface LoginFormUIProps {
   serverError: string | null;
   isLoading: boolean;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+  onResendVerification: () => void;
+  isResending: boolean;
+  resendSuccess: string | null;
+  resendError: string | null;
 }
 
-export function LoginFormUI({ register, errors, serverError, isLoading, onSubmit }: LoginFormUIProps) {
+export function LoginFormUI({
+  register,
+  errors,
+  serverError,
+  isLoading,
+  onSubmit,
+  onResendVerification,
+  isResending,
+  resendSuccess,
+  resendError,
+}: LoginFormUIProps) {
   return (
     <Card>
       <CardHeader>
@@ -22,7 +36,33 @@ export function LoginFormUI({ register, errors, serverError, isLoading, onSubmit
       </CardHeader>
       <form onSubmit={onSubmit}>
         <CardContent className="space-y-4">
-          {serverError && <div className="text-sm text-red-500 bg-red-50 p-3 rounded">{serverError}</div>}
+          {serverError && (
+            <div className="text-sm text-red-500 bg-red-50 p-3 rounded space-y-2">
+              <div>{serverError}</div>
+              {serverError === 'Please verify your email before logging in' && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={onResendVerification}
+                    disabled={isResending}
+                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline disabled:opacity-50"
+                  >
+                    {isResending ? 'Resending...' : 'Resend verification email'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          {resendSuccess && (
+            <div className="text-sm text-green-600 bg-green-50 p-3 rounded">
+              {resendSuccess}
+            </div>
+          )}
+          {resendError && (
+            <div className="text-sm text-red-500 bg-red-50 p-3 rounded">
+              {resendError}
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="email">Email address</label>
             <Input

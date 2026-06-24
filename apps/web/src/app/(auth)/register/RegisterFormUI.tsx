@@ -9,15 +9,12 @@ import { UserRole } from '@lms/shared-types';
 interface RegisterFormUIProps {
   register: UseFormRegister<any>;
   errors: FieldErrors<any>;
-  watch: UseFormWatch<any>;
-  setValue: UseFormSetValue<any>;
   serverError: string | null;
   isLoading: boolean;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
 }
 
-export function RegisterFormUI({ register, errors, watch, setValue, serverError, isLoading, onSubmit }: RegisterFormUIProps) {
-  const role = watch('role');
+export function RegisterFormUI({ register, errors, serverError, isLoading, onSubmit }: RegisterFormUIProps) {
 
   return (
     <Card>
@@ -77,15 +74,25 @@ export function RegisterFormUI({ register, errors, watch, setValue, serverError,
           </div>
 
           <div className="space-y-2">
+            <label className="text-sm font-medium" htmlFor="confirmPassword">Confirm Password</label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              {...register('confirmPassword')}
+            />
+            {errors.confirmPassword && (
+              <p className="text-xs text-red-500">{errors.confirmPassword.message?.toString()}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-medium">I want to join as:</label>
             <div className="flex space-x-4 mt-2">
               <label className="flex items-center space-x-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
                   type="radio"
-                  name="role"
                   value={UserRole.LEARNER}
-                  checked={role === UserRole.LEARNER}
-                  onChange={() => setValue('role', UserRole.LEARNER, { shouldValidate: true })}
+                  {...register('role')}
                   className="text-indigo-600 focus:ring-indigo-500"
                 />
                 <span className="text-sm font-medium">Student</span>
@@ -93,10 +100,8 @@ export function RegisterFormUI({ register, errors, watch, setValue, serverError,
               <label className="flex items-center space-x-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
                   type="radio"
-                  name="role"
                   value={UserRole.INSTRUCTOR}
-                  checked={role === UserRole.INSTRUCTOR}
-                  onChange={() => setValue('role', UserRole.INSTRUCTOR, { shouldValidate: true })}
+                  {...register('role')}
                   className="text-indigo-600 focus:ring-indigo-500"
                 />
                 <span className="text-sm font-medium">Instructor</span>

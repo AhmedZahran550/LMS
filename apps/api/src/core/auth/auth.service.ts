@@ -11,6 +11,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { User } from '../../modules/users/entities/user.entity';
 
 @Injectable()
@@ -106,6 +107,27 @@ export class AuthService {
     await this.usersService.save(user);
 
     return { message: 'Email verified successfully' };
+  }
+
+  async resendVerification({ email }: ResendVerificationDto) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User with this email does not exist');
+    }
+
+    if (user.isEmailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+    user.emailVerificationToken = emailVerificationToken;
+    await this.usersService.save(user);
+
+    const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
+    const verifyUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}`;
+    await this.mailService.sendVerificationEmail(user.email, verifyUrl);
+
+    return { message: 'Verification email sent successfully' };
   }
 
   async forgotPassword({ email }: ForgotPasswordDto) {

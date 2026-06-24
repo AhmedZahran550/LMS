@@ -12,3 +12,9 @@ export const useRegisterMutation = () => {
     mutationFn: (data: any) => authApis.register(data),
   });
 };
+
+export const useResendVerificationMutation = () => {
+  return useMutation({
+    mutationFn: (email: string) => authApis.resendVerification(email),
+  });
+};

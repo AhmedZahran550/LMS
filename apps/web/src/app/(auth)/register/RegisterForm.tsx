@@ -22,7 +22,11 @@ const registerSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
       'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character'
     ),
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
   role: z.nativeEnum(UserRole),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -36,8 +40,6 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -49,7 +51,8 @@ export function RegisterForm() {
   const onSubmit = async (data: RegisterFormData) => {
     setServerError(null);
     try {
-      const response = await registerMutation.mutateAsync(data);
+      const { confirmPassword, ...apiData } = data;
+      const response = await registerMutation.mutateAsync(apiData);
       const { user, accessToken, refreshToken } = response;
       
       setAuth(user, accessToken, refreshToken);
@@ -68,8 +71,6 @@ export function RegisterForm() {
     <RegisterFormUI
       register={register}
       errors={errors}
-      watch={watch}
-      setValue={setValue}
       serverError={serverError}
       isLoading={registerMutation.isPending}
       onSubmit={handleSubmit(onSubmit)}
