@@ -1,0 +1,22 @@
+services:
+  db:
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lms_user
+      POSTGRES_PASSWORD: lms_password
+      POSTGRES_DB: lms_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lms_user']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

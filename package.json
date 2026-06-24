@@ -1,0 +1,33 @@
+{
+  "name": "@lms/root",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "dev:api": "pnpm --filter @lms/api dev",
+    "dev:web": "pnpm --filter @lms/web dev",
+    "dev:admin": "pnpm --filter @lms/admin dev",
+    "build": "pnpm -r run build",
+    "build:api": "pnpm --filter @lms/api build",
+    "build:web": "pnpm --filter @lms/web build",
+    "build:admin": "pnpm --filter @lms/admin build",
+    "lint": "pnpm -r run lint",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @lms/api migration:run",
+    "db:migrate:generate": "pnpm --filter @lms/api migration:generate",
+    "db:migrate:create": "pnpm --filter @lms/api migration:create",
+    "db:migrate:revert": "pnpm --filter @lms/api migration:revert",
+    "db:seed": "pnpm --filter @lms/api seed",
+    "clean": "pnpm -r exec rm -rf node_modules dist .next"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "bcrypt"
+    ]
+  }
+}
