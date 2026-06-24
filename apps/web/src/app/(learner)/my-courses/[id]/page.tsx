@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { courseApis } from '@/lib/courseApis';
 import { PlayCircle, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -15,8 +16,7 @@ export default function CourseDetailPage() {
   const { data: course, isLoading } = useQuery({
     queryKey: ['course', courseId],
     queryFn: async () => {
-      const res = await api.get(`/my-courses/${courseId}`);
-      return res.data;
+      return await courseApis.getMyCourse(courseId);
     },
   });
 

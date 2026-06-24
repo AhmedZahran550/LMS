@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { CourseVisibility, EnrollmentStatus } from '@lms/shared-types';
-import { Upload, Users, Check, X, Mail } from 'lucide-react';
+import { Upload, Users, Check, X, Mail, PlayCircle } from 'lucide-react';
 
 export default function InstructorCourseDetailPage() {
   const params = useParams();
@@ -21,6 +21,7 @@ export default function InstructorCourseDetailPage() {
   const [videoDesc, setVideoDesc] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
+  const [activeVideo, setActiveVideo] = useState<any>(null);
 
   const { data: courseData, isLoading: courseLoading } = useQuery({
     queryKey: ['instructor-course', courseId],
@@ -118,6 +119,27 @@ export default function InstructorCourseDetailPage() {
               <CardDescription>Upload and manage videos for this course.</CardDescription>
             </CardHeader>
             <CardContent>
+              {activeVideo && (
+                <div className="mb-6 bg-black rounded-lg overflow-hidden aspect-video relative flex items-center justify-center">
+                  <video 
+                    key={activeVideo.id} 
+                    controls 
+                    className="w-full h-full object-contain"
+                  >
+                    <source src={activeVideo.url} type={activeVideo.mimeType} />
+                    Your browser does not support the video tag.
+                  </video>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute top-2 right-2 text-white bg-black/50 hover:bg-black/70 hover:text-white rounded-full h-8 w-8"
+                    onClick={() => setActiveVideo(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
               <div className="space-y-4 mb-6 p-4 border border-slate-200 rounded-lg bg-slate-50">
                 <h3 className="text-sm font-semibold">Upload New Video</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -149,6 +171,16 @@ export default function InstructorCourseDetailPage() {
                       <div className="flex flex-col">
                         <span className="font-medium text-sm">{i + 1}. {vid.title}</span>
                         <span className="text-xs text-slate-500">{(vid.size / (1024*1024)).toFixed(2)} MB</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setActiveVideo(vid)}
+                          className={activeVideo?.id === vid.id ? 'bg-slate-100' : ''}
+                        >
+                          <PlayCircle className="h-4 w-4 mr-2" /> Play
+                        </Button>
                       </div>
                     </div>
                   ))

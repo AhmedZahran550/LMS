@@ -17,7 +17,13 @@ export const COURSE_PAGINATION_CONFIG: PaginateConfig<Course> = {
   sortableColumns: ["createdAt", "title"],
   nullSort: "last",
   defaultSortBy: [["createdAt", "DESC"]],
-  searchableColumns: ["title", "description"],
+  searchableColumns: [
+    "title",
+    "description",
+    "instructor.firstName",
+    "instructor.lastName",
+    "instructor.email",
+  ],
   filterableColumns: {
     visibility: [FilterOperator.EQ],
     isActive: [FilterOperator.EQ],

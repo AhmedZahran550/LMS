@@ -3,6 +3,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { courseApis } from '@/lib/courseApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { BookOpen, Clock, CheckCircle2, XCircle } from 'lucide-react';
@@ -13,8 +14,7 @@ export default function MyCoursesPage() {
   const { data: enrollments, isLoading } = useQuery({
     queryKey: ['my-enrollments'],
     queryFn: async () => {
-      const res = await api.get('/my-courses');
-      return res.data;
+      return await courseApis.getMyCourses();
     },
   });
 
