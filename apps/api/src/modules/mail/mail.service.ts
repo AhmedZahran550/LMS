@@ -49,4 +49,22 @@ export class MailService {
       context: { instructorName, courseName },
     });
   }
+
+  async sendVerificationEmail(to: string, verificationUrl: string) {
+    await this.mailProvider.sendMail({
+      to,
+      subject: 'Verify your email address',
+      template: 'email-verification',
+      context: { verificationUrl },
+    });
+  }
+
+  async sendPasswordResetEmail(to: string, resetUrl: string) {
+    await this.mailProvider.sendMail({
+      to,
+      subject: 'Reset your password',
+      template: 'reset-password',
+      context: { resetUrl },
+    });
+  }
 }

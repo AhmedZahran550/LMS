@@ -5,4 +5,5 @@ export default registerAs('app', () => ({
   apiUrl: process.env.API_URL || 'http://localhost:5000',
   webUrl: process.env.WEB_URL || 'http://localhost:3000',
   adminUrl: process.env.ADMIN_URL || 'http://localhost:3001',
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
 }));

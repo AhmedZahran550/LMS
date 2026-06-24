@@ -25,6 +25,18 @@ export class User {
   })
   role!: UserRole;
 
+  @Column({ default: false })
+  isEmailVerified!: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  emailVerificationToken?: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  resetPasswordToken?: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordTokenExpiresAt?: Date | null;
+
   @Column({ default: true })
   isActive!: boolean;
 

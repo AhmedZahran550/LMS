@@ -38,6 +38,18 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
+  async save(user: User): Promise<User> {
+    return this.usersRepository.save(user);
+  }
+
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { emailVerificationToken: token } });
+  }
+
+  async findByResetToken(token: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { resetPasswordToken: token } });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findById(id);
 

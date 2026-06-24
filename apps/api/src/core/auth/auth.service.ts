@@ -1,11 +1,16 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
 import * as argon2 from 'argon2';
 import { UsersService } from '../../modules/users/users.service';
+import { MailService } from '../../modules/mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { User } from '../../modules/users/entities/user.entity';
 
 @Injectable()
@@ -14,6 +19,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -23,18 +29,32 @@ export class AuthService {
     }
 
     const hashedPassword = await argon2.hash(registerDto.password);
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
     const user = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
     });
+    
+    user.isEmailVerified = false;
+    user.emailVerificationToken = emailVerificationToken;
+    await this.usersService.save(user);
 
-    return this.generateTokens(user);
+    const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
+    const verifyUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}`;
+    await this.mailService.sendVerificationEmail(user.email, verifyUrl);
+
+    return { message: 'Registration successful. Please check your email to verify your account.' };
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.isEmailVerified) {
+      throw new UnauthorizedException('Please verify your email before logging in');
     }
 
     const isPasswordValid = await argon2.verify(user.password, loginDto.password);
@@ -73,6 +93,55 @@ export class AuthService {
     } catch (e) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
+  }
+
+  async verifyEmail({ token }: VerifyEmailDto) {
+    const user = await this.usersService.findByVerificationToken(token);
+    if (!user) {
+      throw new BadRequestException('Invalid or expired verification token');
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    await this.usersService.save(user);
+
+    return { message: 'Email verified successfully' };
+  }
+
+  async forgotPassword({ email }: ForgotPasswordDto) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      return { message: 'If an account exists, a password reset link has been sent.' };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1);
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordTokenExpiresAt = expiresAt;
+    await this.usersService.save(user);
+
+    const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+    await this.mailService.sendPasswordResetEmail(user.email, resetUrl);
+
+    return { message: 'If an account exists, a password reset link has been sent.' };
+  }
+
+  async resetPassword({ token, newPassword }: ResetPasswordDto) {
+    const user = await this.usersService.findByResetToken(token);
+    
+    if (!user || !user.resetPasswordTokenExpiresAt || user.resetPasswordTokenExpiresAt < new Date()) {
+      throw new BadRequestException('Invalid or expired password reset token');
+    }
+
+    user.password = await argon2.hash(newPassword);
+    user.resetPasswordToken = null;
+    user.resetPasswordTokenExpiresAt = null;
+    await this.usersService.save(user);
+
+    return { message: 'Password reset successfully' };
   }
 
   async logout(userId: string) {
