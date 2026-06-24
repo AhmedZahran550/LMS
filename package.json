@@ -25,9 +25,8 @@
     "pnpm": ">=9.0.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "@nestjs/core",
-      "argon2"
-    ]
+    "approvedBuilds": {
+      "argon2": "0.44.0"
+    }
   }
 }

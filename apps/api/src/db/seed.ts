@@ -1,5 +1,5 @@
 import { AppDataSource } from './datasource';
-import * as bcrypt from 'bcryptjs';
+import * as argon2 from 'argon2';
 import { UserRole } from '@lms/shared-types';
 
 async function seed() {
@@ -20,7 +20,7 @@ async function seed() {
   if (existingAdmin.length > 0) {
     console.log('Admin user already exists.');
   } else {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password);
 
     // Using raw query since entity might not be fully available during initial seed
     // Or we could import User entity if we create it first
