@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { courseApis } from '@/lib/courseApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Compass, Users } from 'lucide-react';
@@ -14,15 +14,13 @@ export default function CourseCatalogPage() {
   const { data: coursesData, isLoading } = useQuery({
     queryKey: ['public-courses'],
     queryFn: async () => {
-      const res = await api.get('/courses');
-      return res.data;
+      return await courseApis.getCourses();
     },
   });
 
   const enrollMutation = useMutation({
     mutationFn: async (courseId: string) => {
-      const res = await api.post(`/courses/${courseId}/enroll`);
-      return res.data;
+      return await courseApis.enrollInCourse(courseId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-enrollments'] });

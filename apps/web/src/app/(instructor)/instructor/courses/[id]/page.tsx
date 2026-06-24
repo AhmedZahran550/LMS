@@ -3,7 +3,8 @@
 import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { api } from '@/lib/api';
+import { courseApis } from '@/lib/courseApis';
+import { enrollmentApis } from '@/lib/enrollmentApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -24,23 +25,20 @@ export default function InstructorCourseDetailPage() {
   const { data: courseData, isLoading: courseLoading } = useQuery({
     queryKey: ['instructor-course', courseId],
     queryFn: async () => {
-      const res = await api.get(`/courses/${courseId}`);
-      return res.data;
+      return await courseApis.getCourse(courseId);
     },
   });
 
   const { data: enrollments, isLoading: enrollLoading } = useQuery({
     queryKey: ['course-enrollments', courseId],
     queryFn: async () => {
-      const res = await api.get(`/courses/${courseId}/enrollments`);
-      return res.data;
+      return await courseApis.getCourseEnrollments(courseId);
     },
   });
 
   const updateCourseMutation = useMutation({
     mutationFn: async (visibility: CourseVisibility) => {
-      const res = await api.patch(`/courses/${courseId}`, { visibility });
-      return res.data;
+      return await courseApis.updateCourse(courseId, { visibility });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['instructor-course', courseId] })
   });
@@ -53,10 +51,9 @@ export default function InstructorCourseDetailPage() {
       formData.append('description', videoDesc);
       formData.append('file', selectedFile);
       
-      const res = await api.post(`/courses/${courseId}/videos`, formData, {
+      return await courseApis.uploadVideo(courseId, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-course', courseId] });
@@ -69,14 +66,14 @@ export default function InstructorCourseDetailPage() {
 
   const respondEnrollmentMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: EnrollmentStatus }) => {
-      await api.patch(`/enrollments/${id}/respond`, { status });
+      await enrollmentApis.respondEnrollment(id, status);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['course-enrollments', courseId] })
   });
 
   const inviteMutation = useMutation({
     mutationFn: async () => {
-      await api.post(`/courses/${courseId}/invite`, { email: inviteEmail });
+      await courseApis.inviteInstructor(courseId, inviteEmail);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-enrollments', courseId] });

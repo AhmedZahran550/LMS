@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { courseApis } from '@/lib/courseApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -18,19 +18,17 @@ export default function InstructorCoursesPage() {
   const { data: coursesData, isLoading } = useQuery({
     queryKey: ['instructor-courses'],
     queryFn: async () => {
-      const res = await api.get('/courses');
-      return res.data;
+      return await courseApis.getCourses();
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const res = await api.post('/courses', {
+      return await courseApis.createCourse({
         title: newTitle,
         description: newDesc,
         visibility: CourseVisibility.PRIVATE, // default
       });
-      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
