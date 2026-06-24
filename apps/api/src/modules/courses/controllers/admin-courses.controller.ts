@@ -1,4 +1,5 @@
-import { Controller, Get, Patch, Param, Delete, UseGuards, Query, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Delete, UseGuards, Body } from '@nestjs/common';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CoursesService } from '../courses.service';
 import { UpdateCourseDto } from '../dto/update-course.dto';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
@@ -13,31 +14,16 @@ export class AdminCoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Get()
-  async findAll(
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
-  ) {
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
-
-    const [courses, total] = await this.coursesService.findAll(skip, limitNum);
-
-    const result: Omit<PaginatedResponse<any>, 'success' | 'message'> = {
-      data: courses.map(c => {
-         if (c.instructor) {
-             const { password, hashedRefreshToken, ...safeUser } = c.instructor;
-             c.instructor = safeUser as any;
-         }
-         return c;
-      }),
-      meta: {
-        total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: Math.ceil(total / limitNum),
-      },
-    };
+  async findAll(@Paginate() query: PaginateQuery) {
+    const result = await this.coursesService.findAll(query);
+    
+    result.data = result.data.map(c => {
+      if (c.instructor) {
+        const { password, hashedRefreshToken, ...safeUser } = c.instructor;
+        c.instructor = safeUser as any;
+      }
+      return c;
+    });
     return result;
   }
 

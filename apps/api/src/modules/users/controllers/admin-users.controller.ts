@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { UsersService } from '../users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -19,28 +20,14 @@ export class AdminUsersController {
   }
 
   @Get()
-  async findAll(
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
-  ) {
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
+  async findAll(@Paginate() query: PaginateQuery) {
+    const result = await this.usersService.findAll(query);
 
-    const [users, total] = await this.usersService.findAll(skip, limitNum);
+    result.data = result.data.map(u => {
+      const { password, hashedRefreshToken, ...safeUser } = u;
+      return safeUser as any;
+    });
 
-    const result: Omit<PaginatedResponse<any>, 'success' | 'message'> = {
-      data: users.map(u => {
-        const { password, hashedRefreshToken, ...safeUser } = u;
-        return safeUser;
-      }),
-      meta: {
-        total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: Math.ceil(total / limitNum),
-      },
-    };
     return result;
   }
 

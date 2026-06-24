@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PaginateConfig, FilterOperator } from 'nestjs-paginate';
+import { DBService } from '../../core/base/db.service';
 import { Video } from './entities/video.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
@@ -8,14 +10,26 @@ import { CoursesService } from '../courses/courses.service';
 import { StorageService } from '../storage/storage.service';
 import { ReorderVideosDto } from './dto/reorder-videos.dto';
 
+export const VIDEO_PAGINATION_CONFIG: PaginateConfig<Video> = {
+  sortableColumns: ['createdAt', 'orderIndex', 'title'],
+  nullSort: 'last',
+  defaultSortBy: [['orderIndex', 'ASC']],
+  searchableColumns: ['title', 'description'],
+  filterableColumns: {
+    courseId: [FilterOperator.EQ],
+  },
+};
+
 @Injectable()
-export class VideosService {
+export class VideosService extends DBService<Video, CreateVideoDto, UpdateVideoDto> {
   constructor(
     @InjectRepository(Video)
-    private videosRepository: Repository<Video>,
-    private coursesService: CoursesService,
-    private storageService: StorageService,
-  ) {}
+    private readonly videosRepository: Repository<Video>,
+    private readonly coursesService: CoursesService,
+    private readonly storageService: StorageService,
+  ) {
+    super(videosRepository, VIDEO_PAGINATION_CONFIG);
+  }
 
   async upload(courseId: string, instructorId: string, createVideoDto: CreateVideoDto, file: Express.Multer.File): Promise<Video> {
     // Verify course ownership
@@ -55,7 +69,7 @@ export class VideosService {
     });
   }
 
-  async findById(courseId: string, videoId: string): Promise<Video> {
+  async findCourseVideoById(courseId: string, videoId: string): Promise<Video> {
     const video = await this.videosRepository.findOne({ where: { id: videoId, courseId } });
     if (!video) {
       throw new NotFoundException(`Video with ID ${videoId} not found in this course`);
@@ -63,19 +77,19 @@ export class VideosService {
     return video;
   }
 
-  async update(courseId: string, videoId: string, instructorId: string, updateVideoDto: UpdateVideoDto): Promise<Video> {
+  async updateCourseVideo(courseId: string, videoId: string, instructorId: string, updateVideoDto: UpdateVideoDto): Promise<Video> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
     
-    const video = await this.findById(courseId, videoId);
+    const video = await this.findCourseVideoById(courseId, videoId);
     Object.assign(video, updateVideoDto);
     
     return this.videosRepository.save(video);
   }
 
-  async remove(courseId: string, videoId: string, instructorId: string): Promise<void> {
+  async removeCourseVideo(courseId: string, videoId: string, instructorId: string): Promise<void> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
     
-    const video = await this.findById(courseId, videoId);
+    const video = await this.findCourseVideoById(courseId, videoId);
     
     // Delete physical file
     await this.storageService.delete(video.filename);

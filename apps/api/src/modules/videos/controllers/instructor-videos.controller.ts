@@ -44,7 +44,7 @@ export class InstructorVideosController {
     @Param('videoId') videoId: string,
     @Body() updateVideoDto: UpdateVideoDto,
   ) {
-    return this.videosService.update(courseId, videoId, user.id, updateVideoDto);
+    return this.videosService.updateCourseVideo(courseId, videoId, user.id, updateVideoDto);
   }
 
   @Delete(':videoId')
@@ -53,7 +53,7 @@ export class InstructorVideosController {
     @Param('courseId') courseId: string,
     @Param('videoId') videoId: string,
   ) {
-    await this.videosService.remove(courseId, videoId, user.id);
+    await this.videosService.removeCourseVideo(courseId, videoId, user.id);
     return { videoId, deleted: true };
   }
 }

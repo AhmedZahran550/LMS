@@ -1,63 +1,59 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
+import { PaginateConfig, FilterOperator, paginate, PaginateQuery } from 'nestjs-paginate';
+import { DBService } from '../../core/base/db.service';
 import { Course } from './entities/course.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { CourseVisibility } from '@lms/shared-types';
+import { CourseVisibility, PaginatedResponse } from '@lms/shared-types';
+
+export const COURSE_PAGINATION_CONFIG: PaginateConfig<Course> = {
+  sortableColumns: ['createdAt', 'title'],
+  nullSort: 'last',
+  defaultSortBy: [['createdAt', 'DESC']],
+  searchableColumns: ['title', 'description'],
+  filterableColumns: {
+    visibility: [FilterOperator.EQ],
+    isActive: [FilterOperator.EQ],
+    instructorId: [FilterOperator.EQ]
+  },
+  relations: ['instructor']
+};
 
 @Injectable()
-export class CoursesService {
+export class CoursesService extends DBService<Course, CreateCourseDto, UpdateCourseDto> {
   constructor(
     @InjectRepository(Course)
-    private coursesRepository: Repository<Course>,
-  ) {}
-
-  async create(instructorId: string, createCourseDto: CreateCourseDto): Promise<Course> {
-    const course = this.coursesRepository.create({
-      ...createCourseDto,
-      instructorId,
-    });
-    return this.coursesRepository.save(course);
+    private readonly coursesRepository: Repository<Course>,
+  ) {
+    super(coursesRepository, COURSE_PAGINATION_CONFIG);
   }
 
-  async findAll(skip: number = 0, take: number = 10, instructorId?: string): Promise<[Course[], number]> {
-    const where = instructorId ? { instructorId } : {};
-    return this.coursesRepository.findAndCount({
-      where,
-      skip,
-      take,
-      order: { createdAt: 'DESC' },
-      relations: ['instructor'],
-    });
+  async create(createCourseDto: CreateCourseDto, additionalData?: DeepPartial<Course>): Promise<Course> {
+    return super.create(createCourseDto, additionalData);
   }
 
-  async findPublic(skip: number = 0, take: number = 10, search?: string): Promise<[Course[], number]> {
+  async findPublic(query: PaginateQuery): Promise<Omit<PaginatedResponse<Course>, 'success' | 'message'>> {
     const qb = this.coursesRepository.createQueryBuilder('course')
       .leftJoinAndSelect('course.instructor', 'instructor')
       .where('course.visibility = :visibility', { visibility: CourseVisibility.PUBLIC })
       .andWhere('course.isActive = :isActive', { isActive: true });
 
-    if (search) {
-      qb.andWhere('course.title ILIKE :search OR course.description ILIKE :search', { search: `%${search}%` });
-    }
-
-    return qb
-      .orderBy('course.createdAt', 'DESC')
-      .skip(skip)
-      .take(take)
-      .getManyAndCount();
+    const result = await paginate(query, qb, COURSE_PAGINATION_CONFIG);
+    return {
+      data: result.data,
+      meta: {
+        total: result.meta.totalItems || 0,
+        page: result.meta.currentPage || 1,
+        limit: result.meta.itemsPerPage || 10,
+        totalPages: result.meta.totalPages || 1,
+      }
+    };
   }
 
   async findById(id: string): Promise<Course> {
-    const course = await this.coursesRepository.findOne({
-      where: { id },
-      relations: ['instructor', 'videos'], // assuming videos will be related
-    });
-    if (!course) {
-      throw new NotFoundException(`Course with ID ${id} not found`);
-    }
-    return course;
+    return super.findById(id, { relations: ['instructor', 'videos'] });
   }
 
   async findInstructorCourse(id: string, instructorId: string): Promise<Course> {
@@ -69,24 +65,17 @@ export class CoursesService {
   }
 
   async update(id: string, updateCourseDto: UpdateCourseDto, instructorId?: string): Promise<Course> {
-    let course;
     if (instructorId) {
-      course = await this.findInstructorCourse(id, instructorId);
-    } else {
-      course = await this.findById(id);
+      await this.findInstructorCourse(id, instructorId);
     }
-
-    Object.assign(course, updateCourseDto);
-    return this.coursesRepository.save(course);
+    return super.update(id, updateCourseDto);
   }
 
   async remove(id: string, instructorId?: string): Promise<void> {
-    let course;
     if (instructorId) {
-      course = await this.findInstructorCourse(id, instructorId);
-    } else {
-      course = await this.findById(id);
+      await this.findInstructorCourse(id, instructorId);
     }
-    await this.coursesRepository.remove(course);
+    return super.remove(id);
   }
 }
+

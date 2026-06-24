@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CoursesService } from '../courses.service';
 import { CreateCourseDto } from '../dto/create-course.dto';
 import { UpdateCourseDto } from '../dto/update-course.dto';
@@ -16,31 +17,17 @@ export class InstructorCoursesController {
 
   @Post()
   async create(@CurrentUser() user: any, @Body() createCourseDto: CreateCourseDto) {
-    return this.coursesService.create(user.id, createCourseDto);
+    return this.coursesService.create(createCourseDto, { instructorId: user.id });
   }
 
   @Get()
   async findAll(
     @CurrentUser() user: any,
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
+    @Paginate() query: PaginateQuery
   ) {
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
-
-    const [courses, total] = await this.coursesService.findAll(skip, limitNum, user.id);
-
-    const result: Omit<PaginatedResponse<any>, 'success' | 'message'> = {
-      data: courses,
-      meta: {
-        total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: Math.ceil(total / limitNum),
-      },
-    };
-    return result;
+    return this.coursesService.findAll(query, {
+      where: { instructorId: user.id }
+    });
   }
 
   @Get(':id')

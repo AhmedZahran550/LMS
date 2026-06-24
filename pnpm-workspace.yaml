@@ -4,6 +4,7 @@ packages:
   - 'tooling/*'
 
 allowBuilds:
+  '@scarf/scarf': set this to true or false
   argon2: true
 
 onlyBuiltDependencies:

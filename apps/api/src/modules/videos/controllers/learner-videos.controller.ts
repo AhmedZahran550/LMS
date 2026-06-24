@@ -17,6 +17,6 @@ export class LearnerVideosController {
     @Param('videoId') videoId: string,
   ) {
     // Note: Enrollment check should happen here or via a guard to ensure learner is enrolled
-    return this.videosService.findById(courseId, videoId);
+    return this.videosService.findCourseVideoById(courseId, videoId);
   }
 }

@@ -2,36 +2,30 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
+import { PaginateConfig, FilterOperator } from 'nestjs-paginate';
+import { DBService } from '../../core/base/db.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
+export const USER_PAGINATION_CONFIG: PaginateConfig<User> = {
+  sortableColumns: ['createdAt', 'firstName', 'lastName', 'email'],
+  nullSort: 'last',
+  defaultSortBy: [['createdAt', 'DESC']],
+  searchableColumns: ['firstName', 'lastName', 'email'],
+  filterableColumns: {
+    role: [FilterOperator.EQ],
+    isActive: [FilterOperator.EQ],
+  },
+};
+
 @Injectable()
-export class UsersService {
+export class UsersService extends DBService<User, CreateUserDto, UpdateUserDto> {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) {}
-
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
-    return this.usersRepository.save(user);
-  }
-
-  async findAll(skip: number = 0, take: number = 10): Promise<[User[], number]> {
-    return this.usersRepository.findAndCount({
-      skip,
-      take,
-      order: { createdAt: 'DESC' },
-    });
-  }
-
-  async findById(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
+    private readonly usersRepository: Repository<User>,
+  ) {
+    super(usersRepository, USER_PAGINATION_CONFIG);
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -51,14 +45,10 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findById(id);
-
     if (updateUserDto.password) {
       updateUserDto.password = await argon2.hash(updateUserDto.password);
     }
-
-    Object.assign(user, updateUserDto);
-    return this.usersRepository.save(user);
+    return super.update(id, updateUserDto);
   }
 
   async updateRefreshToken(id: string, hashedRefreshToken: string | null): Promise<void> {

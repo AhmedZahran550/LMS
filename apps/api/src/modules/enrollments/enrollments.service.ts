@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PaginateConfig, FilterOperator } from 'nestjs-paginate';
+import { DBService } from '../../core/base/db.service';
 import { Enrollment } from './entities/enrollment.entity';
 import { RespondEnrollmentDto } from './dto/respond-enrollment.dto';
 import { InviteLearnerDto } from './dto/invite-learner.dto';
@@ -8,14 +10,29 @@ import { CoursesService } from '../courses/courses.service';
 import { UsersService } from '../users/users.service';
 import { EnrollmentStatus, CourseVisibility } from '@lms/shared-types';
 
+export const ENROLLMENT_PAGINATION_CONFIG: PaginateConfig<Enrollment> = {
+  sortableColumns: ['createdAt', 'status'],
+  nullSort: 'last',
+  defaultSortBy: [['createdAt', 'DESC']],
+  searchableColumns: [],
+  filterableColumns: {
+    status: [FilterOperator.EQ],
+    courseId: [FilterOperator.EQ],
+    learnerId: [FilterOperator.EQ],
+  },
+  relations: ['course', 'learner', 'course.instructor']
+};
+
 @Injectable()
-export class EnrollmentsService {
+export class EnrollmentsService extends DBService<Enrollment> {
   constructor(
     @InjectRepository(Enrollment)
-    private enrollmentsRepository: Repository<Enrollment>,
-    private coursesService: CoursesService,
-    private usersService: UsersService,
-  ) {}
+    private readonly enrollmentsRepository: Repository<Enrollment>,
+    private readonly coursesService: CoursesService,
+    private readonly usersService: UsersService,
+  ) {
+    super(enrollmentsRepository, ENROLLMENT_PAGINATION_CONFIG);
+  }
 
   async requestEnrollment(learnerId: string, courseId: string): Promise<Enrollment> {
     const course = await this.coursesService.findById(courseId);

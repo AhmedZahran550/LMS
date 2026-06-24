@@ -15,14 +15,14 @@ export default function Navbar() {
         <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center">
           <span className="text-white font-bold text-xl leading-none">L</span>
         </div>
-        <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">LMS Platform</span>
+        <span className="hidden sm:inline-block text-xl font-bold tracking-tight text-slate-900 dark:text-white">LMS Platform</span>
       </div>
       <div className="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600 dark:text-slate-300">
         <Link href="#features" className="hover:text-slate-900 dark:hover:text-white transition-colors">Features</Link>
         <Link href="#pricing" className="hover:text-slate-900 dark:hover:text-white transition-colors">Pricing</Link>
         <Link href="#testimonials" className="hover:text-slate-900 dark:hover:text-white transition-colors">Testimonials</Link>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <Link href="/login" className="text-sm font-medium text-slate-900 dark:text-white hover:opacity-80 transition-opacity">
           Log in
         </Link>
