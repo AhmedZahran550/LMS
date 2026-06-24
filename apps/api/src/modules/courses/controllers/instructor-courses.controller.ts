@@ -25,7 +25,8 @@ export class InstructorCoursesController {
     @CurrentUser() user: any,
     @Paginate() query: PaginateQuery
   ) {
-    return this.coursesService.findAll(query, {
+    return this.coursesService.findAll({
+      ...query,
       where: { instructorId: user.id }
     });
   }

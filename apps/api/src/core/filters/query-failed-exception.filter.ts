@@ -1,42 +1,103 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
-import { QueryFailedError } from 'typeorm';
-import { Response } from 'express';
 
-@Catch(QueryFailedError)
-export class QueryFailedExceptionFilter implements ExceptionFilter {
-  catch(exception: QueryFailedError & { code?: string; detail?: string }, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+import {
+  BadRequestException,
+  Catch,
+  ConflictException,
+  ExceptionFilter,
+  NotFoundException,
+} from '@nestjs/common';
+import { EntityNotFoundError, QueryFailedError, TypeORMError } from 'typeorm';
+import { DBErrorCode } from '../utils/db.errors';
+import { ErrorCodes } from '../utils/error-codes';
 
-    // PostgreSQL error codes
-    switch (exception.code) {
-      case '23505': // unique_violation
-        return response.status(HttpStatus.CONFLICT).json({
-          statusCode: HttpStatus.CONFLICT,
-          error: 'Conflict',
-          message: 'A record with this value already exists.',
-          detail: exception.detail,
-        });
-      case '23503': // foreign_key_violation
-        return response.status(HttpStatus.BAD_REQUEST).json({
-          statusCode: HttpStatus.BAD_REQUEST,
-          error: 'Bad Request',
-          message: 'Referenced record does not exist.',
-          detail: exception.detail,
-        });
-      case '23502': // not_null_violation
-        return response.status(HttpStatus.BAD_REQUEST).json({
-          statusCode: HttpStatus.BAD_REQUEST,
-          error: 'Bad Request',
-          message: 'Required field is missing.',
-          detail: exception.detail,
-        });
-      default:
-        return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Database Error',
-          message: 'A database error occurred.',
-        });
+
+@Catch(TypeORMError)
+export class DBExceptionFilter implements ExceptionFilter {
+  constructor() {}
+
+  catch(exception: unknown) {
+    if (exception instanceof QueryFailedError) {
+      const code = (exception as any).code;
+      if (!code) {
+        throw exception;
+      }
+      let message = exception.message as any;
+      const fieldlastIndex = (exception as any).detail?.indexOf(')');
+      let property;
+      if ((exception as any).detail && fieldlastIndex !== -1) {
+        property = ((exception as any).detail as string).substring(
+          5,
+          fieldlastIndex,
+        );
+      }
+      switch (code) {
+        case DBErrorCode.UNIQUE_VOILATION:
+          message = [
+            {
+              property: property ?? undefined,
+              code: ErrorCodes.UNIQUE_VOILATION,
+              constraint: (exception as any).constraint,
+            },
+          ];
+          throw new ConflictException(message);
+        case DBErrorCode.NOT_NULL_CONSTRAINT:
+          message = [
+            {
+              property: (exception as any).column ?? property ?? undefined,
+              code: ErrorCodes.NOT_NULL_CONSTRAINT,
+              constraint: (exception as any).constraint,
+            },
+          ];
+          throw new ConflictException(message);
+        case DBErrorCode.CHECK_VOILATION:
+          message = [
+            {
+              property: property ?? undefined,
+              code: ErrorCodes.UNIQUE_VOILATION,
+              constraint: (exception as any).constraint,
+            },
+          ];
+          throw new ConflictException(message);
+        case DBErrorCode.FORIGN_KEY_VIOLATION:
+          const forignKeyError = this.getForignKeyViolationError(
+            (exception as any).detail,
+          );
+          message = [forignKeyError];
+          throw new ConflictException(message);
+        case DBErrorCode.INVALID_TEXT_REPRESENTATION:
+          message = [
+            {
+              property: property ?? undefined,
+              code: ErrorCodes.INVALID_FORMAT,
+            },
+          ];
+          throw new BadRequestException(message);
+      }
+      throw exception;
+    } else if (exception instanceof EntityNotFoundError) {
+      // For EntityNotFound, we can directly throw a NotFoundException
+      throw new NotFoundException({
+        message: 'Resource not found.',
+        code: ErrorCodes.RESOURCE_NOT_FOUND,
+      });
+    } else {
+      throw exception;
     }
+  }
+
+  getForignKeyViolationError(message: string) {
+    const regex = /Key \(([^)]+)\)=\(([^)]+)\)/;
+    const matches = message.match(regex);
+    if (!matches || matches.length < 2) {
+      console.warn('no matches found while error mapping', message);
+      return null;
+    }
+    const key = matches[1];
+    const value = matches[2];
+    return {
+      property: key,
+      value,
+      code: ErrorCodes.UNIQUE_VOILATION,
+    };
   }
 }

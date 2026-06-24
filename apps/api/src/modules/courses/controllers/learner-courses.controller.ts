@@ -14,16 +14,7 @@ export class LearnerCoursesController {
 
   @Get()
   async findAll(@Paginate() query: PaginateQuery) {
-    const result = await this.coursesService.findPublic(query);
-
-    result.data = result.data.map(c => {
-      if (c.instructor) {
-        const { password, hashedRefreshToken, ...safeUser } = c.instructor;
-        c.instructor = safeUser as any;
-      }
-      return c;
-    });
-    return result;
+    return this.coursesService.findAll(query);
   }
 
   @Get(':id')

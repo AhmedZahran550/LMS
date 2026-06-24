@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
-import { QueryFailedExceptionFilter } from './core/filters/query-failed-exception.filter';
+import { DBExceptionFilter } from './core/filters/query-failed-exception.filter';
 import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
 
 async function bootstrap() {
@@ -35,7 +35,7 @@ async function bootstrap() {
   // Register filters (last registered is evaluated first)
   app.useGlobalFilters(
     new GlobalExceptionFilter(),
-    new QueryFailedExceptionFilter(),
+    new DBExceptionFilter(),
   );
 
   app.useGlobalInterceptors(new LoggingInterceptor());

@@ -1,49 +1,68 @@
-import { NotFoundException, NotImplementedException, BadRequestException, Logger } from '@nestjs/common';
-import { Repository, DeepPartial, FindOptionsWhere, FindOneOptions, ObjectLiteral } from 'typeorm';
-import { paginate, PaginateQuery, PaginateConfig } from 'nestjs-paginate';
-import { PaginatedResponse } from '@lms/shared-types';
+import {
+  NotFoundException,
+  NotImplementedException,
+  BadRequestException,
+  Logger,
+} from "@nestjs/common";
+import {
+  Repository,
+  DeepPartial,
+  FindOptionsWhere,
+  FindOneOptions,
+  ObjectLiteral,
+} from "typeorm";
+import {
+  paginate,
+  PaginateQuery,
+  PaginateConfig,
+  FilterOperator,
+  Paginated,
+} from "nestjs-paginate";
+import { PaginatedResponse } from "@lms/shared-types";
+export interface Page<T> extends Paginated<T> {}
+export interface QueryConfig<T> extends PaginateConfig<T> {}
+export interface QueryOptions<T = any> extends PaginateQuery {
+  where?: FindOptionsWhere<T>;
+  disableCache?: boolean;
+}
+export const defaultQueryConfig: QueryConfig<any> = {
+  filterableColumns: {
+    createdBy: [FilterOperator.EQ],
+    courseType: [FilterOperator.EQ],
+  },
+  sortableColumns: ["createdAt"],
+  maxLimit: 100,
+  defaultLimit: 10,
+  // defaultSortBy: [['createdAt', 'DESC']],
+};
 
 export abstract class DBService<T extends ObjectLiteral, D = T, U = D> {
   protected readonly logger = new Logger(this.constructor.name);
 
-  protected constructor(
-    protected readonly repository: Repository<T>,
-    protected readonly queryConfig?: PaginateConfig<T>
-  ) {}
-
+  constructor(
+    protected repository: Repository<T>,
+    protected queryConfig?: QueryConfig<T>,
+  ) {
+    this.queryConfig = {
+      ...defaultQueryConfig,
+      ...queryConfig,
+    } as QueryConfig<T>;
+  }
   /**
    * Fetch all records with pagination, sorting, and filtering support
    * @param query PaginateQuery object from the controller
    * @param configOverride Optional PaginateConfig override
    * @returns Promise<PaginatedResponse<T>> mapped to the standard response shape
    */
-  async findAll(query: PaginateQuery, configOverride?: Partial<PaginateConfig<T>>): Promise<Omit<PaginatedResponse<T>, 'success' | 'message'>> {
-    if (!this.queryConfig && !configOverride) {
-      throw new NotImplementedException('PaginateConfig must be configured to use findAll');
+  async findAll(options: QueryOptions<T>): Promise<Page<T>> {
+    if (this.queryConfig) {
+      const result = await paginate(options, this.repository, {
+        ...this.queryConfig,
+        where: options?.where,
+      });
+      return result;
     }
-
-    const finalConfig = { ...this.queryConfig, ...configOverride } as PaginateConfig<T>;
-
-    try {
-      const paginatedResult = await paginate<T>(query, this.repository, finalConfig);
-      
-      return {
-        data: paginatedResult.data,
-        meta: {
-          total: paginatedResult.meta.totalItems || 0,
-          page: paginatedResult.meta.currentPage || 1,
-          limit: paginatedResult.meta.itemsPerPage || 10,
-          totalPages: paginatedResult.meta.totalPages || 1,
-        }
-      };
-    } catch (error) {
-      if (error instanceof Error) {
-        this.logger.error(`Error in findAll: ${error.message}`, error.stack);
-      } else {
-        this.logger.error(`Error in findAll: ${String(error)}`);
-      }
-      throw new BadRequestException('Invalid query parameters');
-    }
+    throw new NotImplementedException("paginateConfig must be configured");
   }
 
   /**
@@ -51,11 +70,9 @@ export abstract class DBService<T extends ObjectLiteral, D = T, U = D> {
    * @param options FindOneOptions
    * @returns Promise<T>
    */
-  async findOne(options: FindOneOptions<T>): Promise<T> {
+  async findOne(options: FindOneOptions<T>) {
     const entity = await this.repository.findOne(options);
-    if (!entity) {
-      throw new NotFoundException('Entity not found');
-    }
+
     return entity;
   }
 
@@ -65,15 +82,31 @@ export abstract class DBService<T extends ObjectLiteral, D = T, U = D> {
    * @param options Optional FindOneOptions
    * @returns Promise<T>
    */
-  async findById(id: string | number, options?: Omit<FindOneOptions<T>, 'where'>): Promise<T> {
+  async findById(
+    id: string | number,
+    options?: Omit<FindOneOptions<T>, "where">,
+  ) {
     const entity = await this.repository.findOne({
       where: { id } as unknown as FindOptionsWhere<T>,
-      ...options
+      ...options,
     });
-    if (!entity) {
-      throw new NotFoundException(`Entity with ID ${id} not found`);
-    }
     return entity;
+  }
+
+  async findByIdOrFail(
+    id: string | number,
+    options?: Omit<FindOneOptions<T>, "where">,
+  ): Promise<T> {
+    const entity = await this.repository.findOneOrFail({
+      where: { id } as unknown as FindOptionsWhere<T>,
+      ...options,
+    });
+
+    return entity;
+  }
+
+  async findOneOrFail(options: FindOneOptions<T>) {
+    return await this.repository.findOneOrFail(options);
   }
 
   /**
@@ -83,20 +116,11 @@ export abstract class DBService<T extends ObjectLiteral, D = T, U = D> {
    * @returns Promise<T>
    */
   async create(createDto: D, additionalData?: DeepPartial<T>): Promise<T> {
-    try {
-      const entity = this.repository.create({
-        ...createDto as unknown as DeepPartial<T>,
-        ...additionalData,
-      });
-      return await this.repository.save(entity);
-    } catch (error) {
-      if (error instanceof Error) {
-        this.logger.error(`Error in create: ${error.message}`, error.stack);
-      } else {
-        this.logger.error(`Error in create: ${String(error)}`);
-      }
-      throw new BadRequestException('Failed to create entity');
-    }
+    const entity = this.repository.create({
+      ...(createDto as unknown as DeepPartial<T>),
+      ...additionalData,
+    });
+    return await this.repository.save(entity);
   }
 
   /**
@@ -106,20 +130,12 @@ export abstract class DBService<T extends ObjectLiteral, D = T, U = D> {
    * @returns Promise<T>
    */
   async update(id: string | number, updateDto: U): Promise<T> {
-    try {
-      const entity = await this.findById(id);
-      const updatedEntity = this.repository.merge(entity, updateDto as unknown as DeepPartial<T>);
-      return await this.repository.save(updatedEntity);
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      
-      if (error instanceof Error) {
-        this.logger.error(`Error in update: ${error.message}`, error.stack);
-      } else {
-        this.logger.error(`Error in update: ${String(error)}`);
-      }
-      throw new BadRequestException('Failed to update entity');
-    }
+    const entity = await this.findByIdOrFail(id);
+    const updatedEntity = this.repository.merge(
+      entity,
+      updateDto as unknown as DeepPartial<T>,
+    );
+    return await this.repository.save(updatedEntity);
   }
 
   /**
@@ -127,7 +143,12 @@ export abstract class DBService<T extends ObjectLiteral, D = T, U = D> {
    * @param id The entity ID
    */
   async remove(id: string | number): Promise<void> {
-    const entity = await this.findById(id);
+    const entity = await this.findByIdOrFail(id);
     await this.repository.remove(entity);
+  }
+
+  async softDelete(id: string | number): Promise<void> {
+    const entity = await this.findByIdOrFail(id);
+    await this.repository.softRemove(entity);
   }
 }
