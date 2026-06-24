@@ -1,5 +1,5 @@
 import { AppDataSource } from './datasource';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { UserRole } from '@lms/shared-types';
 
 async function seed() {

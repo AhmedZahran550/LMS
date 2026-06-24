@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
 import { CourseVisibility } from '@lms/shared-types';
 import { User } from '../../users/entities/user.entity';
 
@@ -33,6 +33,9 @@ export class Course {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'instructorId' })
   instructor!: User;
+
+  @OneToMany('Video', 'course')
+  videos!: any[];
 
   @CreateDateColumn()
   createdAt!: Date;

@@ -28,8 +28,8 @@ export class User {
   @Column({ default: true })
   isActive!: boolean;
 
-  @Column({ nullable: true })
-  hashedRefreshToken?: string;
+  @Column({ type: 'varchar', nullable: true })
+  hashedRefreshToken?: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
