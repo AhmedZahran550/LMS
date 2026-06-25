@@ -20,19 +20,18 @@ export function Sidebar() {
         return [
           { name: 'Dashboard', href: '/instructor', icon: LayoutDashboard },
           { name: 'My Courses', href: '/instructor/courses', icon: Video },
-          { name: 'Profile', href: '/instructor/profile', icon: Settings },
         ];
       case UserRole.LEARNER:
       default:
         return [
           { name: 'Browse Courses', href: '/courses', icon: Compass },
           { name: 'My Learning', href: '/my-courses', icon: BookOpen },
-          { name: 'Profile', href: '/profile', icon: Settings },
         ];
     }
   };
 
   const links = getLinks();
+  const profileHref = user.role === UserRole.INSTRUCTOR ? '/instructor/profile' : '/profile';
 
   return (
     <div className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
@@ -68,19 +67,28 @@ export function Sidebar() {
         </nav>
       </div>
 
-      <div className="border-t border-slate-200 p-4">
-        <div className="flex items-center pb-4">
+      <div className="border-t border-slate-200 p-4 space-y-1">
+        <Link 
+          href={profileHref}
+          className={`flex items-center p-2 rounded-md transition-colors group ${
+            pathname.startsWith(profileHref) 
+              ? 'bg-indigo-50' 
+              : 'hover:bg-slate-100'
+          }`}
+        >
           <Avatar
             src={user.profileImageUrl}
             firstName={user.firstName}
             lastName={user.lastName}
             size="sm"
           />
-          <div className="ml-3 overflow-hidden">
-            <p className="text-sm font-semibold text-slate-700 truncate">{user.firstName} {user.lastName}</p>
+          <div className="ml-3 overflow-hidden flex-1">
+            <p className={`text-sm font-semibold truncate transition-colors ${
+              pathname.startsWith(profileHref) ? 'text-indigo-700' : 'text-slate-700 group-hover:text-indigo-600'
+            }`}>{user.firstName} {user.lastName}</p>
             <p className="text-xs text-slate-500 truncate">{user.email}</p>
           </div>
-        </div>
+        </Link>
         <button
           onClick={() => {
             logout();
