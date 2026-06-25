@@ -6,4 +6,7 @@ export default registerAs('app', () => ({
   webUrl: process.env.WEB_URL || 'http://localhost:3000',
   adminUrl: process.env.ADMIN_URL || 'http://localhost:3001',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  allowedOrigins: process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',').map(url => url.trim())
+    : ['http://localhost:3000', 'http://localhost:3001'],
 }));
