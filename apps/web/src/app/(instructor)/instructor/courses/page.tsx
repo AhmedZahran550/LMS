@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { CourseVisibility } from '@lms/shared-types';
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 
 export default function InstructorCoursesPage() {
   const queryClient = useQueryClient();
@@ -17,6 +17,7 @@ export default function InstructorCoursesPage() {
   const [newDesc, setNewDesc] = useState('');
   const [search, setSearch] = useState('');
   const [visibilityFilter, setVisibilityFilter] = useState('ALL');
+  const [updatingCourseId, setUpdatingCourseId] = useState<string | null>(null);
 
   const { data: coursesData, isLoading } = useQuery({
     queryKey: ['instructor-courses', search, visibilityFilter],
@@ -41,6 +42,22 @@ export default function InstructorCoursesPage() {
       setIsCreating(false);
       setNewTitle('');
       setNewDesc('');
+    }
+  });
+
+  const updateVisibilityMutation = useMutation({
+    mutationFn: async ({ courseId, visibility }: { courseId: string; visibility: CourseVisibility }) => {
+      setUpdatingCourseId(courseId);
+      return await courseApis.updateCourse(courseId, { visibility });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || 'Failed to update visibility');
+    },
+    onSettled: () => {
+      setUpdatingCourseId(null);
     }
   });
 
@@ -115,13 +132,27 @@ export default function InstructorCoursesPage() {
             <Card key={course.id} className="flex flex-col">
               <CardHeader>
                 <div className="flex justify-between items-start mb-2">
-                  <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                    course.visibility === CourseVisibility.PUBLIC 
-                      ? 'bg-green-50 text-green-700 ring-green-600/20' 
-                      : 'bg-slate-50 text-slate-600 ring-slate-500/10'
-                  }`}>
-                    {course.visibility}
-                  </span>
+                  <div className="relative">
+                    <select
+                      value={course.visibility}
+                      onChange={(e) => updateVisibilityMutation.mutate({ 
+                        courseId: course.id, 
+                        visibility: e.target.value as CourseVisibility 
+                      })}
+                      disabled={updatingCourseId === course.id}
+                      className={`appearance-none rounded-full pl-2 pr-6 py-1 text-xs font-medium ring-1 ring-inset cursor-pointer transition-colors ${
+                        course.visibility === CourseVisibility.PUBLIC 
+                          ? 'bg-green-50 text-green-700 ring-green-600/20 hover:bg-green-100' 
+                          : 'bg-slate-50 text-slate-600 ring-slate-500/10 hover:bg-slate-100'
+                      }`}
+                    >
+                      <option value={CourseVisibility.PUBLIC}>Public</option>
+                      <option value={CourseVisibility.PRIVATE}>Private</option>
+                    </select>
+                    <ChevronDown className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none ${
+                      course.visibility === CourseVisibility.PUBLIC ? 'text-green-600' : 'text-slate-500'
+                    }`} />
+                  </div>
                 </div>
                 <CardTitle>{course.title}</CardTitle>
                 <CardDescription className="line-clamp-2 mt-2">{course.description}</CardDescription>

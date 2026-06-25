@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Compass, Users, Search, GraduationCap } from 'lucide-react';
-import { CourseDto } from '@lms/shared-types';
+import { CourseDto, EnrollmentStatus } from '@lms/shared-types';
+import { useSnackbar } from '@/components/ui/Snackbar';
 import Link from 'next/link';
 
 export default function CourseCatalogPage() {
@@ -32,18 +33,33 @@ export default function CourseCatalogPage() {
     enabled: activeTab === 'instructors'
   });
 
+  const { showSnackbar } = useSnackbar();
+
+  const { data: myEnrollments } = useQuery({
+    queryKey: ['my-enrollments'],
+    queryFn: async () => {
+      return await courseApis.getMyCourses();
+    },
+  });
+
   const enrollMutation = useMutation({
     mutationFn: async (courseId: string) => {
       return await courseApis.enrollInCourse(courseId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-enrollments'] });
-      alert('Enrollment requested successfully! Waiting for instructor approval.');
+      showSnackbar('Enrollment requested successfully! Waiting for instructor approval.', 'success');
     },
     onError: (err: any) => {
-      alert(err.response?.data?.message || 'Failed to request enrollment');
+      showSnackbar(err.response?.data?.message || 'Failed to request enrollment', 'error');
     }
   });
+
+  const pendingCourseIds = new Set(
+    (myEnrollments || [])
+      .filter((e: any) => e.status === EnrollmentStatus.PENDING)
+      .map((e: any) => e.courseId)
+  );
 
   const courses: CourseDto[] = coursesData?.data || [];
   const instructors: any[] = instructorsData?.data || [];
@@ -118,13 +134,23 @@ export default function CourseCatalogPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button 
-                    className="w-full" 
-                    onClick={() => enrollMutation.mutate(course.id)}
-                    isLoading={enrollMutation.isPending}
-                  >
-                    Request to Join
-                  </Button>
+                  {pendingCourseIds.has(course.id) ? (
+                    <Button 
+                      className="w-full" 
+                      variant="outline"
+                      disabled
+                    >
+                      Waiting for instructor accept
+                    </Button>
+                  ) : (
+                    <Button 
+                      className="w-full" 
+                      onClick={() => enrollMutation.mutate(course.id)}
+                      isLoading={enrollMutation.isPending}
+                    >
+                      Request to Join
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             ))
