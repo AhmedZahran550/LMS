@@ -9,15 +9,12 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function InstructorDashboard() {
   const { user } = useAuthStore();
-  const { data: coursesData } = useQuery({
-    queryKey: ['instructor-courses'],
+  const { data: stats } = useQuery({
+    queryKey: ['instructor-dashboard-stats'],
     queryFn: async () => {
-      return await courseApis.getCourses();
+      return await courseApis.getDashboardStats();
     },
   });
-
-
-  const courses = coursesData?.data || [];
 
   return (
     <div className="space-y-6">
@@ -35,18 +32,17 @@ export default function InstructorDashboard() {
             <BookOpen className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{courses.length}</div>
+            <div className="text-2xl font-bold text-slate-900">{stats?.totalCourses || 0}</div>
           </CardContent>
         </Card>
         
-        {/* Placeholder stats */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-slate-600">Total Videos</CardTitle>
             <Video className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">-</div>
+            <div className="text-2xl font-bold text-slate-900">{stats?.totalVideos || 0}</div>
           </CardContent>
         </Card>
 
@@ -56,7 +52,7 @@ export default function InstructorDashboard() {
             <Users className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">-</div>
+            <div className="text-2xl font-bold text-slate-900">{stats?.totalStudents || 0}</div>
           </CardContent>
         </Card>
       </div>

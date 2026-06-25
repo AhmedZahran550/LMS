@@ -77,4 +77,30 @@ export class CoursesService extends DBService<
     }
     return super.remove(id);
   }
+
+  async getDashboardStats(instructorId: string) {
+    const [totalCourses, videosResult, studentsResult] = await Promise.all([
+      this.coursesRepository.count({
+        where: { instructorId },
+      }),
+      this.coursesRepository.manager.createQueryBuilder()
+        .select("COUNT(video.id)", "total")
+        .from("video", "video")
+        .innerJoin("course", "course", "video.courseId = course.id")
+        .where("course.instructorId = :instructorId", { instructorId })
+        .getRawOne(),
+      this.coursesRepository.manager.createQueryBuilder()
+        .select("COUNT(DISTINCT enrollment.learnerId)", "total")
+        .from("enrollment", "enrollment")
+        .innerJoin("course", "course", "enrollment.courseId = course.id")
+        .where("course.instructorId = :instructorId", { instructorId })
+        .getRawOne()
+    ]);
+
+    return {
+      totalCourses,
+      totalVideos: parseInt(videosResult?.total || "0", 10),
+      totalStudents: parseInt(studentsResult?.total || "0", 10),
+    };
+  }
 }

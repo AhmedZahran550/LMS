@@ -5,6 +5,10 @@ export const courseApis = {
     const response = await roleApi.get("/courses", { params });
     return response.data;
   },
+  getDashboardStats: async () => {
+    const response = await roleApi.get("/courses/stats/dashboard");
+    return response.data;
+  },
   getCourse: async (courseId: string) => {
     const response = await roleApi.get(`/courses/${courseId}`);
     return response.data;

@@ -31,6 +31,11 @@ export class InstructorCoursesController {
     });
   }
 
+  @Get('stats/dashboard')
+  async getDashboardStats(@CurrentUser() user: any) {
+    return this.coursesService.getDashboardStats(user.id);
+  }
+
   @Get(':id')
   async findOne(@CurrentUser() user: any, @Param('id') id: string) {
     return this.coursesService.findInstructorCourse(id, user.id);
