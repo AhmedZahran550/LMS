@@ -8,7 +8,8 @@ import { RespondEnrollmentDto } from './dto/respond-enrollment.dto';
 import { InviteLearnerDto } from './dto/invite-learner.dto';
 import { CoursesService } from '../courses/courses.service';
 import { UsersService } from '../users/users.service';
-import { EnrollmentStatus, CourseVisibility } from '@lms/shared-types';
+import { NotificationsService } from '../notifications/notifications.service';
+import { EnrollmentStatus, CourseVisibility, NotificationType } from '@lms/shared-types';
 
 export const ENROLLMENT_PAGINATION_CONFIG: PaginateConfig<Enrollment> = {
   sortableColumns: ['createdAt', 'status'],
@@ -30,13 +31,14 @@ export class EnrollmentsService extends DBService<Enrollment> {
     private readonly enrollmentsRepository: Repository<Enrollment>,
     private readonly coursesService: CoursesService,
     private readonly usersService: UsersService,
+    private readonly notificationsService: NotificationsService,
   ) {
     super(enrollmentsRepository, ENROLLMENT_PAGINATION_CONFIG);
   }
 
   async requestEnrollment(learnerId: string, courseId: string): Promise<Enrollment> {
     const course = await this.coursesService.findById(courseId);
-    
+
     if (course.visibility === CourseVisibility.PRIVATE) {
       throw new ForbiddenException('Cannot request enrollment to a private course');
     }
@@ -52,7 +54,20 @@ export class EnrollmentsService extends DBService<Enrollment> {
       status: EnrollmentStatus.PENDING,
     });
 
-    return this.enrollmentsRepository.save(enrollment);
+    const saved = await this.enrollmentsRepository.save(enrollment);
+
+    const learner = await this.usersService.findByIdOrFail(learnerId);
+    await this.notificationsService.create(
+      course.instructorId,
+      NotificationType.ENROLLMENT_REQUEST,
+      'New Enrollment Request',
+      learner.firstName + ' ' + learner.lastName + ' wants to join your course "' + course.title + '"',
+      { enrollmentId: saved.id, courseId, learnerId },
+      'course',
+      courseId,
+    );
+
+    return saved;
   }
 
   async respondToEnrollment(id: string, instructorId: string, respondDto: RespondEnrollmentDto): Promise<Enrollment> {
@@ -72,12 +87,25 @@ export class EnrollmentsService extends DBService<Enrollment> {
     enrollment.status = respondDto.status;
     enrollment.respondedAt = new Date();
 
-    return this.enrollmentsRepository.save(enrollment);
+    const saved = await this.enrollmentsRepository.save(enrollment);
+
+    const isApproved = respondDto.status === EnrollmentStatus.APPROVED;
+    await this.notificationsService.create(
+      enrollment.learnerId,
+      NotificationType.ENROLLMENT_RESPONSE,
+      isApproved ? 'Enrollment Approved' : 'Enrollment Rejected',
+      'Your request to join "' + enrollment.course.title + '" has been ' + (isApproved ? 'approved' : 'rejected') + '.',
+      { enrollmentId: id, courseId: enrollment.courseId, status: respondDto.status },
+      'course',
+      enrollment.courseId,
+    );
+
+    return saved;
   }
 
   async inviteLearner(courseId: string, instructorId: string, inviteDto: InviteLearnerDto): Promise<Enrollment> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
-    
+
     const user = await this.usersService.findByEmail(inviteDto.email);
     if (!user) {
       throw new NotFoundException('User with this email not found');
@@ -91,7 +119,7 @@ export class EnrollmentsService extends DBService<Enrollment> {
     const enrollment = this.enrollmentsRepository.create({
       learnerId: user.id,
       courseId,
-      status: EnrollmentStatus.APPROVED, // Direct invite automatically approves
+      status: EnrollmentStatus.APPROVED,
       respondedAt: new Date(),
     });
 
@@ -108,7 +136,7 @@ export class EnrollmentsService extends DBService<Enrollment> {
 
   async getCourseEnrollments(courseId: string, instructorId: string): Promise<Enrollment[]> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
-    
+
     return this.enrollmentsRepository.find({
       where: { courseId },
       relations: ['learner'],

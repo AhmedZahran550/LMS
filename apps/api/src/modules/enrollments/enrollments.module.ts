@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { EnrollmentsService } from './enrollments.service';
 import { AdminEnrollmentsController } from './controllers/admin-enrollments.controller';
@@ -8,13 +8,14 @@ import { Enrollment } from '../../db/entities/enrollment.entity';
 import { CoursesModule } from '../courses/courses.module';
 import { UsersModule } from '../users/users.module';
 import { ContentModule } from '../videos/videos.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
-    
     CoursesModule,
     UsersModule,
     ContentModule,
+    NotificationsModule,
   ],
   controllers: [
     AdminEnrollmentsController,

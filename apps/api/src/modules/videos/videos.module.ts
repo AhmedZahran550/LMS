@@ -6,12 +6,13 @@ import { LearnerContentController } from './controllers/learner-videos.controlle
 import { CourseContent } from '../../db/entities/course-content.entity';
 import { CoursesModule } from '../courses/courses.module';
 import { StorageModule } from '../storage/storage.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
-    
     CoursesModule,
     StorageModule,
+    NotificationsModule,
   ],
   controllers: [InstructorContentController, LearnerContentController],
   providers: [CourseContentService],

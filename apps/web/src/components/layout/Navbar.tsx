@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { notificationApis } from '@/lib/notificationApis';
 import { Avatar } from '@/components/ui/Avatar';
@@ -9,6 +10,7 @@ import { Bell, LogOut, User, Check } from 'lucide-react';
 import Link from 'next/link';
 
 export function Navbar() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { user, logout } = useAuthStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -17,7 +19,6 @@ export function Navbar() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const bellRef = useRef<HTMLDivElement>(null);
 
-  // Close menus when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -35,7 +36,7 @@ export function Navbar() {
     queryKey: ['notifications'],
     queryFn: () => notificationApis.getNotifications(),
     enabled: !!user,
-    refetchInterval: 30000, // Poll notifications every 30 seconds
+    refetchInterval: 30000,
   });
 
   const notifications = notificationsData || [];
@@ -55,6 +56,28 @@ export function Navbar() {
     },
   });
 
+  const handleNotificationClick = (notification: any) => {
+    if (!notification.isRead) {
+      markAsReadMutation.mutate(notification.id);
+    }
+
+    setShowNotifications(false);
+
+    if (notification.relatedEntityType === 'course' && notification.relatedEntityId) {
+      if (user?.role === 'instructor') {
+        router.push('/instructor/courses/' + notification.relatedEntityId);
+      } else {
+        router.push('/my-courses/' + notification.relatedEntityId);
+      }
+      return;
+    }
+
+    if (notification.relatedEntityType === 'content' && notification.metadata?.courseId) {
+      router.push('/my-courses/' + notification.metadata.courseId);
+      return;
+    }
+  };
+
   if (!user) return null;
 
   const profileUrl = user.role.toLowerCase() === 'instructor' ? '/instructor/profile' : '/profile';
@@ -62,11 +85,9 @@ export function Navbar() {
   return (
     <header className="flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-8 shadow-sm">
       <div className="flex items-center">
-        {/* Left spacing or breadcrumb */}
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Notifications Bell Dropdown */}
         <div className="relative" ref={bellRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
@@ -103,15 +124,15 @@ export function Navbar() {
                   notifications.map((notification: any) => (
                     <div
                       key={notification.id}
-                      onClick={() => !notification.isRead && markAsReadMutation.mutate(notification.id)}
-                      className={`flex flex-col gap-1 rounded-lg px-4 py-2.5 text-left transition-colors cursor-pointer ${
+                      onClick={() => handleNotificationClick(notification)}
+                      className={"flex flex-col gap-1 rounded-lg px-4 py-2.5 text-left transition-colors cursor-pointer " + (
                         notification.isRead
                           ? 'text-slate-600 hover:bg-slate-50'
                           : 'bg-indigo-50/40 text-slate-800 hover:bg-indigo-50/70'
-                      }`}
+                      )}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-800">{notification.title}</span>
+                        <span className="text-xs font-bold text-slate-800">{notification.subject}</span>
                         {!notification.isRead && (
                           <span className="h-1.5 w-1.5 rounded-full bg-indigo-600" />
                         )}
@@ -128,7 +149,6 @@ export function Navbar() {
           )}
         </div>
 
-        {/* User Profile Dropdown */}
         <div className="relative" ref={userMenuRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}

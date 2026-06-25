@@ -13,8 +13,9 @@ import { CreateVideoDto } from "./dto/create-video.dto";
 import { UpdateVideoDto } from "./dto/update-video.dto";
 import { CoursesService } from "../courses/courses.service";
 import { StorageService } from "../storage/storage.service";
+import { NotificationsService } from "../notifications/notifications.service";
 import { ReorderVideosDto } from "./dto/reorder-videos.dto";
-import { ContentType, EnrollmentStatus } from "@lms/shared-types";
+import { ContentType, EnrollmentStatus, NotificationType } from "@lms/shared-types";
 import { ForbiddenException } from "@nestjs/common";
 
 export const CONTENT_PAGINATION_CONFIG: PaginateConfig<CourseContent> = {
@@ -39,7 +40,6 @@ function inferContentType(mimeType: string): ContentType {
   ) {
     return ContentType.PRESENTATION;
   }
-  // Default to video for unknown types
   return ContentType.VIDEO;
 }
 
@@ -56,6 +56,7 @@ export class CourseContentService extends DBService<
     private readonly enrollmentRepository: Repository<Enrollment>,
     private readonly coursesService: CoursesService,
     private readonly storageService: StorageService,
+    private readonly notificationsService: NotificationsService,
   ) {
     super(contentRepository, CONTENT_PAGINATION_CONFIG);
   }
@@ -66,24 +67,21 @@ export class CourseContentService extends DBService<
     createDto: CreateVideoDto,
     file: Express.Multer.File,
   ): Promise<CourseContent> {
-    // Verify course ownership
-    await this.coursesService.findInstructorCourse(courseId, instructorId);
+    const course = await this.coursesService.findInstructorCourse(courseId, instructorId);
 
     if (!file) {
       throw new BadRequestException("File is required");
     }
 
-    // Determine next orderIndex
     const lastContent = await this.contentRepository.findOne({
       where: { courseId },
       order: { orderIndex: "DESC" },
     });
     const orderIndex = lastContent ? lastContent.orderIndex + 1 : 0;
 
-    // Upload file
     const uploadResult = await this.storageService.upload(
       file,
-      `courses/${courseId}`,
+      "courses/" + courseId,
     );
 
     const contentType = inferContentType(uploadResult.mimeType);
@@ -99,7 +97,26 @@ export class CourseContentService extends DBService<
       contentType,
     });
 
-    return this.contentRepository.save(content);
+    const saved = await this.contentRepository.save(content);
+
+    const approvedEnrollments = await this.enrollmentRepository.find({
+      where: { courseId, status: EnrollmentStatus.APPROVED },
+    });
+
+    if (approvedEnrollments.length > 0) {
+      const learnerIds = approvedEnrollments.map((e) => e.learnerId);
+      await this.notificationsService.createMany(
+        learnerIds,
+        NotificationType.NEW_CONTENT,
+        "New Content Added",
+        'New content "' + createDto.title + '" has been added to "' + course.title + '".',
+        { courseId, contentId: saved.id, title: createDto.title },
+        "content",
+        saved.id,
+      );
+    }
+
+    return saved;
   }
 
   async findCourseContents(courseId: string): Promise<CourseContent[]> {
@@ -176,7 +193,6 @@ export class CourseContentService extends DBService<
 
     const content = await this.findCourseContentById(courseId, contentId);
 
-    // Delete physical file
     await this.storageService.delete(content.filename);
 
     await this.contentRepository.remove(content);
@@ -191,7 +207,6 @@ export class CourseContentService extends DBService<
 
     const contents = await this.findCourseContents(courseId);
 
-    // Verify all IDs match
     if (contents.length !== reorderDto.videoIds.length) {
       throw new BadRequestException("Must provide all content IDs to reorder");
     }
@@ -201,7 +216,7 @@ export class CourseContentService extends DBService<
     const updatedContents = reorderDto.videoIds.map((id, index) => {
       const content = contentMap.get(id);
       if (!content)
-        throw new BadRequestException(`Content ID ${id} is invalid`);
+        throw new BadRequestException("Content ID " + id + " is invalid");
       content.orderIndex = index;
       return content;
     });

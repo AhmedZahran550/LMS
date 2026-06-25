@@ -11,25 +11,45 @@ export class NotificationsService {
     private notificationsRepository: Repository<Notification>,
   ) {}
 
-  async create(userId: string, type: NotificationType, subject: string, message: string, metadata?: Record<string, any>): Promise<Notification> {
+  async create(
+    userId: string,
+    type: NotificationType,
+    subject: string,
+    message: string,
+    metadata?: Record<string, any>,
+    relatedEntityType?: string,
+    relatedEntityId?: string,
+  ): Promise<Notification> {
     const notification = this.notificationsRepository.create({
       userId,
       type,
       subject,
       message,
       metadata,
+      relatedEntityType,
+      relatedEntityId,
     });
     return this.notificationsRepository.save(notification);
   }
 
-  async createMany(userIds: string[], type: NotificationType, subject: string, message: string, metadata?: Record<string, any>): Promise<Notification[]> {
-    const notifications = userIds.map(userId => 
+  async createMany(
+    userIds: string[],
+    type: NotificationType,
+    subject: string,
+    message: string,
+    metadata?: Record<string, any>,
+    relatedEntityType?: string,
+    relatedEntityId?: string,
+  ): Promise<Notification[]> {
+    const notifications = userIds.map(userId =>
       this.notificationsRepository.create({
         userId,
         type,
         subject,
         message,
         metadata,
+        relatedEntityType,
+        relatedEntityId,
       })
     );
     return this.notificationsRepository.save(notifications);
@@ -47,7 +67,7 @@ export class NotificationsService {
     if (!notification) {
       throw new NotFoundException('Notification not found');
     }
-    
+
     notification.isRead = true;
     return this.notificationsRepository.save(notification);
   }
