@@ -30,5 +30,4 @@ COPY --from=builder /app/apps/api/node_module[s] ./apps/api/node_modules/
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 
-EXPOSE 5000
 CMD ["node", "apps/api/dist/main.js"]
