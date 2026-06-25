@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { ContentType } from '@lms/shared-types';
 import { Course } from '../../courses/entities/course.entity';
 
-@Entity()
+@Entity('video') // Keep existing table name; migration will add column
 @Index(['courseId', 'orderIndex'])
-export class Video {
+export class CourseContent {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -27,6 +28,13 @@ export class Video {
 
   @Column('int')
   orderIndex!: number;
+
+  @Column({
+    type: 'enum',
+    enum: ContentType,
+    default: ContentType.VIDEO,
+  })
+  contentType!: ContentType;
 
   @Column()
   courseId!: string;

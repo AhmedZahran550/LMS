@@ -25,12 +25,16 @@ export const courseApis = {
     const response = await roleApi.post("/courses", data);
     return response.data;
   },
-  uploadVideo: async (courseId: string, formData: FormData, config?: any) => {
+  uploadContent: async (courseId: string, formData: FormData, config?: any) => {
     const response = await roleApi.post(
-      `/courses/${courseId}/videos`,
+      `/courses/${courseId}/content`,
       formData,
       config,
     );
+    return response.data;
+  },
+  deleteContent: async (courseId: string, contentId: string) => {
+    const response = await roleApi.delete(`/courses/${courseId}/content/${contentId}`);
     return response.data;
   },
   inviteInstructor: async (courseId: string, email: string) => {

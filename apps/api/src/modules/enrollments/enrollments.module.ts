@@ -7,14 +7,14 @@ import { LearnerEnrollmentsController } from './controllers/learner-enrollments.
 import { Enrollment } from './entities/enrollment.entity';
 import { CoursesModule } from '../courses/courses.module';
 import { UsersModule } from '../users/users.module';
-import { VideosModule } from '../videos/videos.module';
+import { ContentModule } from '../videos/videos.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Enrollment]),
     CoursesModule,
     UsersModule,
-    VideosModule,
+    ContentModule,
   ],
   controllers: [
     AdminEnrollmentsController,

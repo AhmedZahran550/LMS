@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VideosService } from './videos.service';
-import { InstructorVideosController } from './controllers/instructor-videos.controller';
-import { LearnerVideosController } from './controllers/learner-videos.controller';
-import { Video } from './entities/video.entity';
+import { CourseContentService } from './videos.service';
+import { InstructorContentController } from './controllers/instructor-videos.controller';
+import { LearnerContentController } from './controllers/learner-videos.controller';
+import { CourseContent } from './entities/video.entity';
 import { CoursesModule } from '../courses/courses.module';
 import { StorageModule } from '../storage/storage.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Video]),
+    TypeOrmModule.forFeature([CourseContent]),
     CoursesModule,
     StorageModule,
   ],
-  controllers: [InstructorVideosController, LearnerVideosController],
-  providers: [VideosService],
-  exports: [VideosService],
+  controllers: [InstructorContentController, LearnerContentController],
+  providers: [CourseContentService],
+  exports: [CourseContentService],
 })
-export class VideosModule {}
+export class ContentModule {}

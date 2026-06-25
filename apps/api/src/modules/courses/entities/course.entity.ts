@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
 import { CourseVisibility } from '@lms/shared-types';
 import { User } from '../../users/entities/user.entity';
+import { CourseContent } from '../../videos/entities/video.entity';
 
 @Entity()
 @Index(['instructorId'])
@@ -34,8 +35,8 @@ export class Course {
   @JoinColumn({ name: 'instructorId' })
   instructor!: User;
 
-  @OneToMany('Video', 'course')
-  videos!: any[];
+  @OneToMany(() => CourseContent, (content) => content.course)
+  contents!: CourseContent[];
 
   @CreateDateColumn()
   createdAt!: Date;

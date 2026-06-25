@@ -3,120 +3,139 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaginateConfig, FilterOperator } from 'nestjs-paginate';
 import { DBService } from '../../core/base/db.service';
-import { Video } from './entities/video.entity';
+import { CourseContent } from './entities/video.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { CoursesService } from '../courses/courses.service';
 import { StorageService } from '../storage/storage.service';
 import { ReorderVideosDto } from './dto/reorder-videos.dto';
+import { ContentType } from '@lms/shared-types';
 
-export const VIDEO_PAGINATION_CONFIG: PaginateConfig<Video> = {
+export const CONTENT_PAGINATION_CONFIG: PaginateConfig<CourseContent> = {
   sortableColumns: ['createdAt', 'orderIndex', 'title'],
   nullSort: 'last',
   defaultSortBy: [['orderIndex', 'ASC']],
   searchableColumns: ['title', 'description'],
   filterableColumns: {
     courseId: [FilterOperator.EQ],
+    contentType: [FilterOperator.EQ],
   },
 };
 
+function inferContentType(mimeType: string): ContentType {
+  if (mimeType.startsWith('video/')) return ContentType.VIDEO;
+  if (mimeType === 'application/pdf') return ContentType.PDF;
+  if (mimeType.startsWith('image/')) return ContentType.IMAGE;
+  if (
+    mimeType === 'application/vnd.ms-powerpoint' ||
+    mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  ) {
+    return ContentType.PRESENTATION;
+  }
+  // Default to video for unknown types
+  return ContentType.VIDEO;
+}
+
 @Injectable()
-export class VideosService extends DBService<Video, CreateVideoDto, UpdateVideoDto> {
+export class CourseContentService extends DBService<CourseContent, CreateVideoDto, UpdateVideoDto> {
   constructor(
-    @InjectRepository(Video)
-    private readonly videosRepository: Repository<Video>,
+    @InjectRepository(CourseContent)
+    private readonly contentRepository: Repository<CourseContent>,
     private readonly coursesService: CoursesService,
     private readonly storageService: StorageService,
   ) {
-    super(videosRepository, VIDEO_PAGINATION_CONFIG);
+    super(contentRepository, CONTENT_PAGINATION_CONFIG);
   }
 
-  async upload(courseId: string, instructorId: string, createVideoDto: CreateVideoDto, file: Express.Multer.File): Promise<Video> {
+  async upload(courseId: string, instructorId: string, createDto: CreateVideoDto, file: Express.Multer.File): Promise<CourseContent> {
     // Verify course ownership
     await this.coursesService.findInstructorCourse(courseId, instructorId);
 
     if (!file) {
-      throw new BadRequestException('Video file is required');
+      throw new BadRequestException('File is required');
     }
 
     // Determine next orderIndex
-    const lastVideo = await this.videosRepository.findOne({
+    const lastContent = await this.contentRepository.findOne({
       where: { courseId },
       order: { orderIndex: 'DESC' },
     });
-    const orderIndex = lastVideo ? lastVideo.orderIndex + 1 : 0;
+    const orderIndex = lastContent ? lastContent.orderIndex + 1 : 0;
 
     // Upload file
     const uploadResult = await this.storageService.upload(file, `courses/${courseId}`);
 
-    const video = this.videosRepository.create({
-      ...createVideoDto,
+    const contentType = inferContentType(uploadResult.mimeType);
+
+    const content = this.contentRepository.create({
+      ...createDto,
       courseId,
       url: uploadResult.url,
       filename: uploadResult.filename,
       mimeType: uploadResult.mimeType,
       size: uploadResult.size,
       orderIndex,
+      contentType,
     });
 
-    return this.videosRepository.save(video);
+    return this.contentRepository.save(content);
   }
 
-  async findCourseVideos(courseId: string): Promise<Video[]> {
-    return this.videosRepository.find({
+  async findCourseContents(courseId: string): Promise<CourseContent[]> {
+    return this.contentRepository.find({
       where: { courseId },
       order: { orderIndex: 'ASC' },
     });
   }
 
-  async findCourseVideoById(courseId: string, videoId: string): Promise<Video> {
-    const video = await this.videosRepository.findOne({ where: { id: videoId, courseId } });
-    if (!video) {
-      throw new NotFoundException(`Video with ID ${videoId} not found in this course`);
+  async findCourseContentById(courseId: string, contentId: string): Promise<CourseContent> {
+    const content = await this.contentRepository.findOne({ where: { id: contentId, courseId } });
+    if (!content) {
+      throw new NotFoundException(`Content with ID ${contentId} not found in this course`);
     }
-    return video;
+    return content;
   }
 
-  async updateCourseVideo(courseId: string, videoId: string, instructorId: string, updateVideoDto: UpdateVideoDto): Promise<Video> {
+  async updateCourseContent(courseId: string, contentId: string, instructorId: string, updateDto: UpdateVideoDto): Promise<CourseContent> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
     
-    const video = await this.findCourseVideoById(courseId, videoId);
-    Object.assign(video, updateVideoDto);
+    const content = await this.findCourseContentById(courseId, contentId);
+    Object.assign(content, updateDto);
     
-    return this.videosRepository.save(video);
+    return this.contentRepository.save(content);
   }
 
-  async removeCourseVideo(courseId: string, videoId: string, instructorId: string): Promise<void> {
+  async removeCourseContent(courseId: string, contentId: string, instructorId: string): Promise<void> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
     
-    const video = await this.findCourseVideoById(courseId, videoId);
+    const content = await this.findCourseContentById(courseId, contentId);
     
     // Delete physical file
-    await this.storageService.delete(video.filename);
+    await this.storageService.delete(content.filename);
     
-    await this.videosRepository.remove(video);
+    await this.contentRepository.remove(content);
   }
 
-  async reorder(courseId: string, instructorId: string, reorderDto: ReorderVideosDto): Promise<Video[]> {
+  async reorder(courseId: string, instructorId: string, reorderDto: ReorderVideosDto): Promise<CourseContent[]> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
     
-    const videos = await this.findCourseVideos(courseId);
+    const contents = await this.findCourseContents(courseId);
     
     // Verify all IDs match
-    if (videos.length !== reorderDto.videoIds.length) {
-      throw new BadRequestException('Must provide all video IDs to reorder');
+    if (contents.length !== reorderDto.videoIds.length) {
+      throw new BadRequestException('Must provide all content IDs to reorder');
     }
 
-    const videoMap = new Map(videos.map(v => [v.id, v]));
+    const contentMap = new Map(contents.map(c => [c.id, c]));
     
-    const updatedVideos = reorderDto.videoIds.map((id, index) => {
-      const video = videoMap.get(id);
-      if (!video) throw new BadRequestException(`Video ID ${id} is invalid`);
-      video.orderIndex = index;
-      return video;
+    const updatedContents = reorderDto.videoIds.map((id, index) => {
+      const content = contentMap.get(id);
+      if (!content) throw new BadRequestException(`Content ID ${id} is invalid`);
+      content.orderIndex = index;
+      return content;
     });
 
-    await this.videosRepository.save(updatedVideos);
-    return updatedVideos;
+    await this.contentRepository.save(updatedContents);
+    return updatedContents;
   }
 }

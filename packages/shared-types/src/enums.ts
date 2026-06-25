@@ -20,3 +20,10 @@ export enum NotificationType {
   ENROLLMENT_REQUEST = 'enrollment_request',
   ENROLLMENT_RESPONSE = 'enrollment_response',
 }
+
+export enum ContentType {
+  VIDEO = 'video',
+  PDF = 'pdf',
+  IMAGE = 'image',
+  PRESENTATION = 'presentation',
+}

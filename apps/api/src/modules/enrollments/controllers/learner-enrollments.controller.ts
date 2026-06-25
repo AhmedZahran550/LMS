@@ -6,7 +6,7 @@ import { Roles } from '../../../core/decorators/roles.decorator';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole } from '@lms/shared-types';
 import { CoursesService } from '../../courses/courses.service';
-import { VideosService } from '../../videos/videos.service';
+import { CourseContentService } from '../../videos/videos.service';
 
 @Controller('learner')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -15,7 +15,7 @@ export class LearnerEnrollmentsController {
   constructor(
     private readonly enrollmentsService: EnrollmentsService,
     private readonly coursesService: CoursesService,
-    private readonly videosService: VideosService,
+    private readonly contentService: CourseContentService,
   ) {}
 
   @Post('courses/:courseId/enroll')
@@ -49,13 +49,13 @@ export class LearnerEnrollmentsController {
     }
 
     const course = await this.coursesService.findById(courseId);
-    const videos = await this.videosService.findCourseVideos(courseId);
+    const contents = await this.contentService.findCourseContents(courseId);
     
     if (course.instructor) {
         const { password, hashedRefreshToken, ...safeUser } = course.instructor;
         course.instructor = safeUser as any;
     }
 
-    return { ...course, videos };
+    return { ...course, contents };
   }
 }

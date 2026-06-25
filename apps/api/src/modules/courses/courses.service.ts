@@ -46,7 +46,7 @@ export class CoursesService extends DBService<
   }
 
   async findById(id: string): Promise<Course> {
-    return super.findByIdOrFail(id, { relations: ["instructor", "videos"] });
+    return super.findByIdOrFail(id, { relations: ["instructor", "contents"] });
   }
 
   async findInstructorCourse(
