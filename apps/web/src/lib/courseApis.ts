@@ -25,6 +25,10 @@ export const courseApis = {
     const response = await roleApi.post("/courses", data);
     return response.data;
   },
+  getCourseContents: async (courseId: string, params?: any) => {
+    const response = await roleApi.get(`/courses/${courseId}/content`, { params });
+    return response.data;
+  },
   uploadContent: async (courseId: string, formData: FormData, config?: any) => {
     const response = await roleApi.post(
       `/courses/${courseId}/content`,
@@ -53,6 +57,10 @@ export const courseApis = {
   },
   getMyCourse: async (courseId: string) => {
     const response = await roleApi.get(`/my-courses/${courseId}`);
+    return response.data;
+  },
+  getLearnerCourseContents: async (courseId: string, params?: any) => {
+    const response = await roleApi.get(`/my-courses/${courseId}/content`, { params });
     return response.data;
   },
 };

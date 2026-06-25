@@ -75,7 +75,7 @@ export default function InstructorCourseDetailPage() {
       </div>
 
       <div className="mt-6">
-        {activeTab === 'content' && <CourseContentTab courseId={courseId} contents={course?.contents || []} />}
+        {activeTab === 'content' && <CourseContentTab courseId={courseId} />}
         {activeTab === 'students' && <CourseStudentsTab courseId={courseId} enrollments={enrollments || []} />}
         {activeTab === 'settings' && <CourseSettingsTab courseId={courseId} courseData={course} />}
       </div>

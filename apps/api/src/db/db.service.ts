@@ -10,6 +10,7 @@ import {
   FindOptionsWhere,
   FindOneOptions,
   ObjectLiteral,
+  SelectQueryBuilder,
 } from "typeorm";
 import {
   paginate,
@@ -34,7 +35,6 @@ export const defaultQueryConfig: QueryConfig<any> = {
   sortableColumns: ["createdAt"],
   maxLimit: 100,
   defaultLimit: 10,
-  // defaultSortBy: [['createdAt', 'DESC']],
 };
 
 export abstract class DBService<T extends BaseEntity, D = T, U = D> {
@@ -55,9 +55,12 @@ export abstract class DBService<T extends BaseEntity, D = T, U = D> {
    * @param configOverride Optional PaginateConfig override
    * @returns Promise<PaginatedResponse<T>> mapped to the standard response shape
    */
-  async findAll(options: QueryOptions<T>): Promise<Page<T>> {
+  async findAll(
+    options: QueryOptions<T>,
+    qb?: SelectQueryBuilder<T>,
+  ): Promise<Page<T>> {
     if (this.queryConfig) {
-      const result = await paginate(options, this.repository, {
+      const result = await paginate(options, qb ?? this.repository, {
         ...this.queryConfig,
         where: options?.where,
       });

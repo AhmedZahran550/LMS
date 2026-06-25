@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CourseContentService } from '../videos.service';
 import { CreateVideoDto } from '../dto/create-video.dto';
@@ -9,12 +9,22 @@ import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole } from '@lms/shared-types';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @Controller('instructor/courses/:courseId/content')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.INSTRUCTOR)
 export class InstructorContentController {
   constructor(private readonly contentService: CourseContentService) {}
+
+  @Get()
+  async findAll(
+    @CurrentUser() user: any,
+    @Param('courseId') courseId: string,
+    @Paginate() query: PaginateQuery,
+  ) {
+    return this.contentService.findPaginatedCourseContents(courseId, user.id, query);
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
