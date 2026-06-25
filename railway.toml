@@ -1,0 +1,6 @@
+[build]
+watch = [
+  "/apps/api/**",
+  "/packages/shared-types/**",
+  "/Dockerfile"
+]
