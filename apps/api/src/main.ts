@@ -1,4 +1,5 @@
 import { NestFactory } from "@nestjs/core";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -15,6 +16,16 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix("api");
+
+  // Setup Swagger API Documentation
+  const config = new DocumentBuilder()
+    .setTitle("LMS API")
+    .setDescription("The LMS API description")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api/docs", app, document);
 
   app.enableCors({
     origin: "*", // Adjust in production
