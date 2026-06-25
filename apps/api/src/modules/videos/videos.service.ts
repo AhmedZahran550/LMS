@@ -127,7 +127,7 @@ export class CourseContentService extends DBService<
   ) {
     const qb = this.contentRepository.createQueryBuilder("content");
     qb.leftJoin("content.course", "course")
-      .leftJoin("course.  enrollments", "enrollment")
+      .leftJoin("course.enrollments", "enrollment")
       .where("content.courseId = :courseId", { courseId })
       .andWhere("enrollment.learnerId = :learnerId", { learnerId })
       .andWhere("enrollment.status = :status", {
@@ -143,7 +143,7 @@ export class CourseContentService extends DBService<
   ): Promise<CourseContent> {
     const qb = this.contentRepository.createQueryBuilder("content");
     qb.leftJoin("content.course", "course")
-      .leftJoin("course.  enrollments", "enrollment")
+      .leftJoin("course.enrollments", "enrollment")
       .where("content.courseId = :courseId", { courseId })
       .andWhere("content.id = :contentId", { contentId })
       .andWhere("enrollment.learnerId = :learnerId", { learnerId })

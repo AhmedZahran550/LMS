@@ -1,5 +1,9 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+
+import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
+import { DBExceptionFilter } from './core/filters/query-failed-exception.filter';
 
 import { DatabaseModule } from './db/database.module';
 import { AuthModule } from './core/auth/auth.module';
@@ -37,7 +41,16 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
 
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: DBExceptionFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

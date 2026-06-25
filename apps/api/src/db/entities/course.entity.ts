@@ -1,20 +1,28 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
-import { CourseVisibility } from '@lms/shared-types';
-import { User } from '../../db/entities/user.entity';
-import { CourseContent } from './course-content.entity';
-import { BaseEntity } from './base.entity';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from "typeorm";
+import { CourseVisibility } from "@lms/shared-types";
+import { User } from "../../db/entities/user.entity";
+import { CourseContent } from "./course-content.entity";
+import { Enrollment } from "./enrollment.entity";
+import { BaseEntity } from "./base.entity";
 
 @Entity()
-@Index(['instructorId'])
+@Index(["instructorId"])
 export class Course extends BaseEntity {
   @Column()
   title!: string;
 
-  @Column('text')
+  @Column("text")
   description!: string;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: CourseVisibility,
     default: CourseVisibility.PRIVATE,
   })
@@ -30,9 +38,12 @@ export class Course extends BaseEntity {
   instructorId!: string;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'instructorId' })
+  @JoinColumn({ name: "instructorId" })
   instructor!: User;
 
   @OneToMany(() => CourseContent, (content) => content.course)
   contents!: CourseContent[];
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
+  enrollments!: Enrollment[];
 }

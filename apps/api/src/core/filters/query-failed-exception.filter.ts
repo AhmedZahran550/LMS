@@ -1,4 +1,3 @@
-
 import {
   BadRequestException,
   Catch,
@@ -6,12 +5,11 @@ import {
   ExceptionFilter,
   NotFoundException,
 } from '@nestjs/common';
-import { EntityNotFoundError, QueryFailedError, TypeORMError } from 'typeorm';
+import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 import { DBErrorCode } from '../utils/db.errors';
 import { ErrorCodes } from '../utils/error-codes';
 
-
-@Catch(TypeORMError)
+@Catch(QueryFailedError, EntityNotFoundError)
 export class DBExceptionFilter implements ExceptionFilter {
   constructor() {}
 
@@ -73,6 +71,7 @@ export class DBExceptionFilter implements ExceptionFilter {
           ];
           throw new BadRequestException(message);
       }
+      // If we reach here, throw the error for the global filter to handle it
       throw exception;
     } else if (exception instanceof EntityNotFoundError) {
       // For EntityNotFound, we can directly throw a NotFoundException
@@ -81,6 +80,7 @@ export class DBExceptionFilter implements ExceptionFilter {
         code: ErrorCodes.RESOURCE_NOT_FOUND,
       });
     } else {
+      // Just throw the error for the global filter to handle it
       throw exception;
     }
   }
