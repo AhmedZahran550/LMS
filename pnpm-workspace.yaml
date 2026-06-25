@@ -1,10 +1,11 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
-  - 'tooling/*'
+  - "apps/*"
+  - "packages/*"
+  - "tooling/*"
 
 allowBuilds:
-  '@scarf/scarf': true
+  "@nestjs/core": true
+  "@scarf/scarf": true
   argon2: true
 
 onlyBuiltDependencies:
