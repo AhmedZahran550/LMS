@@ -1,26 +1,43 @@
-'use client';
+"use client";
 
-import React, { useRef, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
-import { Select } from '@/components/ui/Select';
-import { Dialog } from '@/components/ui/Dialog';
-import { Pagination } from '@/components/ui/Pagination';
-import { ContentPlayerModal } from '@/components/ui/ContentPlayerModal';
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableRow, 
-  TableHead, 
-  TableCell 
-} from '@/components/ui/Table';
-import { Upload, X, Plus, PlayCircle, FileText, Image as ImageIcon, Presentation, Trash2, Eye, Search } from 'lucide-react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { courseApis } from '@/lib/courseApis';
-import { ContentType } from '@lms/shared-types';
+import React, { useRef, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Badge } from "@/components/ui/Badge";
+import { Select } from "@/components/ui/Select";
+import { Dialog } from "@/components/ui/Dialog";
+import { Pagination } from "@/components/ui/Pagination";
+import { ContentPlayerModal } from "@/components/ui/ContentPlayerModal";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/Table";
+import {
+  Upload,
+  X,
+  Plus,
+  PlayCircle,
+  FileText,
+  Image as ImageIcon,
+  Presentation,
+  Trash2,
+  Eye,
+  Search,
+} from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { courseApis } from "@/lib/courseApis";
+import { ContentType } from "@lms/shared-types";
 
 export function CourseContentTab({ courseId }: { courseId: string }) {
   const queryClient = useQueryClient();
@@ -28,24 +45,34 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
 
   // States for paginated table
   const [page, setPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("");
 
   // States for modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeContent, setActiveContent] = useState<any>(null);
 
   // States for upload form
-  const [contentTitle, setContentTitle] = useState('');
-  const [contentDesc, setContentDesc] = useState('');
+  const [contentTitle, setContentTitle] = useState("");
+  const [contentDesc, setContentDesc] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { data: paginatedData, isLoading, refetch } = useQuery({
-    queryKey: ['instructor-course-contents', courseId, page, searchQuery, filterType],
+  const {
+    data: paginatedData,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "instructor-course-contents",
+      courseId,
+      page,
+      searchQuery,
+      filterType,
+    ],
     queryFn: async () => {
       const queryOptions: any = { page, limit: 10 };
       if (searchQuery) queryOptions.search = searchQuery;
-      if (filterType) queryOptions['filter.contentType'] = `$eq:${filterType}`;
+      if (filterType) queryOptions["filter.contentType"] = `$eq:${filterType}`;
       return await courseApis.getCourseContents(courseId, queryOptions);
     },
   });
@@ -54,22 +81,23 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
     mutationFn: async () => {
       if (!selectedFile) return;
       const formData = new FormData();
-      formData.append('title', contentTitle);
-      formData.append('description', contentDesc);
-      formData.append('file', selectedFile);
-      
+      formData.append("title", contentTitle);
+      formData.append("description", contentDesc);
+      formData.append("file", selectedFile);
+
       return await courseApis.uploadContent(courseId, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { "Content-Type": "multipart/form-data" },
       });
     },
     onSuccess: () => {
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["learner-course-contents"] });
       setIsAddModalOpen(false);
-      setContentTitle('');
-      setContentDesc('');
+      setContentTitle("");
+      setContentDesc("");
       setSelectedFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    },
   });
 
   const deleteMutation = useMutation({
@@ -78,22 +106,24 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
     },
     onSuccess: () => {
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["learner-course-contents"] });
       if (activeContent) setActiveContent(null);
     },
     onError: (err: any) => {
-      alert(err.response?.data?.message || 'Failed to delete content');
-    }
+      alert(err.response?.data?.message || "Failed to delete content");
+    },
   });
 
   const contents = paginatedData?.data || [];
   const meta = paginatedData?.meta;
+  console.log("contents", contents);
 
   const contentTypes = [
-    { value: '', label: 'All Types' },
-    { value: ContentType.VIDEO, label: 'Video' },
-    { value: ContentType.PDF, label: 'PDF' },
-    { value: ContentType.IMAGE, label: 'Image' },
-    { value: ContentType.PRESENTATION, label: 'Presentation' },
+    { value: "", label: "All Types" },
+    { value: ContentType.VIDEO, label: "Video" },
+    { value: ContentType.PDF, label: "PDF" },
+    { value: ContentType.IMAGE, label: "Image" },
+    { value: ContentType.PRESENTATION, label: "Presentation" },
   ];
 
   return (
@@ -102,7 +132,9 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <CardTitle>Course Content</CardTitle>
-            <CardDescription>Manage and organize uploaded files.</CardDescription>
+            <CardDescription>
+              Manage and organize uploaded files.
+            </CardDescription>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" /> Add Content
@@ -134,7 +166,9 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                 }}
               >
                 {contentTypes.map((type) => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
                 ))}
               </Select>
             </div>
@@ -160,7 +194,10 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                   </TableRow>
                 ) : contents.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                    <TableCell
+                      colSpan={5}
+                      className="text-center py-8 text-slate-500"
+                    >
                       No content found.
                     </TableCell>
                   </TableRow>
@@ -168,39 +205,55 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                   contents.map((content: any, i: number) => (
                     <TableRow key={content.id}>
                       <TableCell className="font-medium text-slate-500">
-                        {((page - 1) * (meta?.itemsPerPage || 10)) + i + 1}
+                        {(page - 1) * (meta?.itemsPerPage || 10) + i + 1}
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-slate-900">{content.title}</div>
-                        {content.description && <div className="text-xs text-slate-500 line-clamp-1">{content.description}</div>}
+                        <div className="font-medium text-slate-900">
+                          {content.title}
+                        </div>
+                        {content.description && (
+                          <div className="text-xs text-slate-500 line-clamp-1">
+                            {content.description}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={content.contentType as any} className="capitalize">
+                        <Badge
+                          variant={content.contentType as any}
+                          className="capitalize"
+                        >
                           {content.contentType}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-slate-500">
-                        {(content.size / (1024*1024)).toFixed(2)} MB
+                        {(content.size / (1024 * 1024)).toFixed(2)} MB
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => setActiveContent(content)}
                           >
                             <Eye className="h-4 w-4 mr-1" /> View
                           </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             onClick={() => {
-                              if (confirm('Are you sure you want to delete this content?')) {
+                              if (
+                                confirm(
+                                  "Are you sure you want to delete this content?",
+                                )
+                              ) {
                                 deleteMutation.mutate(content.id);
                               }
                             }}
-                            isLoading={deleteMutation.isPending && deleteMutation.variables === content.id}
+                            isLoading={
+                              deleteMutation.isPending &&
+                              deleteMutation.variables === content.id
+                            }
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -226,8 +279,8 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
       </Card>
 
       {/* Add Content Modal */}
-      <Dialog 
-        open={isAddModalOpen} 
+      <Dialog
+        open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
         title="Upload Content"
         description="Add videos, PDFs, images, or presentations to this course."
@@ -235,30 +288,38 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-1 block">Title</label>
-            <Input placeholder="e.g. Introduction Lecture" value={contentTitle} onChange={e => setContentTitle(e.target.value)} />
+            <Input
+              placeholder="e.g. Introduction Lecture"
+              value={contentTitle}
+              onChange={(e) => setContentTitle(e.target.value)}
+            />
           </div>
           <div>
             <label className="text-sm font-medium mb-1 block">File</label>
-            <Input 
-              type="file" 
-              accept="video/*,application/pdf,image/*,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" 
-              ref={fileInputRef} 
-              onChange={e => setSelectedFile(e.target.files?.[0] || null)} 
+            <Input
+              type="file"
+              accept="video/*,application/pdf,image/*,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+              ref={fileInputRef}
+              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
             />
-            <p className="text-xs text-slate-500 mt-1">Supported: Video, PDF, Image, PPTX</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Supported: Video, PDF, Image, PPTX
+            </p>
           </div>
           <div>
-            <label className="text-sm font-medium mb-1 block">Description</label>
-            <textarea 
-              className="w-full text-sm p-3 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-              placeholder="Content description..." 
-              rows={3} 
-              value={contentDesc} 
-              onChange={e => setContentDesc(e.target.value)}
+            <label className="text-sm font-medium mb-1 block">
+              Description
+            </label>
+            <textarea
+              className="w-full text-sm p-3 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Content description..."
+              rows={3}
+              value={contentDesc}
+              onChange={(e) => setContentDesc(e.target.value)}
             />
           </div>
-          <Button 
-            onClick={() => uploadMutation.mutate()} 
+          <Button
+            onClick={() => uploadMutation.mutate()}
             disabled={!selectedFile || !contentTitle}
             isLoading={uploadMutation.isPending}
             className="w-full"
@@ -269,9 +330,9 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
       </Dialog>
 
       {/* Fullscreen Player Modal */}
-      <ContentPlayerModal 
-        content={activeContent} 
-        onClose={() => setActiveContent(null)} 
+      <ContentPlayerModal
+        content={activeContent}
+        onClose={() => setActiveContent(null)}
       />
     </>
   );

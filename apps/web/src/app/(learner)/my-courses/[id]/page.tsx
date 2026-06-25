@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { courseApis } from '@/lib/courseApis';
 import { PlayCircle, ChevronLeft, Search, FileText, Image as ImageIcon, Presentation } from 'lucide-react';
@@ -31,11 +31,18 @@ export default function CourseDetailPage() {
   const { data: paginatedContent, isLoading: contentLoading } = useQuery({
     queryKey: ['learner-course-contents', courseId, page, searchQuery, filterType],
     queryFn: async () => {
-      const queryOptions: any = { page, limit: 12 };
+      const queryOptions: any = { page, limit: 100 };
       if (searchQuery) queryOptions.search = searchQuery;
       if (filterType) queryOptions['filter.contentType'] = `$eq:${filterType}`;
-      return await courseApis.getLearnerCourseContents(courseId, queryOptions);
+      
+      console.log('🔍 Fetching with options:', queryOptions);
+      const result = await courseApis.getLearnerCourseContents(courseId, queryOptions);
+      console.log('📦 API result:', result);
+      return result;
     },
+    placeholderData: keepPreviousData,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   if (courseLoading) return <div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>;
@@ -64,7 +71,7 @@ export default function CourseDetailPage() {
   };
 
   return (
-    <div className="h-full flex flex-col space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="min-h-full flex flex-col space-y-6 max-w-7xl mx-auto pb-12">
       <div className="flex items-center space-x-4">
         <Link href="/my-courses" className="p-2 rounded-full hover:bg-slate-200 text-slate-600 transition-colors">
           <ChevronLeft className="h-5 w-5" />
@@ -135,7 +142,7 @@ export default function CourseDetailPage() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-medium text-slate-900 group-hover:text-indigo-700 transition-colors">
-                        {((page - 1) * (meta?.itemsPerPage || 12)) + index + 1}. {content.title}
+                        {((page - 1) * (meta?.itemsPerPage || 100)) + index + 1}. {content.title}
                       </h3>
                       <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded capitalize">
                         {content.contentType}
