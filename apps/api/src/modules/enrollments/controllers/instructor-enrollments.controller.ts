@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { EnrollmentsService } from '../enrollments.service';
 import { RespondEnrollmentDto } from '../dto/respond-enrollment.dto';
 import { InviteLearnerDto } from '../dto/invite-learner.dto';
@@ -45,5 +45,14 @@ export class InstructorEnrollmentsController {
     @Body() inviteDto: InviteLearnerDto,
   ) {
     return this.enrollmentsService.inviteLearner(courseId, user.id, inviteDto);
+  }
+
+  @Delete('enrollments/:id')
+  async remove(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+  ) {
+    await this.enrollmentsService.removeLearner(id, user.id);
+    return { id, deleted: true };
   }
 }

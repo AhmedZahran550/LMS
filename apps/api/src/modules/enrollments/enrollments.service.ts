@@ -122,4 +122,21 @@ export class EnrollmentsService extends DBService<Enrollment> {
     });
     return !!enrollment;
   }
+
+  async removeLearner(id: string, instructorId: string): Promise<void> {
+    const enrollment = await this.enrollmentsRepository.findOne({
+      where: { id },
+      relations: ['course'],
+    });
+
+    if (!enrollment) {
+      throw new NotFoundException('Enrollment not found');
+    }
+
+    if (enrollment.course.instructorId !== instructorId) {
+      throw new ForbiddenException('You do not own this course');
+    }
+
+    await super.remove(id);
+  }
 }
