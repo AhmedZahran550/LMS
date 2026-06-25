@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaginateConfig, FilterOperator } from 'nestjs-paginate';
-import { DBService } from '../../core/base/db.service';
-import { CourseContent } from './entities/video.entity';
+import { DBService } from '../../db/db.service';
+import { CourseContent } from '../../db/entities/course-content.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { CoursesService } from '../courses/courses.service';

@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, ConflictException, ForbiddenException } 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaginateConfig, FilterOperator } from 'nestjs-paginate';
-import { DBService } from '../../core/base/db.service';
-import { Enrollment } from './entities/enrollment.entity';
+import { DBService } from '../../db/db.service';
+import { Enrollment } from '../../db/entities/enrollment.entity';
 import { RespondEnrollmentDto } from './dto/respond-enrollment.dto';
 import { InviteLearnerDto } from './dto/invite-learner.dto';
 import { CoursesService } from '../courses/courses.service';

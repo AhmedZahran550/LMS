@@ -1,8 +1,7 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppDataSource } from './db/datasource';
+import { DatabaseModule } from './db/database.module';
 import { AuthModule } from './core/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -27,7 +26,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
       load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig],
       envFilePath: '.env', // API specific .env
     }),
-    TypeOrmModule.forRoot(AppDataSource.options),
+    DatabaseModule,
     AuthModule,
     MailModule,
     StorageModule,

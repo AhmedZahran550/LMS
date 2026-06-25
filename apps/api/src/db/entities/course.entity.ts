@@ -1,14 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
 import { CourseVisibility } from '@lms/shared-types';
-import { User } from '../../users/entities/user.entity';
-import { CourseContent } from '../../videos/entities/video.entity';
+import { User } from '../../db/entities/user.entity';
+import { CourseContent } from './course-content.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity()
 @Index(['instructorId'])
-export class Course {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class Course extends BaseEntity {
   @Column()
   title!: string;
 
@@ -37,10 +35,4 @@ export class Course {
 
   @OneToMany(() => CourseContent, (content) => content.course)
   contents!: CourseContent[];
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }

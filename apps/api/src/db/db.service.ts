@@ -19,6 +19,7 @@ import {
   Paginated,
 } from "nestjs-paginate";
 import { PaginatedResponse } from "@lms/shared-types";
+import { BaseEntity } from "./entities/base.entity";
 export interface Page<T> extends Paginated<T> {}
 export interface QueryConfig<T> extends PaginateConfig<T> {}
 export interface QueryOptions<T = any> extends PaginateQuery {
@@ -36,7 +37,7 @@ export const defaultQueryConfig: QueryConfig<any> = {
   // defaultSortBy: [['createdAt', 'DESC']],
 };
 
-export abstract class DBService<T extends ObjectLiteral, D = T, U = D> {
+export abstract class DBService<T extends BaseEntity, D = T, U = D> {
   protected readonly logger = new Logger(this.constructor.name);
 
   constructor(

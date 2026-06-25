@@ -12,7 +12,7 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
-import { User } from '../../modules/users/entities/user.entity';
+import { User } from '../../db/entities/user.entity';
 
 @Injectable()
 export class AuthService {

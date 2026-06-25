@@ -1,13 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { NotificationType } from '@lms/shared-types';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../db/entities/user.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity()
 @Index(['userId', 'isRead'])
-export class Notification {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class Notification extends BaseEntity {
   @Column()
   userId!: string;
 
@@ -32,7 +30,4 @@ export class Notification {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user!: User;
-
-  @CreateDateColumn()
-  createdAt!: Date;
 }

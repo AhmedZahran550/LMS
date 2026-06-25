@@ -1,10 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, Column } from 'typeorm';
+import { BaseEntity } from './base.entity';
 
 @Entity()
-export class Log {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class Log extends BaseEntity {
   @Column()
   method!: string;
 
@@ -25,7 +23,4 @@ export class Log {
 
   @Column({ type: 'jsonb', nullable: true })
   requestBody?: any;
-
-  @CreateDateColumn()
-  createdAt!: Date;
 }

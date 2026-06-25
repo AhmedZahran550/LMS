@@ -1,12 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column } from 'typeorm';
 import { UserRole } from '@lms/shared-types';
 import { Exclude } from 'class-transformer';
+import { BaseEntity } from './base.entity';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
 
@@ -50,10 +48,4 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   @Exclude()
   hashedRefreshToken?: string | null;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }

@@ -7,8 +7,8 @@ import {
   paginate,
   PaginateQuery,
 } from "nestjs-paginate";
-import { DBService } from "../../core/base/db.service";
-import { Course } from "./entities/course.entity";
+import { DBService } from '../../db/db.service';
+import { Course } from '../../db/entities/course.entity';
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 import { CourseVisibility, PaginatedResponse } from "@lms/shared-types";

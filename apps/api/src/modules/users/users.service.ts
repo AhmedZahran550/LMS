@@ -3,8 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as argon2 from "argon2";
 import { PaginateConfig, FilterOperator } from "nestjs-paginate";
-import { DBService } from "../../core/base/db.service";
-import { User } from "./entities/user.entity";
+import { DBService } from '../../db/db.service';
+import { User } from '../../db/entities/user.entity';
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 

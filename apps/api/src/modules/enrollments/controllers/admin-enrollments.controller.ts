@@ -1,7 +1,7 @@
 import { Controller, Get, Patch, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Enrollment } from '../entities/enrollment.entity';
+import { Enrollment } from '../../../db/entities/enrollment.entity';
 import { RespondEnrollmentDto } from '../dto/respond-enrollment.dto';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
