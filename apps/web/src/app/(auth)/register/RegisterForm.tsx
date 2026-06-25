@@ -1,14 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { RegisterFormUI } from './RegisterFormUI';
 import { useRegisterMutation } from '@/hooks/useAuthMutations';
-import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole } from '@lms/shared-types';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { CheckCircle } from 'lucide-react';
 
 const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -33,9 +36,23 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
   const router = useRouter();
-  const setAuth = useAuthStore((state) => state.setAuth);
   const registerMutation = useRegisterMutation();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [countdown, setCountdown] = useState(10);
+
+  useEffect(() => {
+    if (!isSuccess) return;
+
+    if (countdown <= 0) {
+      router.push('/login');
+      return;
+    }
+
+    const timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, countdown, router]);
 
   const {
     register,
@@ -53,19 +70,41 @@ export function RegisterForm() {
     try {
       const { confirmPassword, ...apiData } = data;
       const response = await registerMutation.mutateAsync(apiData);
-      const { user, accessToken, refreshToken } = response;
-      
-      setAuth(user, accessToken, refreshToken);
-      
-      if (user.role === UserRole.INSTRUCTOR) {
-        router.push('/instructor');
-      } else {
-        router.push('/courses');
-      }
+      setSuccessMessage(response.message || 'Registration successful. Please check your email to verify your account.');
+      setIsSuccess(true);
     } catch (err: any) {
       setServerError(err.response?.data?.message || 'Registration failed. Please try again later.');
     }
   };
+
+  if (isSuccess) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex justify-center mb-4">
+            <CheckCircle className="h-12 w-12 text-green-500" />
+          </div>
+          <CardTitle className="text-center">Registration Successful</CardTitle>
+          <CardDescription className="text-center">
+            {successMessage}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-center text-slate-500">
+            Redirecting to login in{' '}
+            <span className="font-semibold text-slate-700">{countdown}</span> seconds...
+          </p>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => router.push('/login')}
+          >
+            Sign in now
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <RegisterFormUI
