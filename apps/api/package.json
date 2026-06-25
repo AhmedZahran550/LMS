@@ -37,6 +37,7 @@
     "argon2": "^0.44.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "cloudinary": "^2.10.0",
     "dotenv": "^16.4.5",
     "multer": "1.4.5-lts.1",
     "nestjs-paginate": "^13.5.1",
