@@ -10,6 +10,7 @@ import { AuthModule } from './core/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { LogsModule } from './modules/logs/logs.module';
+import { I18nModule } from './i18n/i18n.module';
 
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
@@ -28,13 +29,14 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig],
-      envFilePath: '.env', // API specific .env
+      envFilePath: '.env',
     }),
     DatabaseModule,
     AuthModule,
     MailModule,
     StorageModule,
     LogsModule,
+    I18nModule,
     AdminApiModule,
     InstructorApiModule,
     LearnerApiModule,
@@ -57,4 +59,3 @@ export class AppModule implements NestModule {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 }
-

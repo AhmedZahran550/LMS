@@ -9,6 +9,7 @@ import { InviteLearnerDto } from './dto/invite-learner.dto';
 import { CoursesService } from '../courses/courses.service';
 import { UsersService } from '../users/users.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { I18nService } from 'nestjs-i18n';
 import { EnrollmentStatus, CourseVisibility, NotificationType } from '@lms/shared-types';
 
 export const ENROLLMENT_PAGINATION_CONFIG: PaginateConfig<Enrollment> = {
@@ -32,6 +33,7 @@ export class EnrollmentsService extends DBService<Enrollment> {
     private readonly coursesService: CoursesService,
     private readonly usersService: UsersService,
     private readonly notificationsService: NotificationsService,
+    private readonly i18nService: I18nService,
   ) {
     super(enrollmentsRepository, ENROLLMENT_PAGINATION_CONFIG);
   }
@@ -57,11 +59,19 @@ export class EnrollmentsService extends DBService<Enrollment> {
     const saved = await this.enrollmentsRepository.save(enrollment);
 
     const learner = await this.usersService.findByIdOrFail(learnerId);
+    const instructorLang = course.instructor?.preferences?.lang || 'ar';
+
+    const subject = this.i18nService.translate('notifications.subjects.enrollment_request', { lang: instructorLang });
+    const message = this.i18nService.translate('notifications.messages.enrollment_request', {
+      lang: instructorLang,
+      args: { name: learner.firstName + ' ' + learner.lastName, course: course.title },
+    });
+
     await this.notificationsService.create(
       course.instructorId,
       NotificationType.ENROLLMENT_REQUEST,
-      'New Enrollment Request',
-      learner.firstName + ' ' + learner.lastName + ' wants to join your course "' + course.title + '"',
+      subject,
+      message,
       { enrollmentId: saved.id, courseId, learnerId },
       'course',
       courseId,
@@ -89,12 +99,24 @@ export class EnrollmentsService extends DBService<Enrollment> {
 
     const saved = await this.enrollmentsRepository.save(enrollment);
 
+    const learner = await this.usersService.findByIdOrFail(enrollment.learnerId);
+    const learnerLang = learner.preferences?.lang || 'ar';
     const isApproved = respondDto.status === EnrollmentStatus.APPROVED;
+
+    const subjectKey = isApproved ? 'notifications.subjects.enrollment_approved' : 'notifications.subjects.enrollment_rejected';
+    const messageKey = isApproved ? 'notifications.messages.enrollment_approved' : 'notifications.messages.enrollment_rejected';
+
+    const subject = this.i18nService.translate(subjectKey, { lang: learnerLang });
+    const message = this.i18nService.translate(messageKey, {
+      lang: learnerLang,
+      args: { course: enrollment.course.title },
+    });
+
     await this.notificationsService.create(
       enrollment.learnerId,
       NotificationType.ENROLLMENT_RESPONSE,
-      isApproved ? 'Enrollment Approved' : 'Enrollment Rejected',
-      'Your request to join "' + enrollment.course.title + '" has been ' + (isApproved ? 'approved' : 'rejected') + '.',
+      subject,
+      message,
       { enrollmentId: id, courseId: enrollment.courseId, status: respondDto.status },
       'course',
       enrollment.courseId,

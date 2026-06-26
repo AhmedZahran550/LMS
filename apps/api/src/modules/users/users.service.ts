@@ -7,6 +7,7 @@ import { DBService } from '../../db/db.service';
 import { User } from '../../db/entities/user.entity';
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdatePreferencesDto } from "./dto/update-preferences.dto";
 
 export const USER_PAGINATION_CONFIG: PaginateConfig<User> = {
   sortableColumns: ["createdAt", "firstName", "lastName", "email"],
@@ -77,6 +78,15 @@ export class UsersService extends DBService<
     return this.usersRepository.save(user);
   }
 
+  async updatePreferences(id: string, dto: UpdatePreferencesDto): Promise<User> {
+    const user = await this.findByIdOrFail(id);
+    user.preferences = {
+      lang: dto.lang ?? user.preferences?.lang ?? 'ar',
+      mode: dto.mode ?? user.preferences?.mode ?? 'light',
+    };
+    return this.usersRepository.save(user);
+  }
+
   async updateProfileImage(id: string, profileImageUrl: string): Promise<User> {
     const user = await this.findByIdOrFail(id);
     user.profileImageUrl = profileImageUrl;
@@ -84,6 +94,6 @@ export class UsersService extends DBService<
   }
 
   async remove(id: string): Promise<void> {
-    await this.usersRepository.softDelete(id); // Soft delete / deactivate
+    await this.usersRepository.softDelete(id);
   }
 }

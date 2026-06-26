@@ -1,0 +1,38 @@
+{
+  "auth": {
+    "register_success": "Registration successful. Please check your email to verify your account.",
+    "invalid_credentials": "Invalid credentials",
+    "email_exists": "Email already exists",
+    "verify_email": "Please verify your email before logging in",
+    "account_inactive": "Account is inactive",
+    "refresh_token_missing": "Refresh token is missing"
+  },
+  "notifications": {
+    "subjects": {
+      "enrollment_request": "New Enrollment Request",
+      "enrollment_approved": "Enrollment Approved",
+      "enrollment_rejected": "Enrollment Rejected",
+      "new_content": "New Content Added"
+    },
+    "messages": {
+      "enrollment_request": "{name} wants to join your course \"{course}\"",
+      "enrollment_approved": "Your request to join \"{course}\" has been approved",
+      "enrollment_rejected": "Your request to join \"{course}\" has been rejected",
+      "new_content": "New content \"{content}\" has been added to \"{course}\""
+    }
+  },
+  "errors": {
+    "INVALID_CREDENTIALS": "Invalid credentials",
+    "EMAIL_EXISTS": "Email already exists",
+    "VERIFY_EMAIL": "Please verify your email before logging in",
+    "ACCOUNT_INACTIVE": "Account is inactive",
+    "RESOURCE_NOT_FOUND": "Resource not found",
+    "FORBIDDEN": "Access denied",
+    "CONFLICT": "Conflict",
+    "BAD_REQUEST": "Bad request",
+    "UNIQUE_VIOLATION": "This value already exists",
+    "INTERNAL_ERROR": "An unexpected error occurred",
+    "REFRESH_TOKEN_MISSING": "Refresh token is missing",
+    "NOT_FOUND": "Not found"
+  }
+}

@@ -48,4 +48,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   @Exclude()
   hashedRefreshToken?: string | null;
+
+  @Column('jsonb', { default: { lang: 'ar', mode: 'light' } })
+  preferences!: { lang: 'ar' | 'en'; mode: 'light' | 'dark' };
 }

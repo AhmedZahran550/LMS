@@ -1,0 +1,38 @@
+{
+  "auth": {
+    "register_success": "تم التسجيل بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.",
+    "invalid_credentials": "بيانات الدخول غير صحيحة",
+    "email_exists": "البريد الإلكتروني موجود بالفعل",
+    "verify_email": "يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول",
+    "account_inactive": "الحساب غير نشط",
+    "refresh_token_missing": "رمز التحديث مفقود"
+  },
+  "notifications": {
+    "subjects": {
+      "enrollment_request": "طلب تسجيل جديد",
+      "enrollment_approved": "تم قبول التسجيل",
+      "enrollment_rejected": "تم رفض التسجيل",
+      "new_content": "تمت إضافة محتوى جديد"
+    },
+    "messages": {
+      "enrollment_request": "{name} يريد الانضمام إلى كورس \"{course}\"",
+      "enrollment_approved": "تم قبول طلب الانضمام إلى كورس \"{course}\"",
+      "enrollment_rejected": "تم رفض طلب الانضمام إلى كورس \"{course}\"",
+      "new_content": "تمت إضافة محتوى جديد \"{content}\" إلى كورس \"{course}\""
+    }
+  },
+  "errors": {
+    "INVALID_CREDENTIALS": "بيانات الدخول غير صحيحة",
+    "EMAIL_EXISTS": "البريد الإلكتروني موجود بالفعل",
+    "VERIFY_EMAIL": "يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول",
+    "ACCOUNT_INACTIVE": "الحساب غير نشط",
+    "RESOURCE_NOT_FOUND": "المورد غير موجود",
+    "FORBIDDEN": "تم رفض الوصول",
+    "CONFLICT": "تعارض",
+    "BAD_REQUEST": "طلب غير صحيح",
+    "UNIQUE_VIOLATION": "هذه القيمة موجودة بالفعل",
+    "INTERNAL_ERROR": "حدث خطأ غير متوقع",
+    "REFRESH_TOKEN_MISSING": "رمز التحديث مفقود",
+    "NOT_FOUND": "غير موجود"
+  }
+}

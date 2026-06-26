@@ -36,19 +36,18 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
     });
-    
+
     user.isEmailVerified = false;
     user.emailVerificationToken = emailVerificationToken;
     await this.usersService.save(user);
-try {
-    const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
-    const verifyUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}`;
-     this.mailService.sendVerificationEmail(user.email, verifyUrl);
+    try {
+      const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
+      const verifyUrl = frontendUrl + '/verify-email?token=' + emailVerificationToken;
+      this.mailService.sendVerificationEmail(user.email, verifyUrl);
+    } catch (error) {
+      console.log('error in verification email', error);
+    }
 
-} catch (error) {
-  console.log("error in verification email",error);
-}
-  
     return { message: 'Registration successful. Please check your email to verify your account.' };
   }
 
@@ -128,7 +127,7 @@ try {
     await this.usersService.save(user);
 
     const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
-    const verifyUrl = `${frontendUrl}/verify-email?token=${emailVerificationToken}`;
+    const verifyUrl = frontendUrl + '/verify-email?token=' + emailVerificationToken;
     await this.mailService.sendVerificationEmail(user.email, verifyUrl);
 
     return { message: 'Verification email sent successfully' };
@@ -149,7 +148,7 @@ try {
     await this.usersService.save(user);
 
     const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
-    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+    const resetUrl = frontendUrl + '/reset-password?token=' + resetToken;
     await this.mailService.sendPasswordResetEmail(user.email, resetUrl);
 
     return { message: 'If an account exists, a password reset link has been sent.' };
@@ -157,7 +156,7 @@ try {
 
   async resetPassword({ token, newPassword }: ResetPasswordDto) {
     const user = await this.usersService.findByResetToken(token);
-    
+
     if (!user || !user.resetPasswordTokenExpiresAt || user.resetPasswordTokenExpiresAt < new Date()) {
       throw new BadRequestException('Invalid or expired password reset token');
     }
@@ -176,7 +175,8 @@ try {
   }
 
   private async generateTokens(user: User) {
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const lang = user.preferences?.lang || 'ar';
+    const payload = { sub: user.id, email: user.email, role: user.role, lang };
 
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, {
@@ -195,6 +195,7 @@ try {
       role: user.role,
       isActive: user.isActive,
       profileImageUrl: user.profileImageUrl,
+      preferences: user.preferences || { lang: 'ar', mode: 'light' },
       createdAt: user.createdAt.toISOString(),
     };
 

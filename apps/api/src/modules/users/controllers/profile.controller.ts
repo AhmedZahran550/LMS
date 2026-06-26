@@ -12,6 +12,7 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UsersService } from "../users.service";
 import { UpdateProfileDto } from "../dto/update-profile.dto";
+import { UpdatePreferencesDto } from "../dto/update-preferences.dto";
 import { JwtAuthGuard } from "../../../core/auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../../../core/decorators/current-user.decorator";
 import { StorageService } from "../../storage/storage.service";
@@ -41,6 +42,13 @@ export class ProfileController {
     return safeUser;
   }
 
+  @Patch("me/preferences")
+  async updatePreferences(@CurrentUser() user: any, @Body() dto: UpdatePreferencesDto) {
+    const dbUser = await this.usersService.updatePreferences(user.id, dto);
+    const { password, hashedRefreshToken, ...safeUser } = dbUser;
+    return safeUser;
+  }
+
   @Post("me/avatar")
   @UseInterceptors(FileInterceptor("file"))
   async uploadAvatar(
@@ -52,7 +60,7 @@ export class ProfileController {
     }
     const uploadResult = await this.storageService.upload(
       file,
-      `avatars/${user.id}`,
+      "avatars/" + user.id,
     );
     const dbUser = await this.usersService.updateProfileImage(
       user.id,

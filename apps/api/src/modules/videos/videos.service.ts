@@ -9,11 +9,13 @@ import { PaginateConfig, FilterOperator, PaginateQuery } from "nestjs-paginate";
 import { DBService } from "../../db/db.service";
 import { CourseContent } from "../../db/entities/course-content.entity";
 import { Enrollment } from "../../db/entities/enrollment.entity";
+import { User } from "../../db/entities/user.entity";
 import { CreateVideoDto } from "./dto/create-video.dto";
 import { UpdateVideoDto } from "./dto/update-video.dto";
 import { CoursesService } from "../courses/courses.service";
 import { StorageService } from "../storage/storage.service";
 import { NotificationsService } from "../notifications/notifications.service";
+import { I18nService } from "nestjs-i18n";
 import { ReorderVideosDto } from "./dto/reorder-videos.dto";
 import { ContentType, EnrollmentStatus, NotificationType } from "@lms/shared-types";
 import { ForbiddenException } from "@nestjs/common";
@@ -54,9 +56,12 @@ export class CourseContentService extends DBService<
     private readonly contentRepository: Repository<CourseContent>,
     @InjectRepository(Enrollment)
     private readonly enrollmentRepository: Repository<Enrollment>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly coursesService: CoursesService,
     private readonly storageService: StorageService,
     private readonly notificationsService: NotificationsService,
+    private readonly i18nService: I18nService,
   ) {
     super(contentRepository, CONTENT_PAGINATION_CONFIG);
   }
@@ -101,19 +106,35 @@ export class CourseContentService extends DBService<
 
     const approvedEnrollments = await this.enrollmentRepository.find({
       where: { courseId, status: EnrollmentStatus.APPROVED },
+      relations: ["learner"],
     });
 
     if (approvedEnrollments.length > 0) {
-      const learnerIds = approvedEnrollments.map((e) => e.learnerId);
-      await this.notificationsService.createMany(
-        learnerIds,
-        NotificationType.NEW_CONTENT,
-        "New Content Added",
-        'New content "' + createDto.title + '" has been added to "' + course.title + '".',
-        { courseId, contentId: saved.id, title: createDto.title },
-        "content",
-        saved.id,
-      );
+      const langGroups: Record<string, string[]> = {};
+
+      for (const enrollment of approvedEnrollments) {
+        const lang = (enrollment.learner as any)?.preferences?.lang || "ar";
+        if (!langGroups[lang]) langGroups[lang] = [];
+        langGroups[lang].push(enrollment.learnerId);
+      }
+
+      for (const [lang, userIds] of Object.entries(langGroups)) {
+        const subject = this.i18nService.translate("notifications.subjects.new_content", { lang });
+        const message = this.i18nService.translate("notifications.messages.new_content", {
+          lang,
+          args: { content: createDto.title, course: course.title },
+        });
+
+        await this.notificationsService.createMany(
+          userIds,
+          NotificationType.NEW_CONTENT,
+          subject,
+          message,
+          { courseId, contentId: saved.id, title: createDto.title },
+          "content",
+          saved.id,
+        );
+      }
     }
 
     return saved;
