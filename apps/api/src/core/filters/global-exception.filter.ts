@@ -53,10 +53,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const exResponse = exception.getResponse();
 
       let rawMessage: string = "Unknown error";
-      let errorCode: string = STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
+      let errorCode: string;
 
       if (typeof exResponse === "string") {
         rawMessage = exResponse;
+        errorCode = MESSAGE_TO_ERROR_CODE[rawMessage] || STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
       } else if (typeof exResponse === "object") {
         const obj = exResponse as Record<string, any>;
         rawMessage = obj.message || obj.error || "Unknown error";
@@ -64,11 +65,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           rawMessage = rawMessage[0]?.message || rawMessage[0] || "Validation error";
         }
         errorCode = obj.code || MESSAGE_TO_ERROR_CODE[rawMessage] || STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
+      } else {
+        errorCode = STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
       }
 
-      errorCode = MESSAGE_TO_ERROR_CODE[rawMessage] || errorCode;
-
-      const lang = (request as any).user?.lang || "ar";
+      const userLang = (request as any).user?.lang;
+      const acceptLanguage = request.headers['accept-language'];
+      const lang = userLang || (acceptLanguage ? acceptLanguage.substring(0, 2) : null) || "ar";
       const translated = this.i18nService.translate("errors." + errorCode, { lang });
 
       return response.status(status).json({

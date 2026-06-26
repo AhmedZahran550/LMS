@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { SnackbarProvider } from "@/components/ui/Snackbar";
+import { I18nProvider } from "@/components/providers/I18nProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,13 +18,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <body className={`${inter.className} antialiased bg-slate-50 text-slate-900 overflow-x-hidden`}>
-        <QueryProvider>
-          <SnackbarProvider>
-            {children}
-          </SnackbarProvider>
-        </QueryProvider>
+        <I18nProvider>
+          <QueryProvider>
+            <SnackbarProvider>
+              {children}
+            </SnackbarProvider>
+          </QueryProvider>
+        </I18nProvider>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
+import i18n from './i18n';
 
 const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || '';
 const API_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`;
@@ -13,8 +14,13 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const { accessToken } = useAuthStore.getState();
-  if (accessToken && config.headers) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+  if (config.headers) {
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    const lang = i18n.language?.substring(0, 2);
+    const supported = ['en', 'ar'];
+    config.headers['Accept-Language'] = supported.includes(lang as string) ? lang : 'ar';
   }
   return config;
 });

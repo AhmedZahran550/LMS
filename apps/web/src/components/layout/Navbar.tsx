@@ -3,16 +3,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/useAuthStore';
 import { notificationApis } from '@/lib/notificationApis';
 import { Avatar } from '@/components/ui/Avatar';
 import { Bell, LogOut, User, Check } from 'lucide-react';
 import Link from 'next/link';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function Navbar() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { user, logout } = useAuthStore();
+  const { t } = useTranslation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -87,7 +90,8 @@ export function Navbar() {
       <div className="flex items-center">
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
         <div className="relative" ref={bellRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
@@ -104,13 +108,13 @@ export function Navbar() {
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 rounded-xl border border-slate-150 bg-white p-2 shadow-lg ring-1 ring-black/5 z-50">
               <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
-                <span className="text-sm font-bold text-slate-800">Notifications</span>
+                <span className="text-sm font-bold text-slate-800">{t('Notifications')}</span>
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllAsReadMutation.mutate()}
                     className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition-colors"
                   >
-                    <Check className="h-3 w-3" /> Mark all read
+                    <Check className="h-3 w-3" /> {t('Mark all read')}
                   </button>
                 )}
               </div>
@@ -118,7 +122,7 @@ export function Navbar() {
               <div className="max-h-64 overflow-y-auto py-1">
                 {notifications.length === 0 ? (
                   <div className="py-8 text-center text-xs text-slate-400">
-                    No notifications yet.
+                    {t('No notifications yet.')}
                   </div>
                 ) : (
                   notifications.map((notification: any) => (
@@ -171,7 +175,7 @@ export function Navbar() {
                   className="flex items-center rounded-lg px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <User className="mr-3 h-4 w-4 text-slate-400" />
-                  My Profile
+                  {t('My Profile')}
                 </Link>
               </div>
 
@@ -184,7 +188,7 @@ export function Navbar() {
                   className="flex w-full items-center rounded-lg px-4 py-2 text-sm text-red-600 hover:bg-red-50/50 transition-colors"
                 >
                   <LogOut className="mr-3 h-4 w-4 text-red-400" />
-                  Logout
+                  {t('Logout')}
                 </button>
               </div>
             </div>

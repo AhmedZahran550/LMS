@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { RegisterFormUI } from './RegisterFormUI';
@@ -37,6 +38,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export function RegisterForm() {
   const router = useRouter();
   const registerMutation = useRegisterMutation();
+  const { t } = useTranslation();
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -84,22 +86,22 @@ export function RegisterForm() {
           <div className="flex justify-center mb-4">
             <CheckCircle className="h-12 w-12 text-green-500" />
           </div>
-          <CardTitle className="text-center">Registration Successful</CardTitle>
+          <CardTitle className="text-center">{t('Registration Successful')}</CardTitle>
           <CardDescription className="text-center">
             {successMessage}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-center text-slate-500">
-            Redirecting to login in{' '}
-            <span className="font-semibold text-slate-700">{countdown}</span> seconds...
+            {t('Redirecting to login in')}{' '}
+            <span className="font-semibold text-slate-700">{countdown}</span> {t('seconds...')}
           </p>
           <Button
             variant="outline"
             className="w-full"
             onClick={() => router.push('/login')}
           >
-            Sign in now
+            {t('Sign in now')}
           </Button>
         </CardContent>
       </Card>

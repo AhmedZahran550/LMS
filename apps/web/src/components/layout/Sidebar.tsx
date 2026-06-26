@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, Compass, LayoutDashboard, LogOut, Settings, Video } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole } from '@lms/shared-types';
@@ -10,6 +11,7 @@ import { Avatar } from '@/components/ui/Avatar';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const { user, logout } = useAuthStore();
 
   if (!user) return null;
@@ -36,7 +38,7 @@ export function Sidebar() {
   return (
     <div className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
       <div className="flex h-16 items-center border-b border-slate-200 px-6">
-        <span className="text-xl font-bold text-indigo-600 tracking-tight">LMS Platform</span>
+        <span className="text-xl font-bold text-indigo-600 tracking-tight">{t('LMS Platform')}</span>
       </div>
       
       <div className="flex-1 overflow-y-auto py-4">
@@ -60,7 +62,7 @@ export function Sidebar() {
                     isActive ? 'text-indigo-700' : 'text-slate-400'
                   }`}
                 />
-                {link.name}
+                {t(link.name)}
               </Link>
             );
           })}
@@ -97,7 +99,7 @@ export function Sidebar() {
           className="flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
         >
           <LogOut className="mr-3 h-5 w-5 text-slate-400" />
-          Logout
+          {t('Logout')}
         </button>
       </div>
     </div>

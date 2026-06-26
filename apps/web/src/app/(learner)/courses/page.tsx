@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { courseApis } from '@/lib/courseApis';
 import { instructorApis } from '@/lib/instructorApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
@@ -14,6 +15,7 @@ import { useSnackbar } from '@/components/ui/Snackbar';
 import Link from 'next/link';
 
 export default function CourseCatalogPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'courses' | 'instructors'>('courses');
@@ -88,8 +90,8 @@ export default function CourseCatalogPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Browse Courses</h1>
-          <p className="text-slate-500 mt-1">Discover new skills and knowledge.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t('Browse Courses')}</h1>
+          <p className="text-slate-500 mt-1">{t('Discover new skills and knowledge.')}</p>
         </div>
         <Compass className="h-8 w-8 text-slate-300" />
       </div>

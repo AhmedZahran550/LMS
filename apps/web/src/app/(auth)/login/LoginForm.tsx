@@ -22,7 +22,7 @@ export function LoginForm() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const loginMutation = useLoginMutation();
   const resendMutation = useResendVerificationMutation();
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<{ message: string; code?: string } | null>(null);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
 
@@ -53,7 +53,11 @@ export function LoginForm() {
         router.push('/my-courses');
       }
     } catch (err: any) {
-      setServerError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      const data = err.response?.data;
+      setServerError({
+        message: data?.message || 'Login failed. Please check your credentials.',
+        code: data?.errorCode,
+      });
     }
   };
 

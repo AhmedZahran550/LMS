@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -16,14 +17,15 @@ interface RegisterFormUIProps {
 }
 
 export function RegisterFormUI({ register, errors, serverError, isLoading, onSubmit }: RegisterFormUIProps) {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>Join our platform as a Learner or Instructor.</CardDescription>
+        <CardTitle>{t('Create an account')}</CardTitle>
+        <CardDescription>{t('Join our platform as a Learner or Instructor.')}</CardDescription>
       </CardHeader>
       <form onSubmit={onSubmit}>
         <CardContent className="space-y-4">
@@ -31,7 +33,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="firstName">First name</label>
+              <label className="text-sm font-medium" htmlFor="firstName">{t('First name')}</label>
               <Input
                 id="firstName"
                 {...register('firstName')}
@@ -41,7 +43,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
               )}
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="lastName">Last name</label>
+              <label className="text-sm font-medium" htmlFor="lastName">{t('Last name')}</label>
               <Input
                 id="lastName"
                 {...register('lastName')}
@@ -53,7 +55,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="email">Email address</label>
+            <label className="text-sm font-medium" htmlFor="email">{t('Email address')}</label>
             <Input
               id="email"
               type="email"
@@ -65,7 +67,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="password">Password</label>
+            <label className="text-sm font-medium" htmlFor="password">{t('Password')}</label>
             <div className="relative">
               <Input
                 id="password"
@@ -87,7 +89,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="confirmPassword">Confirm Password</label>
+            <label className="text-sm font-medium" htmlFor="confirmPassword">{t('Confirm Password')}</label>
             <div className="relative">
               <Input
                 id="confirmPassword"
@@ -109,7 +111,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">I want to join as:</label>
+            <label className="text-sm font-medium">{t('I want to join as:')}</label>
             <div className="flex space-x-4 mt-2">
               <label className="flex items-center space-x-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
@@ -118,7 +120,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
                   {...register('role')}
                   className="text-indigo-600 focus:ring-indigo-500"
                 />
-                <span className="text-sm font-medium">Student</span>
+                <span className="text-sm font-medium">{t('Student')}</span>
               </label>
               <label className="flex items-center space-x-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
@@ -127,7 +129,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
                   {...register('role')}
                   className="text-indigo-600 focus:ring-indigo-500"
                 />
-                <span className="text-sm font-medium">Instructor</span>
+                <span className="text-sm font-medium">{t('Instructor')}</span>
               </label>
             </div>
             {errors.role && (
@@ -138,12 +140,12 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" isLoading={isLoading}>
-            Create account
+            {t('Create account')}
           </Button>
           <p className="text-sm text-center text-slate-500">
-            Already have an account?{' '}
+            {t('Already have an account?')}{' '}
             <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign in
+              {t('Sign in')}
             </Link>
           </p>
         </CardFooter>

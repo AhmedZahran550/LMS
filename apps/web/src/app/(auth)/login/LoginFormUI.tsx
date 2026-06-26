@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -9,7 +10,7 @@ import { UseFormRegister, FieldErrors } from 'react-hook-form';
 interface LoginFormUIProps {
   register: UseFormRegister<any>;
   errors: FieldErrors<any>;
-  serverError: string | null;
+  serverError: { message: string; code?: string } | null;
   isLoading: boolean;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   onResendVerification: () => void;
@@ -29,20 +30,21 @@ export function LoginFormUI({
   resendSuccess,
   resendError,
 }: LoginFormUIProps) {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Enter your credentials to access your account.</CardDescription>
+        <CardTitle>{t('Sign in to your account')}</CardTitle>
+        <CardDescription>{t('Enter your credentials to access your account.')}</CardDescription>
       </CardHeader>
       <form onSubmit={onSubmit}>
         <CardContent className="space-y-4">
           {serverError && (
             <div className="text-sm text-red-500 bg-red-50 p-3 rounded space-y-2">
-              <div>{serverError}</div>
-              {serverError === 'Please verify your email before logging in' && (
+              <div>{serverError.message}</div>
+              {serverError.code === 'VERIFY_EMAIL' && (
                 <div>
                   <button
                     type="button"
@@ -50,7 +52,7 @@ export function LoginFormUI({
                     disabled={isResending}
                     className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline disabled:opacity-50"
                   >
-                    {isResending ? 'Resending...' : 'Resend verification email'}
+                    {isResending ? t('Loading...') : t('Resend verification email')}
                   </button>
                 </div>
               )}
@@ -67,7 +69,7 @@ export function LoginFormUI({
             </div>
           )}
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="email">Email address</label>
+            <label className="text-sm font-medium" htmlFor="email">{t('Email address')}</label>
             <Input
               id="email"
               type="email"
@@ -79,7 +81,7 @@ export function LoginFormUI({
             )}
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="password">Password</label>
+            <label className="text-sm font-medium" htmlFor="password">{t('Password')}</label>
             <div className="relative">
               <Input
                 id="password"
@@ -102,12 +104,12 @@ export function LoginFormUI({
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" isLoading={isLoading}>
-            Sign in
+            {t('Sign in with email')}
           </Button>
           <p className="text-sm text-center text-slate-500">
-            Don't have an account?{' '}
+            {t("Don't have an account?")}{' '}
             <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Register now
+              {t('Sign up')}
             </Link>
           </p>
         </CardFooter>
