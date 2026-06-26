@@ -101,7 +101,7 @@ export default function CourseCatalogPage() {
           <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
           <Input 
             className="pl-9" 
-            placeholder={activeTab === 'courses' ? "Search courses..." : "Search instructors..."}
+            placeholder={activeTab === 'courses' ? t('Search courses...') : t('Search instructors...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -113,7 +113,7 @@ export default function CourseCatalogPage() {
               activeTab === 'courses' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            Courses
+            {t('Courses')}
           </button>
           <button
             onClick={() => setActiveTab('instructors')}
@@ -121,7 +121,7 @@ export default function CourseCatalogPage() {
               activeTab === 'instructors' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            Instructors
+            {t('Instructors')}
           </button>
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function CourseCatalogPage() {
         <div className="space-y-6">
           {courses.length === 0 ? (
             <div className="text-center py-12 text-slate-500">
-              No public courses available right now.
+              {t('No public courses available right now.')}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -152,7 +152,7 @@ export default function CourseCatalogPage() {
                   <CardContent className="flex-1">
                     <div className="flex items-center text-sm text-slate-500">
                       <Users className="mr-2 h-4 w-4" />
-                      Instructor: {course.instructor?.firstName} {course.instructor?.lastName}
+                      {t('Instructor: {{name}}', { name: `${course.instructor?.firstName} ${course.instructor?.lastName}` })}
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -162,7 +162,7 @@ export default function CourseCatalogPage() {
                         variant="outline"
                         disabled
                       >
-                        Waiting for instructor accept
+                        {t('Waiting for instructor accept')}
                       </Button>
                     ) : (
                       <Button 
@@ -170,7 +170,7 @@ export default function CourseCatalogPage() {
                         onClick={() => enrollMutation.mutate(course.id)}
                         isLoading={enrollMutation.isPending}
                       >
-                        Request to Join
+                        {t('Request to Join')}
                       </Button>
                     )}
                   </CardFooter>
@@ -183,7 +183,7 @@ export default function CourseCatalogPage() {
         <div className="space-y-6">
           {instructors.length === 0 ? (
             <div className="text-center py-12 text-slate-500">
-              No instructors found.
+              {t('No instructors found.')}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -203,7 +203,7 @@ export default function CourseCatalogPage() {
                   <CardFooter className="mt-auto pt-4 border-t border-slate-100">
                     <Link href={`/instructors/${instructor.id}`} className="w-full">
                       <Button variant="outline" className="w-full">
-                        View Profile & Courses
+                        {t('View Profile & Courses')}
                       </Button>
                     </Link>
                   </CardFooter>

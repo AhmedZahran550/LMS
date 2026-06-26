@@ -3,6 +3,7 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { courseApis } from '@/lib/courseApis';
 import { instructorApis } from '@/lib/instructorApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
@@ -14,6 +15,7 @@ import Link from 'next/link';
 
 export default function InstructorProfilePage() {
   const { id } = useParams() as { id: string };
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const router = useRouter();
 
@@ -73,8 +75,8 @@ export default function InstructorProfilePage() {
   if (!instructor) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-semibold text-slate-900">Instructor not found</h2>
-        <Button className="mt-4" onClick={() => router.push('/courses')}>Back to Catalog</Button>
+        <h2 className="text-2xl font-semibold text-slate-900">{t('Instructor not found')}</h2>
+        <Button className="mt-4" onClick={() => router.push('/courses')}>{t('Back to Catalog')}</Button>
       </div>
     );
   }
@@ -84,7 +86,7 @@ export default function InstructorProfilePage() {
       <div>
         <Link href="/courses" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 mb-6 transition-colors">
           <ChevronLeft className="mr-1 h-4 w-4" />
-          Back to Catalog
+          {t('Back to Catalog')}
         </Link>
         
         {/* Profile Header */}
@@ -105,7 +107,7 @@ export default function InstructorProfilePage() {
               <span>{instructor.email}</span>
             </div>
             <div className="mt-4 inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
-              Instructor Profile
+              {t('Instructor Profile')}
             </div>
           </div>
         </div>
@@ -113,11 +115,11 @@ export default function InstructorProfilePage() {
 
       {/* Courses Section */}
       <div>
-        <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-6">Courses by this Instructor</h2>
+        <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-6">{t('Courses by this Instructor')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.length === 0 ? (
             <div className="col-span-full text-center py-12 text-slate-500 bg-white rounded-xl border border-dashed border-slate-300">
-              This instructor hasn't published any public courses yet.
+              {t("This instructor hasn't published any public courses yet.")}
             </div>
           ) : (
             courses.map((course) => (
@@ -134,7 +136,7 @@ export default function InstructorProfilePage() {
                 <CardContent className="flex-1">
                   <div className="flex items-center text-sm text-slate-500">
                     <Users className="mr-2 h-4 w-4" />
-                    Instructor: {instructor.firstName} {instructor.lastName}
+                    {t('Instructor: {{name}}', { name: `${instructor.firstName} ${instructor.lastName}` })}
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -144,7 +146,7 @@ export default function InstructorProfilePage() {
                       variant="outline"
                       disabled
                     >
-                      Waiting for instructor accept
+                      {t('Waiting for instructor accept')}
                     </Button>
                   ) : (
                     <Button 
@@ -152,7 +154,7 @@ export default function InstructorProfilePage() {
                       onClick={() => enrollMutation.mutate(course.id)}
                       isLoading={enrollMutation.isPending}
                     >
-                      Request to Join
+                      {t('Request to Join')}
                     </Button>
                   )}
                 </CardFooter>

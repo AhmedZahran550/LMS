@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { courseApis } from '@/lib/courseApis';
+import { useTranslation } from 'react-i18next';
 import { PlayCircle, ChevronLeft, Search, FileText, Image as ImageIcon, Presentation } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/Input';
@@ -15,6 +16,7 @@ import { ContentType } from '@lms/shared-types';
 export default function CourseDetailPage() {
   const params = useParams();
   const courseId = params.id as string;
+  const { t } = useTranslation();
   
   const [activeContent, setActiveContent] = useState<any>(null);
   const [page, setPage] = useState(1);
@@ -47,17 +49,17 @@ export default function CourseDetailPage() {
 
   if (courseLoading) return <div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>;
 
-  if (!course) return <div>Course not found or access denied.</div>;
+  if (!course) return <div>{t('Course not found or access denied.')}</div>;
 
   const contents = paginatedContent?.data || [];
   const meta = paginatedContent?.meta;
 
   const contentTypes = [
-    { value: '', label: 'All Types' },
-    { value: ContentType.VIDEO, label: 'Video' },
-    { value: ContentType.PDF, label: 'PDF' },
-    { value: ContentType.IMAGE, label: 'Image' },
-    { value: ContentType.PRESENTATION, label: 'Presentation' },
+    { value: '', label: t('All Types') },
+    { value: ContentType.VIDEO, label: t('Video') },
+    { value: ContentType.PDF, label: t('PDF') },
+    { value: ContentType.IMAGE, label: t('Image') },
+    { value: ContentType.PRESENTATION, label: t('Presentation') },
   ];
 
   const renderContentIcon = (type: ContentType, className: string = "h-5 w-5") => {
@@ -78,21 +80,21 @@ export default function CourseDetailPage() {
         </Link>
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">{course.title}</h1>
-          <p className="text-slate-500 mt-1">Instructor: {course.instructor?.firstName} {course.instructor?.lastName}</p>
+          <p className="text-slate-500 mt-1">{t('Instructor: {{name}}', { name: `${course.instructor?.firstName} ${course.instructor?.lastName}` })}</p>
         </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-200">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <h2 className="text-xl font-semibold text-slate-900">Course Content</h2>
+            <h2 className="text-xl font-semibold text-slate-900">{t('Course Content')}</h2>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-64">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-slate-400" />
                 </div>
                 <Input
-                  placeholder="Search content..."
+                  placeholder={t('Search content...')}
                   className="pl-10 w-full"
                   value={searchQuery}
                   onChange={(e) => {
@@ -125,8 +127,8 @@ export default function CourseDetailPage() {
             </div>
           ) : contents.length === 0 ? (
             <div className="text-center py-16 px-4">
-              <p className="text-lg text-slate-500 mb-2">No content available.</p>
-              <p className="text-sm text-slate-400">Try adjusting your filters or search query.</p>
+              <p className="text-lg text-slate-500 mb-2">{t('No content available.')}</p>
+              <p className="text-sm text-slate-400">{t('Try adjusting your filters or search query.')}</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
