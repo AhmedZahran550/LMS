@@ -1,42 +1,45 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslation } from 'react-i18next';
 import { BookOpen, Users, LineChart, ShieldCheck, Zap, Laptop } from "lucide-react";
 
-const features = [
-  {
-    icon: <BookOpen className="w-6 h-6 text-violet-600 dark:text-violet-400" />,
-    title: "Interactive Courses",
-    description: "Learn through hands-on exercises, quizzes, and real-world projects designed by industry experts."
-  },
-  {
-    icon: <LineChart className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />,
-    title: "Real-time Analytics",
-    description: "Track your progress with detailed analytics and personalized learning paths to keep you on track."
-  },
-  {
-    icon: <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />,
-    title: "Community Driven",
-    description: "Join a vibrant community of learners. Share insights, ask questions, and collaborate on projects."
-  },
-  {
-    icon: <Laptop className="w-6 h-6 text-fuchsia-600 dark:text-fuchsia-400" />,
-    title: "Learn Anywhere",
-    description: "Access your courses on any device. Sync your progress seamlessly across mobile, tablet, and desktop."
-  },
-  {
-    icon: <Zap className="w-6 h-6 text-rose-600 dark:text-rose-400" />,
-    title: "Fast & Responsive",
-    description: "Experience lightning-fast load times and a silky smooth interface powered by modern web technologies."
-  },
-  {
-    icon: <ShieldCheck className="w-6 h-6 text-blue-600 dark:text-blue-400" />,
-    title: "Secure Platform",
-    description: "Your data is protected with enterprise-grade security, robust encryption, and strict privacy controls."
-  }
-];
-
 export default function Features() {
+  const { t } = useTranslation();
+
+  const features = [
+    {
+      icon: <BookOpen className="w-6 h-6 text-violet-600 dark:text-violet-400" />,
+      title: t('Interactive Courses'),
+      description: t('Learn through hands-on exercises, quizzes, and real-world projects designed by industry experts.')
+    },
+    {
+      icon: <LineChart className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />,
+      title: t('Real-time Analytics'),
+      description: t('Track your progress with detailed analytics and personalized learning paths to keep you on track.')
+    },
+    {
+      icon: <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />,
+      title: t('Community Driven'),
+      description: t('Join a vibrant community of learners. Share insights, ask questions, and collaborate on projects.')
+    },
+    {
+      icon: <Laptop className="w-6 h-6 text-fuchsia-600 dark:text-fuchsia-400" />,
+      title: t('Learn Anywhere'),
+      description: t('Access your courses on any device. Sync your progress seamlessly across mobile, tablet, and desktop.')
+    },
+    {
+      icon: <Zap className="w-6 h-6 text-rose-600 dark:text-rose-400" />,
+      title: t('Fast & Responsive'),
+      description: t('Experience lightning-fast load times and a silky smooth interface powered by modern web technologies.')
+    },
+    {
+      icon: <ShieldCheck className="w-6 h-6 text-blue-600 dark:text-blue-400" />,
+      title: t('Secure Platform'),
+      description: t('Your data is protected with enterprise-grade security, robust encryption, and strict privacy controls.')
+    }
+  ];
+
   return (
     <section id="features" className="py-24 bg-white dark:bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-6">
@@ -48,7 +51,7 @@ export default function Features() {
             transition={{ duration: 0.5 }}
             className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-6"
           >
-            Everything you need to <span className="text-violet-600 dark:text-violet-400">succeed</span>
+            {t('Everything you need to ')}<span className="text-violet-600 dark:text-violet-400">{t('succeed')}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -57,7 +60,7 @@ export default function Features() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-lg text-slate-600 dark:text-slate-400"
           >
-            We've built a comprehensive suite of tools to help you learn faster, retain more knowledge, and achieve your goals.
+            {t("We've built a comprehensive suite of tools to help you learn faster, retain more knowledge, and achieve your goals.")}
           </motion.p>
         </div>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -29,6 +30,7 @@ export function ProfileFormUI({
   isUploading,
   onAvatarChange,
 }: ProfileFormUIProps) {
+  const { t } = useTranslation();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
@@ -37,9 +39,9 @@ export function ProfileFormUI({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-            My Profile <Sparkles className="h-6 w-6 text-indigo-500 animate-pulse" />
+            {t('My Profile')} <Sparkles className="h-6 w-6 text-indigo-500 animate-pulse" />
           </h1>
-          <p className="text-slate-500 mt-1">Manage your account information and avatar.</p>
+          <p className="text-slate-500 mt-1">{t('Manage your account information and avatar.')}</p>
         </div>
       </div>
 
@@ -47,8 +49,8 @@ export function ProfileFormUI({
         {/* Left Column: Avatar Management Card */}
         <Card className="md:col-span-1 shadow-sm border-slate-100 flex flex-col items-center p-6 text-center bg-white rounded-2xl">
           <CardHeader className="w-full pb-2">
-            <CardTitle className="text-lg font-bold text-slate-800">Profile Picture</CardTitle>
-            <CardDescription className="text-xs text-slate-400">JPG, PNG, or GIF up to 5MB</CardDescription>
+            <CardTitle className="text-lg font-bold text-slate-800">{t('Profile Picture')}</CardTitle>
+            <CardDescription className="text-xs text-slate-400">{t('JPG, PNG, or GIF up to 5MB')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center w-full py-6">
             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
@@ -84,7 +86,7 @@ export function ProfileFormUI({
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
-              Change Photo
+              {t('Change Photo')}
             </Button>
           </CardContent>
         </Card>
@@ -93,13 +95,13 @@ export function ProfileFormUI({
         <Card className="md:col-span-2 shadow-sm border-slate-100 bg-white rounded-2xl">
           <form onSubmit={handleSubmit} className="h-full flex flex-col">
             <CardHeader className="border-b border-slate-50">
-              <CardTitle className="text-xl font-bold text-slate-800">Account Information</CardTitle>
-              <CardDescription>Update your personal details below.</CardDescription>
+              <CardTitle className="text-xl font-bold text-slate-800">{t('Account Information')}</CardTitle>
+              <CardDescription>{t('Update your personal details below.')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6 flex-1">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-600">First Name</label>
+                  <label className="text-sm font-semibold text-slate-600">{t('First Name')}</label>
                   <Input
                     {...register('firstName')}
                     placeholder="John"
@@ -111,7 +113,7 @@ export function ProfileFormUI({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-600">Last Name</label>
+                  <label className="text-sm font-semibold text-slate-600">{t('Last Name')}</label>
                   <Input
                     {...register('lastName')}
                     placeholder="Doe"
@@ -125,9 +127,9 @@ export function ProfileFormUI({
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-semibold text-slate-600">Email Address</label>
+                  <label className="text-sm font-semibold text-slate-600">{t('Email Address')}</label>
                   <span className="text-xs text-slate-400 flex items-center gap-1 font-medium bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">
-                    <Shield className="h-3 w-3 text-slate-400" /> Read-Only
+                    <Shield className="h-3 w-3 text-slate-400" /> {t('Read-Only')}
                   </span>
                 </div>
                 <div className="relative">
@@ -138,11 +140,11 @@ export function ProfileFormUI({
                   />
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 </div>
-                <p className="text-xs text-slate-400 mt-1">For security reasons, your email address cannot be changed.</p>
+                <p className="text-xs text-slate-400 mt-1">{t('For security reasons, your email address cannot be changed.')}</p>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-600 font-medium">Role</label>
+                <label className="text-sm font-semibold text-slate-600 font-medium">{t('Role')}</label>
                 <div className="inline-flex items-center rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider">
                   {profile?.role}
                 </div>
@@ -156,7 +158,7 @@ export function ProfileFormUI({
                 isLoading={isUpdating}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
               >
-                Save Changes
+                {t('Save Changes')}
               </Button>
             </CardFooter>
           </form>

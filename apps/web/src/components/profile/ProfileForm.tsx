@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,6 +19,7 @@ export function ProfileForm() {
   const { data: profile, isLoading } = useProfileQuery();
   const updateProfileMutation = useUpdateProfileMutation();
   const uploadAvatarMutation = useUploadAvatarMutation();
+  const { t } = useTranslation();
 
   const {
     register,
@@ -45,10 +47,10 @@ export function ProfileForm() {
   const onSubmit = (data: ProfileFormValues) => {
     updateProfileMutation.mutate(data, {
       onSuccess: () => {
-        alert('Profile updated successfully!');
+        alert(t('Profile updated successfully!'));
       },
       onError: (err: any) => {
-        alert(err.response?.data?.message || 'Failed to update profile');
+        alert(err.response?.data?.message || t('Failed to update profile'));
       },
     });
   };
@@ -58,10 +60,10 @@ export function ProfileForm() {
     if (file) {
       uploadAvatarMutation.mutate(file, {
         onSuccess: () => {
-          alert('Avatar uploaded successfully!');
+          alert(t('Avatar uploaded successfully!'));
         },
         onError: (err: any) => {
-          alert(err.response?.data?.message || 'Failed to upload avatar');
+          alert(err.response?.data?.message || t('Failed to upload avatar'));
         },
       });
     }

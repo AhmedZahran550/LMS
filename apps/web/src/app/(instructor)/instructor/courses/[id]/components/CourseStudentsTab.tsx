@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -20,6 +21,7 @@ import { enrollmentApis } from '@/lib/enrollmentApis';
 import { EnrollmentStatus } from '@lms/shared-types';
 
 export function CourseStudentsTab({ courseId, enrollments }: { courseId: string, enrollments: any[] }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [inviteEmail, setInviteEmail] = useState('');
   
@@ -73,16 +75,16 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
       <div className="xl:col-span-1 space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Invite Students</CardTitle>
-            <CardDescription>Send an email invitation to enroll a new student.</CardDescription>
+            <CardTitle>{t('Invite Students')}</CardTitle>
+            <CardDescription>{t('Send an email invitation to enroll a new student.')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Invite by Email</label>
+              <label className="text-sm font-medium">{t('Invite by Email')}</label>
               <div className="flex space-x-2">
                 <Input placeholder="learner@example.com" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
                 <Button onClick={() => inviteMutation.mutate()} isLoading={inviteMutation.isPending}>
-                  <Mail className="h-4 w-4 mr-2" /> Invite
+                  <Mail className="h-4 w-4 mr-2" /> {t('Invite')}
                 </Button>
               </div>
             </div>
@@ -91,13 +93,13 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
 
         <Card>
           <CardHeader>
-            <CardTitle>Pending Requests</CardTitle>
-            <CardDescription>Manage enrollment requests from learners.</CardDescription>
+            <CardTitle>{t('Pending Requests')}</CardTitle>
+            <CardDescription>{t('Manage enrollment requests from learners.')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {pendingRequests.length === 0 && (
-                <p className="text-sm text-slate-500 text-center py-4">No pending enrollment requests.</p>
+                <p className="text-sm text-slate-500 text-center py-4">{t('No pending enrollment requests.')}</p>
               )}
               {pendingRequests.map((e: any) => (
                 <div key={e.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 border rounded-md bg-yellow-50/30 gap-3">
@@ -107,10 +109,10 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
                   </div>
                   <div className="flex space-x-2 shrink-0">
                     <Button size="sm" variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.APPROVED })}>
-                      <Check className="h-4 w-4 mr-1" /> Approve
+                      <Check className="h-4 w-4 mr-1" /> {t('Approve')}
                     </Button>
                     <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.REJECTED })}>
-                      <X className="h-4 w-4 mr-1" /> Reject
+                      <X className="h-4 w-4 mr-1" /> {t('Reject')}
                     </Button>
                   </div>
                 </div>
@@ -123,24 +125,24 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
       <div className="xl:col-span-2">
         <Card className="h-full">
           <CardHeader>
-            <CardTitle>Enrolled Students</CardTitle>
-            <CardDescription>View and manage students currently enrolled in the course.</CardDescription>
+            <CardTitle>{t('Enrolled Students')}</CardTitle>
+            <CardDescription>{t('View and manage students currently enrolled in the course.')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="rounded-md border border-slate-200">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Enrolled Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('Student')}</TableHead>
+                    <TableHead>{t('Enrolled Date')}</TableHead>
+                    <TableHead className="text-right">{t('Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {approvedStudents.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-8 text-slate-500">
-                        No students enrolled yet.
+                        {t('No students enrolled yet.')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -166,13 +168,13 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
                             variant="ghost" 
                             className="text-red-600 hover:text-red-700 hover:bg-red-50" 
                             onClick={() => {
-                              if (confirm('Are you sure you want to remove this student from the course?')) {
+                              if (confirm(t('Are you sure you want to remove this student from the course?'))) {
                                 removeStudentMutation.mutate(e.id);
                               }
                             }}
                             isLoading={removeStudentMutation.isPending && removeStudentMutation.variables === e.id}
                           >
-                            <Trash2 className="h-4 w-4 mr-1" /> Remove
+                            <Trash2 className="h-4 w-4 mr-1" /> {t('Remove')}
                           </Button>
                         </TableCell>
                       </TableRow>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { courseApis } from '@/lib/courseApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
@@ -14,6 +15,7 @@ import { Search, ChevronDown } from 'lucide-react';
 
 export default function InstructorCoursesPage() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
@@ -82,11 +84,11 @@ export default function InstructorCoursesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Manage Courses</h1>
-          <p className="text-slate-500 mt-1">Create and manage your educational content.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t('Manage Courses')}</h1>
+          <p className="text-slate-500 mt-1">{t('Create and manage your educational content.')}</p>
         </div>
         <Button onClick={() => setIsCreating(!isCreating)}>
-          {isCreating ? 'Cancel' : 'Create New Course'}
+          {isCreating ? t('Cancel') : t('Create New Course')}
         </Button>
       </div>
 
@@ -95,7 +97,7 @@ export default function InstructorCoursesPage() {
           <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
           <Input 
             className="pl-9" 
-            placeholder="Search your courses..." 
+            placeholder={t('Search your courses...')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -105,9 +107,9 @@ export default function InstructorCoursesPage() {
             value={visibilityFilter}
             onChange={(e) => setVisibilityFilter(e.target.value)}
           >
-            <option value="ALL">All Visibility</option>
-            <option value={CourseVisibility.PUBLIC}>Public</option>
-            <option value={CourseVisibility.PRIVATE}>Private</option>
+            <option value="ALL">{t('All Visibility')}</option>
+            <option value={CourseVisibility.PUBLIC}>{t('Public')}</option>
+            <option value={CourseVisibility.PRIVATE}>{t('Private')}</option>
           </Select>
         </div>
       </div>
@@ -115,15 +117,15 @@ export default function InstructorCoursesPage() {
       {isCreating && (
         <Card className="border-indigo-200 bg-indigo-50/50">
           <CardHeader>
-            <CardTitle>Create a new course</CardTitle>
+            <CardTitle>{t('Create a new course')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-1 block">Course Title</label>
+              <label className="text-sm font-medium mb-1 block">{t('Course Title')}</label>
               <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Advanced TypeScript" />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Description</label>
+              <label className="text-sm font-medium mb-1 block">{t('Description')}</label>
               <textarea 
                 className="flex w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" 
                 rows={3}
@@ -133,7 +135,7 @@ export default function InstructorCoursesPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => createMutation.mutate()} isLoading={createMutation.isPending}>Save Course</Button>
+            <Button onClick={() => createMutation.mutate()} isLoading={createMutation.isPending}>{t('Save Course')}</Button>
           </CardFooter>
         </Card>
       )}
@@ -146,7 +148,7 @@ export default function InstructorCoursesPage() {
         <div className="space-y-6">
           {courses.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-              <p className="text-slate-500">No courses found.</p>
+              <p className="text-slate-500">{t('No courses found.')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -168,8 +170,8 @@ export default function InstructorCoursesPage() {
                               : 'bg-slate-50 text-slate-600 ring-slate-500/10 hover:bg-slate-100'
                           }`}
                         >
-                          <option value={CourseVisibility.PUBLIC}>Public</option>
-                          <option value={CourseVisibility.PRIVATE}>Private</option>
+                          <option value={CourseVisibility.PUBLIC}>{t('Public')}</option>
+                          <option value={CourseVisibility.PRIVATE}>{t('Private')}</option>
                         </select>
                         <ChevronDown className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none ${
                           course.visibility === CourseVisibility.PUBLIC ? 'text-green-600' : 'text-slate-500'
@@ -181,7 +183,7 @@ export default function InstructorCoursesPage() {
                   </CardHeader>
                   <CardFooter className="mt-auto pt-6">
                     <Link href={`/instructor/courses/${course.id}`} className="w-full">
-                      <Button variant="outline" className="w-full">Manage Content</Button>
+                      <Button variant="outline" className="w-full">{t('Manage Content')}</Button>
                     </Link>
                   </CardFooter>
                 </Card>

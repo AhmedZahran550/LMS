@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from 'react-i18next';
 import React, { useRef, useState } from "react";
 import {
   Card,
@@ -40,6 +41,7 @@ import { courseApis } from "@/lib/courseApis";
 import { ContentType } from "@lms/shared-types";
 
 export function CourseContentTab({ courseId }: { courseId: string }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -119,11 +121,11 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
   console.log("contents", contents);
 
   const contentTypes = [
-    { value: "", label: "All Types" },
-    { value: ContentType.VIDEO, label: "Video" },
-    { value: ContentType.PDF, label: "PDF" },
-    { value: ContentType.IMAGE, label: "Image" },
-    { value: ContentType.PRESENTATION, label: "Presentation" },
+    { value: "", label: t("All Types") },
+    { value: ContentType.VIDEO, label: t("Video") },
+    { value: ContentType.PDF, label: t("PDF") },
+    { value: ContentType.IMAGE, label: t("Image") },
+    { value: ContentType.PRESENTATION, label: t("Presentation") },
   ];
 
   return (
@@ -131,13 +133,11 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
       <Card className="h-full">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <CardTitle>Course Content</CardTitle>
-            <CardDescription>
-              Manage and organize uploaded files.
-            </CardDescription>
+            <CardTitle>{t('Course Content')}</CardTitle>
+            <CardDescription>{t('Manage and organize uploaded files.')}</CardDescription>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" /> Add Content
+            <Plus className="h-4 w-4 mr-2" /> {t('Add Content')}
           </Button>
         </CardHeader>
         <CardContent>
@@ -148,7 +148,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                 <Search className="h-4 w-4 text-slate-400" />
               </div>
               <Input
-                placeholder="Search content..."
+                placeholder={t('Search content...')}
                 className="pl-10"
                 value={searchQuery}
                 onChange={(e) => {
@@ -178,11 +178,11 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">#</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-12">{t('#')}</TableHead>
+                  <TableHead>{t('Title')}</TableHead>
+                  <TableHead>{t('Type')}</TableHead>
+                  <TableHead>{t('Size')}</TableHead>
+                  <TableHead className="text-right">{t('Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -198,7 +198,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                       colSpan={5}
                       className="text-center py-8 text-slate-500"
                     >
-                      No content found.
+                      {t('No content found.')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -235,7 +235,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                             size="sm"
                             onClick={() => setActiveContent(content)}
                           >
-                            <Eye className="h-4 w-4 mr-1" /> View
+                            <Eye className="h-4 w-4 mr-1" /> {t('View')}
                           </Button>
                           <Button
                             variant="ghost"
@@ -243,9 +243,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             onClick={() => {
                               if (
-                                confirm(
-                                  "Are you sure you want to delete this content?",
-                                )
+                                confirm(t("Are you sure you want to delete this content?"))
                               ) {
                                 deleteMutation.mutate(content.id);
                               }
@@ -282,12 +280,12 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
       <Dialog
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
-        title="Upload Content"
-        description="Add videos, PDFs, images, or presentations to this course."
+        title={t('Upload Content')}
+        description={t('Add videos, PDFs, images, or presentations to this course.')}
       >
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium mb-1 block">Title</label>
+            <label className="text-sm font-medium mb-1 block">{t('Title')}</label>
             <Input
               placeholder="e.g. Introduction Lecture"
               value={contentTitle}
@@ -295,21 +293,17 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
             />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1 block">File</label>
+            <label className="text-sm font-medium mb-1 block">{t('File')}</label>
             <Input
               type="file"
               accept="video/*,application/pdf,image/*,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
               ref={fileInputRef}
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
             />
-            <p className="text-xs text-slate-500 mt-1">
-              Supported: Video, PDF, Image, PPTX
-            </p>
+            <p className="text-xs text-slate-500 mt-1">{t('Supported: Video, PDF, Image, PPTX')}</p>
           </div>
           <div>
-            <label className="text-sm font-medium mb-1 block">
-              Description
-            </label>
+            <label className="text-sm font-medium mb-1 block">{t('Description')}</label>
             <textarea
               className="w-full text-sm p-3 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Content description..."
@@ -324,7 +318,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
             isLoading={uploadMutation.isPending}
             className="w-full"
           >
-            <Upload className="mr-2 h-4 w-4" /> Upload Content
+            <Upload className="mr-2 h-4 w-4" /> {t('Upload Content')}
           </Button>
         </div>
       </Dialog>

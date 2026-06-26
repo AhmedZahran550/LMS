@@ -6,9 +6,11 @@ import { courseApis } from '@/lib/courseApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Video, Users, BookOpen } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useTranslation } from 'react-i18next';
 
 export default function InstructorDashboard() {
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const { data: stats } = useQuery({
     queryKey: ['instructor-dashboard-stats'],
     queryFn: async () => {
@@ -20,15 +22,15 @@ export default function InstructorDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Welcome, {user?.firstName}</h1>
-          <p className="text-slate-500 mt-1">Here is an overview of your teaching activity.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t('Welcome, {{name}}', { name: user?.firstName })}</h1>
+          <p className="text-slate-500 mt-1">{t('Here is an overview of your teaching activity.')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Courses</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">{t('Total Courses')}</CardTitle>
             <BookOpen className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
@@ -38,7 +40,7 @@ export default function InstructorDashboard() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Videos</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">{t('Total Videos')}</CardTitle>
             <Video className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>
@@ -48,7 +50,7 @@ export default function InstructorDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Students</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-600">{t('Total Students')}</CardTitle>
             <Users className="h-4 w-4 text-slate-400" />
           </CardHeader>
           <CardContent>

@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, PlayCircle } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 export default function Hero() {
+  const { t } = useTranslation();
   return (
     <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
       {/* Background Gradients */}
@@ -22,7 +24,7 @@ export default function Hero() {
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-100 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 text-sm font-medium mb-8 border border-violet-200 dark:border-violet-500/20"
         >
           <span className="flex h-2 w-2 rounded-full bg-violet-600 dark:bg-violet-400 animate-pulse" />
-          Platform Version 2.0 is now live
+          {t('Platform Version 2.0 is now live')}
         </motion.div>
 
         <motion.h1
@@ -31,11 +33,11 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl mb-6"
         >
-          Master any skill with our{" "}
+          {t('Master any skill with our')}{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 dark:from-violet-400 dark:to-indigo-400">
-            next-generation
+            {t('next-generation')}
           </span>{" "}
-          learning platform.
+          {t('learning platform.')}
         </motion.h1>
 
         <motion.p
@@ -44,7 +46,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mb-10"
         >
-          Empower your future with interactive courses, real-time progress tracking, and an engaging community of learners.
+          {t('Empower your future with interactive courses, real-time progress tracking, and an engaging community of learners.')}
         </motion.p>
 
         <motion.div
@@ -57,10 +59,10 @@ export default function Hero() {
             href="/register"
             className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold shadow-xl hover:scale-105 transition-transform"
           >
-            Start Learning Free <ArrowRight className="w-5 h-5" />
+            {t('Start Learning Free')} <ArrowRight className="w-5 h-5" />
           </Link>
           <button className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-full bg-white dark:bg-black text-slate-900 dark:text-white font-semibold border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-            <PlayCircle className="w-5 h-5" /> Watch Demo
+            <PlayCircle className="w-5 h-5" /> {t('Watch Demo')}
           </button>
         </motion.div>
 
@@ -74,7 +76,7 @@ export default function Hero() {
           <div className="relative rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden bg-slate-100 dark:bg-zinc-900 ring-1 ring-black/5 dark:ring-white/10 transform-gpu rotate-x-12 scale-95 hover:rotate-x-0 hover:scale-100 transition-all duration-700 ease-out origin-bottom">
             <Image
               src="/hero-mockup.png"
-              alt="LMS Dashboard Mockup"
+              alt={t('LMS Dashboard Mockup')}
               width={1200}
               height={800}
               className="w-full h-auto object-cover"
