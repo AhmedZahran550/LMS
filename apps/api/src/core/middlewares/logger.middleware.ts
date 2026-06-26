@@ -1,5 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import { LogsService } from '../../modules/logs/logs.service';
 import { redactSensitiveData } from '../utils/redact.util';
 
@@ -8,6 +9,10 @@ export class LoggerMiddleware implements NestMiddleware {
   constructor(private readonly logsService: LogsService) {}
 
   use(req: Request, res: Response, next: NextFunction) {
+    const requestId = uuidv4();
+    (req as any).requestId = requestId;
+    res.setHeader('X-Request-Id', requestId);
+
     const startTime = Date.now();
     const { method, originalUrl, ip, body } = req;
 
@@ -32,6 +37,7 @@ export class LoggerMiddleware implements NestMiddleware {
         statusCode,
         responseTime,
         requestBody: redactedBody,
+        requestId,
       }).catch(err => {
         console.error('Failed to save log to database', err);
       });

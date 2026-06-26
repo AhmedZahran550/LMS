@@ -49,7 +49,8 @@
     "reflect-metadata": "^0.2.0",
     "resend": "^3.2.0",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@lms/eslint-config": "workspace:*",
@@ -64,6 +65,7 @@
     "@types/nodemailer": "^6.4.14",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.0",
+    "@types/uuid": "^11.0.0",
     "jest": "^29.5.0",
     "source-map-support": "^0.5.21",
     "supertest": "^6.3.3",

@@ -21,6 +21,15 @@
       "new_content": "New content \"{content}\" has been added to \"{course}\""
     }
   },
+  "validation": {
+    "isEmail": "Must be a valid email address",
+    "isNotEmpty": "This field is required",
+    "isString": "Must be a string",
+    "isEnum": "Invalid value",
+    "minLength": "Too short",
+    "maxLength": "Too long",
+    "matches": "Invalid format"
+  },
   "errors": {
     "INVALID_CREDENTIALS": "Invalid credentials",
     "EMAIL_EXISTS": "Email already exists",

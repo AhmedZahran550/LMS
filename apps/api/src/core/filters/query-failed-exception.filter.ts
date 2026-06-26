@@ -19,7 +19,6 @@ export class DBExceptionFilter implements ExceptionFilter {
       if (!code) {
         throw exception;
       }
-      let message = exception.message as any;
       const fieldlastIndex = (exception as any).detail?.indexOf(')');
       let property;
       if ((exception as any).detail && fieldlastIndex !== -1) {
@@ -30,62 +29,75 @@ export class DBExceptionFilter implements ExceptionFilter {
       }
       switch (code) {
         case DBErrorCode.UNIQUE_VOILATION:
-          message = [
-            {
-              property: property ?? undefined,
-              code: ErrorCodes.UNIQUE_VOILATION,
-              constraint: (exception as any).constraint,
-            },
-          ];
-          throw new ConflictException(message);
+          throw new ConflictException({
+            message: 'This value already exists',
+            errorCode: 'UNIQUE_VIOLATION',
+            errors: [
+              {
+                property: property ?? undefined,
+                code: ErrorCodes.UNIQUE_VOILATION,
+                message: 'This value already exists',
+              },
+            ],
+          });
         case DBErrorCode.NOT_NULL_CONSTRAINT:
-          message = [
-            {
-              property: (exception as any).column ?? property ?? undefined,
-              code: ErrorCodes.NOT_NULL_CONSTRAINT,
-              constraint: (exception as any).constraint,
-            },
-          ];
-          throw new ConflictException(message);
+          throw new BadRequestException({
+            message: 'This field is required',
+            errorCode: 'BAD_REQUEST',
+            errors: [
+              {
+                property: (exception as any).column ?? property ?? undefined,
+                code: ErrorCodes.NOT_NULL_CONSTRAINT,
+                message: 'This field is required',
+              },
+            ],
+          });
         case DBErrorCode.CHECK_VOILATION:
-          message = [
-            {
-              property: property ?? undefined,
-              code: ErrorCodes.UNIQUE_VOILATION,
-              constraint: (exception as any).constraint,
-            },
-          ];
-          throw new ConflictException(message);
+          throw new ConflictException({
+            message: 'Constraint violation',
+            errorCode: 'BAD_REQUEST',
+            errors: [
+              {
+                property: property ?? undefined,
+                code: ErrorCodes.UNIQUE_VOILATION,
+                message: 'Constraint violation',
+              },
+            ],
+          });
         case DBErrorCode.FORIGN_KEY_VIOLATION:
-          const forignKeyError = this.getForignKeyViolationError(
+          const foreignKeyError = this.getForeignkeyViolationError(
             (exception as any).detail,
           );
-          message = [forignKeyError];
-          throw new ConflictException(message);
+          throw new ConflictException({
+            message: 'Related record not found',
+            errorCode: 'CONFLICT',
+            errors: foreignKeyError ? [foreignKeyError] : [],
+          });
         case DBErrorCode.INVALID_TEXT_REPRESENTATION:
-          message = [
-            {
-              property: property ?? undefined,
-              code: ErrorCodes.INVALID_FORMAT,
-            },
-          ];
-          throw new BadRequestException(message);
+          throw new BadRequestException({
+            message: 'Invalid format',
+            errorCode: 'INVALID_FORMAT',
+            errors: [
+              {
+                property: property ?? undefined,
+                code: ErrorCodes.INVALID_FORMAT,
+                message: 'Invalid format',
+              },
+            ],
+          });
       }
-      // If we reach here, throw the error for the global filter to handle it
       throw exception;
     } else if (exception instanceof EntityNotFoundError) {
-      // For EntityNotFound, we can directly throw a NotFoundException
       throw new NotFoundException({
-        message: 'Resource not found.',
-        code: ErrorCodes.RESOURCE_NOT_FOUND,
+        message: 'Resource not found',
+        errorCode: ErrorCodes.RESOURCE_NOT_FOUND,
       });
     } else {
-      // Just throw the error for the global filter to handle it
       throw exception;
     }
   }
 
-  getForignKeyViolationError(message: string) {
+  getForeignkeyViolationError(message: string) {
     const regex = /Key \(([^)]+)\)=\(([^)]+)\)/;
     const matches = message.match(regex);
     if (!matches || matches.length < 2) {
@@ -98,6 +110,7 @@ export class DBExceptionFilter implements ExceptionFilter {
       property: key,
       value,
       code: ErrorCodes.UNIQUE_VOILATION,
+      message: 'Related record not found',
     };
   }
 }

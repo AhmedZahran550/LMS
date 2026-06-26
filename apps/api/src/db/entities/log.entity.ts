@@ -21,6 +21,9 @@ export class Log extends BaseEntity {
   @Column()
   responseTime!: number; // in milliseconds
 
+  @Column({ nullable: true })
+  requestId?: string;
+
   @Column({ type: 'jsonb', nullable: true })
   requestBody?: any;
 }

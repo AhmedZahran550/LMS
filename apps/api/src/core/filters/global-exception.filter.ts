@@ -48,36 +48,81 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    const userLang = (request as any).user?.lang;
+    const acceptLanguage = request.headers['accept-language'];
+    const lang = userLang || (acceptLanguage ? acceptLanguage.substring(0, 2) : null) || "ar";
+
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const exResponse = exception.getResponse();
 
-      let rawMessage: string = "Unknown error";
+      let rawMessage: any = "Unknown error";
       let errorCode: string;
+      let errors: any[] | undefined;
 
       if (typeof exResponse === "string") {
         rawMessage = exResponse;
         errorCode = MESSAGE_TO_ERROR_CODE[rawMessage] || STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
       } else if (typeof exResponse === "object") {
         const obj = exResponse as Record<string, any>;
+        errors = obj.errors;
         rawMessage = obj.message || obj.error || "Unknown error";
         if (Array.isArray(rawMessage)) {
-          rawMessage = rawMessage[0]?.message || rawMessage[0] || "Validation error";
+          errors = rawMessage;
+          rawMessage = "Validation failed";
         }
-        errorCode = obj.code || MESSAGE_TO_ERROR_CODE[rawMessage] || STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
+        errorCode = obj.errorCode || obj.code || MESSAGE_TO_ERROR_CODE[rawMessage] || STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
       } else {
         errorCode = STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
       }
 
-      const userLang = (request as any).user?.lang;
-      const acceptLanguage = request.headers['accept-language'];
-      const lang = userLang || (acceptLanguage ? acceptLanguage.substring(0, 2) : null) || "ar";
       const translated = this.i18nService.translate("translation.errors." + errorCode, { lang });
+
+      if (errors && Array.isArray(errors)) {
+        errors = errors.map((err: any) => {
+          if (err.message) {
+            return err;
+          }
+          const constraintsEntries = err.constraints
+            ? Object.entries(err.constraints)
+            : [];
+          const firstEntry = constraintsEntries[0];
+          const firstConstraint = firstEntry ? String(firstEntry[1]) : undefined;
+          return {
+            ...err,
+            message: (firstEntry && lang === "ar")
+              ? this.i18nService.translate("translation.validation." + firstEntry[0], {
+                  lang,
+                  defaultValue: firstEntry[1] as string,
+                })
+              : (firstConstraint ?? ""),
+            ...(constraintsEntries.length > 0
+              ? {
+                  constraints: Object.fromEntries(
+                    constraintsEntries.map(([key, val]) => [
+                      key,
+                      lang === "ar"
+                        ? this.i18nService.translate("translation.validation." + key, {
+                            lang,
+                            defaultValue: val as string,
+                          })
+                        : val,
+                    ]),
+                  ),
+                }
+              : {}),
+          };
+        });
+      }
 
       return response.status(status).json({
         statusCode: status,
         errorCode,
         message: translated,
+        ...(errors && errors.length > 0 ? { errors } : {}),
+        path: request.originalUrl,
+        timestamp: new Date().toISOString(),
+        requestId: (request as any).requestId ?? undefined,
       });
     }
 
@@ -86,14 +131,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       exception instanceof Error ? exception.stack : exception,
     );
 
-    const userLang = (request as any).user?.lang;
-    const acceptLanguage = request.headers['accept-language'];
-    const lang = userLang || (acceptLanguage ? acceptLanguage.substring(0, 2) : null) || "ar";
-
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       errorCode: "INTERNAL_ERROR",
       message: this.i18nService.translate("translation.errors.INTERNAL_ERROR", { lang }),
+      path: request.originalUrl,
+      timestamp: new Date().toISOString(),
+      requestId: (request as any).requestId ?? undefined,
     });
   }
 }

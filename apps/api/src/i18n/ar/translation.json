@@ -21,6 +21,15 @@
       "new_content": "تمت إضافة محتوى جديد \"{content}\" إلى كورس \"{course}\""
     }
   },
+  "validation": {
+    "isEmail": "يجب أن يكون بريدًا إلكترونيًا صالحًا",
+    "isNotEmpty": "هذا الحقل مطلوب",
+    "isString": "يجب أن يكون نصًا",
+    "isEnum": "قيمة غير صالحة",
+    "minLength": "قصير جدًا",
+    "maxLength": "طويل جدًا",
+    "matches": "تنسيق غير صالح"
+  },
   "errors": {
     "INVALID_CREDENTIALS": "بيانات الدخول غير صحيحة",
     "EMAIL_EXISTS": "البريد الإلكتروني موجود بالفعل",
