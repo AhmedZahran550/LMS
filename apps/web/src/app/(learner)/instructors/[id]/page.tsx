@@ -8,7 +8,8 @@ import { courseApis } from '@/lib/courseApis';
 import { instructorApis } from '@/lib/instructorApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { GraduationCap, Users, ChevronLeft, Mail } from 'lucide-react';
+import { Avatar } from '@/components/ui/Avatar';
+import { Users, ChevronLeft, Mail } from 'lucide-react';
 import { CourseDto, EnrollmentStatus } from '@lms/shared-types';
 import { useSnackbar } from '@/components/ui/Snackbar';
 import Link from 'next/link';
@@ -91,13 +92,13 @@ export default function InstructorProfilePage() {
         
         {/* Profile Header */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 flex flex-col md:flex-row items-center md:items-start gap-6">
-          <div className="h-32 w-32 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 overflow-hidden ring-4 ring-indigo-50">
-            {instructor.profileImageUrl ? (
-              <img src={instructor.profileImageUrl} alt="Profile" className="h-full w-full object-cover" />
-            ) : (
-              <GraduationCap className="h-16 w-16" />
-            )}
-          </div>
+          <Avatar
+            src={instructor.profileImageUrl}
+            firstName={instructor.firstName}
+            lastName={instructor.lastName}
+            size="xl"
+            className="ring-4 ring-indigo-50 shrink-0"
+          />
           <div className="text-center md:text-left pt-2">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">
               {instructor.firstName} {instructor.lastName}

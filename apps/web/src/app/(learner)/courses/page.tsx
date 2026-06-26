@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Pagination } from '@/components/ui/Pagination';
-import { Compass, Users, Search, GraduationCap } from 'lucide-react';
+import { Avatar } from '@/components/ui/Avatar';
+import { Compass, Users, Search } from 'lucide-react';
 import { CourseDto, EnrollmentStatus } from '@lms/shared-types';
 import { useSnackbar } from '@/components/ui/Snackbar';
 import Link from 'next/link';
@@ -150,8 +151,13 @@ export default function CourseCatalogPage() {
                     <CardDescription className="line-clamp-2 mt-2">{course.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1">
-                    <div className="flex items-center text-sm text-slate-500">
-                      <Users className="me-2 h-4 w-4" />
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Avatar
+                        src={course.instructor?.profileImageUrl}
+                        firstName={course.instructor?.firstName}
+                        lastName={course.instructor?.lastName}
+                        size="sm"
+                      />
                       {t('Instructor: {{name}}', { name: `${course.instructor?.firstName} ${course.instructor?.lastName}` })}
                     </div>
                   </CardContent>
@@ -190,13 +196,13 @@ export default function CourseCatalogPage() {
               {instructors.map((instructor) => (
                 <Card key={instructor.id} className="flex flex-col text-center">
                   <CardHeader className="items-center pb-4">
-                    <div className="h-20 w-20 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-4 overflow-hidden">
-                      {instructor.profileImageUrl ? (
-                        <img src={instructor.profileImageUrl} alt="Profile" className="h-full w-full object-cover" />
-                      ) : (
-                        <GraduationCap className="h-10 w-10" />
-                      )}
-                    </div>
+                    <Avatar
+                      src={instructor.profileImageUrl}
+                      firstName={instructor.firstName}
+                      lastName={instructor.lastName}
+                      size="lg"
+                      className="mb-4"
+                    />
                     <CardTitle>{instructor.firstName} {instructor.lastName}</CardTitle>
                     <CardDescription>{instructor.email}</CardDescription>
                   </CardHeader>
