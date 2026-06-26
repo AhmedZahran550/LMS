@@ -3,11 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, BookOpen, Brain, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
-import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
+import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { UserRole } from '@lms/shared-types';
 
 interface RegisterFormUIProps {
@@ -24,134 +23,167 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('Create an account')}</CardTitle>
-        <CardDescription>{t('Join our platform as a Learner or Instructor.')}</CardDescription>
-      </CardHeader>
-      <form onSubmit={onSubmit}>
-        <CardContent className="space-y-4">
-          {serverError && <div className="text-sm text-red-500 bg-red-50 p-3 rounded">{serverError}</div>}
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="firstName">{t('First name')}</label>
-              <Input
-                id="firstName"
-                {...register('firstName')}
-              />
-              {errors.firstName && (
-                <p className="text-xs text-red-500">{errors.firstName.message?.toString()}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="lastName">{t('Last name')}</label>
-              <Input
-                id="lastName"
-                {...register('lastName')}
-              />
-              {errors.lastName && (
-                <p className="text-xs text-red-500">{errors.lastName.message?.toString()}</p>
-              )}
-            </div>
-          </div>
+    <div className="w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-[0_15px_35px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 flex flex-col gap-6">
+      <div className="text-center space-y-2 mb-2">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('Create an account')}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('Join our platform as a Learner or Instructor.')}</p>
+      </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="email">{t('Email address')}</label>
+      <form onSubmit={onSubmit} className="space-y-6">
+        {serverError && (
+          <div className="text-sm text-red-500 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-3 rounded-lg">
+            {serverError}
+          </div>
+        )}
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="firstName">{t('First name')}</label>
+            <Input
+              id="firstName"
+              placeholder={t('Enter your name')}
+              {...register('firstName')}
+            />
+            {errors.firstName && (
+              <p className="text-xs text-red-500 mt-1">{errors.firstName.message?.toString()}</p>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="lastName">{t('Last name')}</label>
+            <Input
+              id="lastName"
+              placeholder={t('Enter your surname')}
+              {...register('lastName')}
+            />
+            {errors.lastName && (
+              <p className="text-xs text-red-500 mt-1">{errors.lastName.message?.toString()}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="email">{t('Email address')}</label>
+          <div className="relative group">
+            <span className="absolute inset-y-0 start-3 my-auto h-5 w-5 flex items-center text-slate-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+              <Mail className="w-5 h-5" />
+            </span>
             <Input
               id="email"
               type="email"
+              placeholder="example@domain.com"
               {...register('email')}
+              className="ps-10"
             />
-            {errors.email && (
-              <p className="text-xs text-red-500">{errors.email.message?.toString()}</p>
-            )}
           </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="password">{t('Password')}</label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                {...register('password')}
-                className="pe-10"
+          {errors.email && (
+            <p className="text-xs text-red-500 mt-1">{errors.email.message?.toString()}</p>
+          )}
+        </div>
+        
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">{t('I want to join as:')}</label>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <input
+                id="role-student"
+                type="radio"
+                value={UserRole.LEARNER}
+                {...register('role')}
+                className="peer hidden"
               />
+              <label 
+                htmlFor="role-student" 
+                className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 peer-checked:border-indigo-600 dark:peer-checked:border-indigo-500 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400"
+              >
+                <BookOpen className="w-6 h-6 mb-2" />
+                <span className="text-sm font-semibold">{t('Student')}</span>
+              </label>
+            </div>
+            <div className="flex-1">
+              <input
+                id="role-instructor"
+                type="radio"
+                value={UserRole.INSTRUCTOR}
+                {...register('role')}
+                className="peer hidden"
+              />
+              <label 
+                htmlFor="role-instructor" 
+                className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 peer-checked:border-indigo-600 dark:peer-checked:border-indigo-500 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400"
+              >
+                <Brain className="w-6 h-6 mb-2" />
+                <span className="text-sm font-semibold">{t('Instructor')}</span>
+              </label>
+            </div>
+          </div>
+          {errors.role && (
+            <p className="text-xs text-red-500 mt-1">{errors.role.message?.toString()}</p>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="password">{t('Password')}</label>
+            <div className="relative group">
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 end-0 pe-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none transition-colors"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                {...register('password')}
+                className="ps-10"
+              />
             </div>
             {errors.password && (
-              <p className="text-xs text-red-500">{errors.password.message?.toString()}</p>
+              <p className="text-xs text-red-500 mt-1">{errors.password.message?.toString()}</p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="confirmPassword">{t('Confirm Password')}</label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                {...register('confirmPassword')}
-                className="pe-10"
-              />
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="confirmPassword">{t('Confirm Password')}</label>
+            <div className="relative group">
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 end-0 pe-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none transition-colors"
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                {...register('confirmPassword')}
+                className="ps-10"
+              />
             </div>
             {errors.confirmPassword && (
-              <p className="text-xs text-red-500">{errors.confirmPassword.message?.toString()}</p>
+              <p className="text-xs text-red-500 mt-1">{errors.confirmPassword.message?.toString()}</p>
             )}
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('I want to join as:')}</label>
-            <div className="flex space-x-4 mt-2">
-              <label className="flex items-center space-x-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-slate-50 transition-colors">
-                <input
-                  type="radio"
-                  value={UserRole.LEARNER}
-                  {...register('role')}
-                  className="text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-sm font-medium">{t('Student')}</span>
-              </label>
-              <label className="flex items-center space-x-2 border rounded-md p-3 flex-1 cursor-pointer hover:bg-slate-50 transition-colors">
-                <input
-                  type="radio"
-                  value={UserRole.INSTRUCTOR}
-                  {...register('role')}
-                  className="text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-sm font-medium">{t('Instructor')}</span>
-              </label>
-            </div>
-            {errors.role && (
-              <p className="text-xs text-red-500">{errors.role.message?.toString()}</p>
-            )}
-          </div>
+        <Button type="submit" className="w-full h-11 text-base shadow-md flex items-center justify-center gap-2" isLoading={isLoading}>
+          {t('Create account')}
+          <ArrowLeft className="w-5 h-5 hidden rtl:block" />
+          <ArrowRight className="w-5 h-5 hidden ltr:block" />
+        </Button>
 
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" isLoading={isLoading}>
-            {t('Create account')}
-          </Button>
-          <p className="text-sm text-center text-slate-500">
+        <div className="pt-2 text-center">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {t('Already have an account?')}{' '}
-            <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <Link href="/login" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
               {t('Sign in')}
             </Link>
           </p>
-        </CardFooter>
+        </div>
       </form>
-    </Card>
+    </div>
   );
 }

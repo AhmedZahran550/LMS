@@ -1,4 +1,5 @@
 node_modules
+scratch
 dist
 .next
 # Environment variables
@@ -7,3 +8,5 @@ dist
 !.env.example
 uploads
 .DS_Store
+
+

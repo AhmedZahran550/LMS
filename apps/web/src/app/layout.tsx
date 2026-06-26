@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { SnackbarProvider } from "@/components/ui/Snackbar";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-plus-jakarta-sans" });
 
 export const metadata: Metadata = {
   title: "LMS Platform",
@@ -26,7 +27,7 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} dir={dir}>
-      <body className={`${inter.className} antialiased overflow-x-hidden`}>
+      <body className={`${inter.variable} ${plusJakartaSans.variable} font-sans antialiased overflow-x-hidden`}>
         <ThemeProvider>
           <I18nProvider>
             <QueryProvider>

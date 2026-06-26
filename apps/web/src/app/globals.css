@@ -2,7 +2,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-plus-jakarta-sans), var(--font-inter), sans-serif;
 
   --color-slate-50: var(--sv-slate-50);
   --color-slate-100: var(--sv-slate-100);
@@ -104,26 +104,26 @@
   --sv-slate-950: #020617;
 
   --sv-primary-50: #eef2ff;
-  --sv-primary-100: #e0e7ff;
-  --sv-primary-200: #c7d2fe;
-  --sv-primary-300: #a5b4fc;
-  --sv-primary-400: #818cf8;
-  --sv-primary-500: #6366f1;
-  --sv-primary-600: #4f46e5;
-  --sv-primary-700: #4338ca;
-  --sv-primary-800: #3730a3;
-  --sv-primary-900: #312e81;
+  --sv-primary-100: #e9e5ff;
+  --sv-primary-200: #e2dfff;
+  --sv-primary-300: #c3c0ff;
+  --sv-primary-400: #5850ec;
+  --sv-primary-500: #4e44e2;
+  --sv-primary-600: #3e32d3;
+  --sv-primary-700: #3424ca;
+  --sv-primary-800: #0f0069;
+  --sv-primary-900: #0a0045;
 
-  --sv-accent-50: #f5f3ff;
-  --sv-accent-100: #ede9fe;
-  --sv-accent-200: #ddd6fe;
-  --sv-accent-300: #c4b5fd;
-  --sv-accent-400: #a78bfa;
-  --sv-accent-500: #8b5cf6;
-  --sv-accent-600: #7c3aed;
-  --sv-accent-700: #6d28d9;
-  --sv-accent-800: #5b21b6;
-  --sv-accent-900: #4c1d95;
+  --sv-accent-50: #e0f8ff;
+  --sv-accent-100: #b3ecff;
+  --sv-accent-200: #80ddff;
+  --sv-accent-300: #57dffe;
+  --sv-accent-400: #4cd7f6;
+  --sv-accent-500: #00b4d8;
+  --sv-accent-600: #00687a;
+  --sv-accent-700: #006172;
+  --sv-accent-800: #004e5c;
+  --sv-accent-900: #001f26;
 
   --sv-success-50: #f0fdf4;
   --sv-success-100: #dcfce7;
@@ -152,11 +152,11 @@
   --sv-info-500: #3b82f6;
   --sv-info-600: #2563eb;
 
-  --sv-bg-page: var(--sv-slate-50);
-  --sv-bg-card: var(--sv-white);
-  --sv-bg-navbar: var(--sv-white);
-  --sv-bg-sidebar: var(--sv-white);
-  --sv-bg-input: var(--sv-white);
+  --sv-bg-page: #f9f9ff;
+  --sv-bg-card: #ffffff;
+  --sv-bg-navbar: #ffffff;
+  --sv-bg-sidebar: #ffffff;
+  --sv-bg-input: #ffffff;
   --sv-bg-overlay: rgba(0, 0, 0, 0.5);
 
   --sv-text-primary: var(--sv-slate-900);
@@ -242,11 +242,11 @@
   --sv-info-500: #93c5fd;
   --sv-info-600: #bfdbfe;
 
-  --sv-bg-page: #030712;
-  --sv-bg-card: var(--sv-slate-100);
-  --sv-bg-navbar: var(--sv-slate-50);
-  --sv-bg-sidebar: var(--sv-slate-50);
-  --sv-bg-input: var(--sv-slate-100);
+  --sv-bg-page: #111827;
+  --sv-bg-card: #1f2937;
+  --sv-bg-navbar: #111827;
+  --sv-bg-sidebar: #111827;
+  --sv-bg-input: #1f2937;
   --sv-bg-overlay: rgba(0, 0, 0, 0.7);
 
   --sv-text-primary: var(--sv-slate-900);
