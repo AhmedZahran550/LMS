@@ -84,10 +84,11 @@ export class CoursesService extends DBService<
         where: { instructorId },
       }),
       this.coursesRepository.manager.createQueryBuilder()
-        .select("COUNT(video.id)", "total")
-        .from("video", "video")
-        .innerJoin("course", "course", "video.courseId = course.id")
+        .select("COUNT(content.id)", "total")
+        .from("course_content", "content")
+        .innerJoin("course", "course", "content.courseId = course.id")
         .where("course.instructorId = :instructorId", { instructorId })
+        .andWhere("content.contentType = 'VIDEO'")
         .getRawOne(),
       this.coursesRepository.manager.createQueryBuilder()
         .select("COUNT(DISTINCT enrollment.learnerId)", "total")
