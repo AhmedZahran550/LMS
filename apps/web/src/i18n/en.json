@@ -209,14 +209,8 @@
   "Course settings updated successfully!": "Course settings updated successfully!",
   "Course Description...": "Course Description...",
   "Invitation sent successfully!": "Invitation sent successfully!",
-  "Instructor: {{name}}', { name: (course.instructor?.firstName || '": "Instructor: {{name}}', { name: (course.instructor?.firstName || '",
   "Manage your account information and avatar.": "Manage your account information and avatar.",
   "First Name": "First Name",
   "Last Name": "Last Name",
-  "Email Address": "Email Address",
-  "/courses/stats/dashboard": "/courses/stats/dashboard",
-  "/my-courses": "/my-courses",
-  "/notifications": "/notifications",
-  "/notifications/read-all": "/notifications/read-all",
-  "/profile/me": "/profile/me"
-}
+  "Email Address": "Email Address"
+}\n
