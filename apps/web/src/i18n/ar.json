@@ -212,5 +212,16 @@
   "Manage your account information and avatar.": "إدارة معلومات حسابك وصورتك الرمزية.",
   "First Name": "الاسم الأول",
   "Last Name": "اسم العائلة",
-  "Email Address": "عنوان البريد الإلكتروني"
+  "Email Address": "عنوان البريد الإلكتروني",
+  "Failed to request enrollment": "فشل طلب التسجيل",
+  "Failed to update visibility": "فشل تحديث الرؤية",
+  "Failed to delete content": "فشل حذف المحتوى",
+  "Failed to invite user": "فشل دعوة المستخدم",
+  "Failed to remove student": "فشل إزالة الطالب",
+  "John": "جون",
+  "Doe": "دو",
+  "e.g. Advanced TypeScript": "مثال: TypeScript متقدم",
+  "learner@example.com": "متعلّم@example.com",
+  "e.g. Introduction Lecture": "مثال: محاضرة تمهيدية",
+  "Content description...": "وصف المحتوى..."
 }

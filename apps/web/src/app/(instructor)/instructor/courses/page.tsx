@@ -65,7 +65,7 @@ export default function InstructorCoursesPage() {
       queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
     },
     onError: (err: any) => {
-      alert(err.response?.data?.message || 'Failed to update visibility');
+      alert(err.response?.data?.message || t('Failed to update visibility'));
     },
     onSettled: () => {
       setUpdatingCourseId(null);
@@ -122,7 +122,7 @@ export default function InstructorCoursesPage() {
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-1 block">{t('Course Title')}</label>
-              <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Advanced TypeScript" />
+              <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={t('e.g. Advanced TypeScript')} />
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">{t('Description')}</label>

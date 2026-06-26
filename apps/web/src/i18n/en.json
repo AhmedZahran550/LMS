@@ -212,5 +212,16 @@
   "Manage your account information and avatar.": "Manage your account information and avatar.",
   "First Name": "First Name",
   "Last Name": "Last Name",
-  "Email Address": "Email Address"
-}\n
+  "Email Address": "Email Address",
+  "Failed to request enrollment": "Failed to request enrollment",
+  "Failed to update visibility": "Failed to update visibility",
+  "Failed to delete content": "Failed to delete content",
+  "Failed to invite user": "Failed to invite user",
+  "Failed to remove student": "Failed to remove student",
+  "John": "John",
+  "Doe": "Doe",
+  "e.g. Advanced TypeScript": "e.g. Advanced TypeScript",
+  "learner@example.com": "learner@example.com",
+  "e.g. Introduction Lecture": "e.g. Introduction Lecture",
+  "Content description...": "Content description..."
+}

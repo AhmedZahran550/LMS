@@ -112,7 +112,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
       if (activeContent) setActiveContent(null);
     },
     onError: (err: any) => {
-      alert(err.response?.data?.message || "Failed to delete content");
+      alert(err.response?.data?.message || t("Failed to delete content"));
     },
   });
 
@@ -222,7 +222,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                           variant={content.contentType as any}
                           className="capitalize"
                         >
-                          {content.contentType}
+                          {t(content.contentType)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-slate-500">
@@ -286,11 +286,11 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-1 block">{t('Title')}</label>
-            <Input
-              placeholder="e.g. Introduction Lecture"
-              value={contentTitle}
-              onChange={(e) => setContentTitle(e.target.value)}
-            />
+              <Input
+                placeholder={t('e.g. Introduction Lecture')}
+                value={contentTitle}
+                onChange={(e) => setContentTitle(e.target.value)}
+              />
           </div>
           <div>
             <label className="text-sm font-medium mb-1 block">{t('File')}</label>
@@ -306,7 +306,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
             <label className="text-sm font-medium mb-1 block">{t('Description')}</label>
             <textarea
               className="w-full text-sm p-3 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Content description..."
+              placeholder={t('Content description...')}
               rows={3}
               value={contentDesc}
               onChange={(e) => setContentDesc(e.target.value)}

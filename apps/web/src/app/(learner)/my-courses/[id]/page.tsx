@@ -147,7 +147,7 @@ export default function CourseDetailPage() {
                         {((page - 1) * (meta?.itemsPerPage || 100)) + index + 1}. {content.title}
                       </h3>
                       <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded capitalize">
-                        {content.contentType}
+                        {t(content.contentType)}
                       </span>
                     </div>
                     {content.description && (

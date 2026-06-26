@@ -38,7 +38,7 @@ export function CourseSettingsTab({ courseId, courseData }: { courseId: string, 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-course', courseId] });
       setIsEditingSettings(false);
-      alert('Course settings updated successfully!');
+      alert(t('Course settings updated successfully!'));
     }
   });
 

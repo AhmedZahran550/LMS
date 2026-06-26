@@ -104,7 +104,7 @@ export function ProfileFormUI({
                   <label className="text-sm font-semibold text-slate-600">{t('First Name')}</label>
                   <Input
                     {...register('firstName')}
-                    placeholder="John"
+                    placeholder={t('John')}
                     className={errors.firstName ? 'border-red-300 focus:ring-red-500' : ''}
                   />
                   {errors.firstName && (
@@ -116,7 +116,7 @@ export function ProfileFormUI({
                   <label className="text-sm font-semibold text-slate-600">{t('Last Name')}</label>
                   <Input
                     {...register('lastName')}
-                    placeholder="Doe"
+                    placeholder={t('Doe')}
                     className={errors.lastName ? 'border-red-300 focus:ring-red-500' : ''}
                   />
                   {errors.lastName && (

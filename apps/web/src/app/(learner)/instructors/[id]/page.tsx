@@ -48,10 +48,10 @@ export default function InstructorProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-enrollments'] });
-      showSnackbar('Enrollment requested successfully! Waiting for instructor approval.', 'success');
+      showSnackbar(t('Enrollment requested successfully! Waiting for instructor approval.'), 'success');
     },
     onError: (err: any) => {
-      showSnackbar(err.response?.data?.message || 'Failed to request enrollment', 'error');
+      showSnackbar(err.response?.data?.message || t('Failed to request enrollment'), 'error');
     }
   });
 

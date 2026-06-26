@@ -43,10 +43,10 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-enrollments', courseId] });
       setInviteEmail('');
-      alert('Invitation sent successfully!');
+      alert(t('Invitation sent successfully!'));
     },
     onError: (err: any) => {
-      alert(err.response?.data?.message || 'Failed to invite user');
+      alert(err.response?.data?.message || t('Failed to invite user'));
     }
   });
 
@@ -56,7 +56,7 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['course-enrollments', courseId] }),
     onError: (err: any) => {
-      alert(err.response?.data?.message || 'Failed to remove student');
+      alert(err.response?.data?.message || t('Failed to remove student'));
     }
   });
 
@@ -82,7 +82,7 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
             <div className="space-y-2">
               <label className="text-sm font-medium">{t('Invite by Email')}</label>
               <div className="flex space-x-2">
-                <Input placeholder="learner@example.com" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
+                <Input placeholder={t('learner@example.com')} value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
                 <Button onClick={() => inviteMutation.mutate()} isLoading={inviteMutation.isPending}>
                   <Mail className="h-4 w-4 me-2" /> {t('Invite')}
                 </Button>
