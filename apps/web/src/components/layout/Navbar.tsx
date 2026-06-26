@@ -101,14 +101,14 @@ export function Navbar() {
           >
             <Bell className="h-6 w-6" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white animate-bounce">
+              <span className="absolute top-1 end-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white animate-bounce">
                 {unreadCount}
               </span>
             )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 rounded-xl border border-slate-150 bg-white p-2 shadow-lg ring-1 ring-black/5 z-50">
+            <div className="absolute end-0 mt-2 w-80 rounded-xl border border-slate-150 bg-white p-2 shadow-lg ring-1 ring-black/5 z-50">
               <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
                 <span className="text-sm font-bold text-slate-800">{t('Notifications')}</span>
                 {unreadCount > 0 && (
@@ -164,7 +164,7 @@ export function Navbar() {
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-slate-150 bg-white p-1.5 shadow-lg ring-1 ring-black/5 z-50">
+            <div className="absolute end-0 mt-2 w-56 origin-top-right rtl:origin-top-left rounded-xl border border-slate-150 bg-white p-1.5 shadow-lg ring-1 ring-black/5 z-50">
               <div className="border-b border-slate-100 px-4 py-3">
                 <p className="text-sm font-semibold text-slate-800">{user.firstName} {user.lastName}</p>
                 <p className="truncate text-xs text-slate-500">{user.email}</p>
@@ -176,7 +176,7 @@ export function Navbar() {
                   onClick={() => setShowUserMenu(false)}
                   className="flex items-center rounded-lg px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                 >
-                  <User className="mr-3 h-4 w-4 text-slate-400" />
+                  <User className="me-3 h-4 w-4 text-slate-400" />
                   {t('My Profile')}
                 </Link>
               </div>
@@ -189,7 +189,7 @@ export function Navbar() {
                   }}
                   className="flex w-full items-center rounded-lg px-4 py-2 text-sm text-red-600 hover:bg-red-50/50 transition-colors"
                 >
-                  <LogOut className="mr-3 h-4 w-4 text-red-400" />
+                  <LogOut className="me-3 h-4 w-4 text-red-400" />
                   {t('Logout')}
                 </button>
               </div>
