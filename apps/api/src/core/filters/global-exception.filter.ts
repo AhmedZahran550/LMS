@@ -48,6 +48,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    (request as any).error = exception;
+
     const userLang = (request as any).user?.lang;
     const acceptLanguage = request.headers['accept-language'];
     const lang = userLang || (acceptLanguage ? acceptLanguage.substring(0, 2) : null) || "ar";

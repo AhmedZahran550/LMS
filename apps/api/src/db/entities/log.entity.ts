@@ -26,4 +26,7 @@ export class Log extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: true })
   requestBody?: any;
+
+  @Column({ type: 'jsonb', nullable: true })
+  error?: any;
 }

@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware, HttpException } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { LogsService } from '../../modules/logs/logs.service';
@@ -29,6 +29,30 @@ export class LoggerMiddleware implements NestMiddleware {
         ? redactSensitiveData(body)
         : null;
 
+      const rawError = (req as any).error;
+      let errorData: any = null;
+      if (rawError) {
+        if (rawError instanceof HttpException) {
+          const response = rawError.getResponse();
+          errorData = {
+            message: rawError.message,
+            name: rawError.name,
+            statusCode: rawError.getStatus(),
+            response: typeof response === 'object' ? response : { message: response },
+          };
+        } else if (rawError instanceof Error) {
+          errorData = {
+            message: rawError.message,
+            name: rawError.name,
+            stack: rawError.stack,
+          };
+        } else if (typeof rawError === 'object') {
+          errorData = rawError;
+        } else {
+          errorData = { message: String(rawError) };
+        }
+      }
+
       this.logsService.create({
         method,
         url: originalUrl,
@@ -38,6 +62,7 @@ export class LoggerMiddleware implements NestMiddleware {
         responseTime,
         requestBody: redactedBody,
         requestId,
+        error: errorData,
       }).catch(err => {
         console.error('Failed to save log to database', err);
       });
