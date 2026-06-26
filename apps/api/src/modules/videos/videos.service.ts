@@ -119,8 +119,8 @@ export class CourseContentService extends DBService<
       }
 
       for (const [lang, userIds] of Object.entries(langGroups)) {
-        const subject = this.i18nService.translate("notifications.subjects.new_content", { lang });
-        const message = this.i18nService.translate("notifications.messages.new_content", {
+        const subject = this.i18nService.translate("translation.notifications.subjects.new_content", { lang });
+        const message = this.i18nService.translate("translation.notifications.messages.new_content", {
           lang,
           args: { content: createDto.title, course: course.title },
         });

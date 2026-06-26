@@ -72,7 +72,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const userLang = (request as any).user?.lang;
       const acceptLanguage = request.headers['accept-language'];
       const lang = userLang || (acceptLanguage ? acceptLanguage.substring(0, 2) : null) || "ar";
-      const translated = this.i18nService.translate("errors." + errorCode, { lang });
+      const translated = this.i18nService.translate("translation.errors." + errorCode, { lang });
 
       return response.status(status).json({
         statusCode: status,
@@ -86,10 +86,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       exception instanceof Error ? exception.stack : exception,
     );
 
+    const userLang = (request as any).user?.lang;
+    const acceptLanguage = request.headers['accept-language'];
+    const lang = userLang || (acceptLanguage ? acceptLanguage.substring(0, 2) : null) || "ar";
+
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       errorCode: "INTERNAL_ERROR",
-      message: this.i18nService.translate("errors.INTERNAL_ERROR", { lang: "ar" }),
+      message: this.i18nService.translate("translation.errors.INTERNAL_ERROR", { lang }),
     });
   }
 }
