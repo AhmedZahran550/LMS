@@ -25,8 +25,22 @@ export default async function RootLayout({
   const lang = cookieStore.get("i18next")?.value?.substring(0, 2) === "en" ? "en" : "ar";
   const dir = lang === "ar" ? "rtl" : "ltr";
 
+  const themeScript = `
+    try {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (_) {}
+  `;
+
   return (
-    <html lang={lang} dir={dir}>
+    <html lang={lang} dir={dir} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className={`${inter.variable} ${plusJakartaSans.variable} font-sans antialiased overflow-x-hidden`}>
         <ThemeProvider>
           <I18nProvider>

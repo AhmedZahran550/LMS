@@ -91,35 +91,35 @@ export default function CourseCatalogPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t('Browse Courses')}</h1>
-          <p className="text-slate-500 mt-1">{t('Discover new skills and knowledge.')}</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--sv-on-surface)]">{t('Browse Courses')}</h1>
+          <p className="text-[var(--sv-on-surface-variant)] mt-1">{t('Discover new skills and knowledge.')}</p>
         </div>
-        <Compass className="h-8 w-8 text-slate-300" />
+        <Compass className="h-8 w-8 text-[var(--sv-outline-variant)]" />
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6 mt-6">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
+          <Search className="absolute start-3 top-3 h-4 w-4 text-[var(--sv-on-surface-variant)]" />
           <Input 
-            className="ps-9" 
+            className="ps-9 bg-[var(--sv-surface-container-lowest)] border-[var(--sv-outline-variant)]/30 text-[var(--sv-on-surface)]" 
             placeholder={activeTab === 'courses' ? t('Search courses...') : t('Search instructors...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex bg-slate-100 p-1 rounded-lg">
+        <div className="flex bg-[var(--sv-surface-container-high)] p-1 rounded-lg">
           <button
             onClick={() => setActiveTab('courses')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === 'courses' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            className={`px-4 py-2 text-sm font-bold rounded-md transition-colors ${
+              activeTab === 'courses' ? 'bg-[var(--sv-primary)] shadow text-[var(--sv-on-primary)]' : 'text-[var(--sv-on-surface-variant)] hover:text-[var(--sv-on-surface)]'
             }`}
           >
             {t('Courses')}
           </button>
           <button
             onClick={() => setActiveTab('instructors')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === 'instructors' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            className={`px-4 py-2 text-sm font-bold rounded-md transition-colors ${
+              activeTab === 'instructors' ? 'bg-[var(--sv-primary)] shadow text-[var(--sv-on-primary)]' : 'text-[var(--sv-on-surface-variant)] hover:text-[var(--sv-on-surface)]'
             }`}
           >
             {t('Instructors')}
@@ -142,7 +142,7 @@ export default function CourseCatalogPage() {
               {courses.map((course) => (
                 <Card key={course.id} className="flex flex-col">
                   {course.thumbnailUrl && (
-                    <div className="h-40 w-full bg-slate-100 rounded-t-lg overflow-hidden">
+                    <div className="h-40 w-full bg-[var(--sv-surface-container-high)] rounded-t-lg overflow-hidden border-b border-[var(--sv-outline-variant)]/30">
                       <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
                     </div>
                   )}

@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api": {
+    "/": {
       "get": {
         "operationId": "AppController_getHealthCheck",
         "parameters": [],
@@ -87,16 +87,16 @@
         ]
       }
     },
-    "/auth/resend-verification": {
+    "/auth/send-otp": {
       "post": {
-        "operationId": "AuthController_resendVerification",
+        "operationId": "AuthController_sendOtp",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResendVerificationDto"
+                "$ref": "#/components/schemas/SendOtpDto"
               }
             }
           }
@@ -330,6 +330,30 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Profile"
+        ]
+      }
+    },
+    "/profile/me/preferences": {
+      "patch": {
+        "operationId": "ProfileController_updatePreferences",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
               }
             }
           }
@@ -1174,7 +1198,7 @@
         "type": "object",
         "properties": {}
       },
-      "ResendVerificationDto": {
+      "SendOtpDto": {
         "type": "object",
         "properties": {}
       },
@@ -1199,6 +1223,10 @@
         "properties": {}
       },
       "UpdateProfileDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdatePreferencesDto": {
         "type": "object",
         "properties": {}
       },

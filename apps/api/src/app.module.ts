@@ -44,9 +44,10 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
   ],
   controllers: [AppController],
   providers: [
+    GlobalExceptionFilter,
     {
       provide: APP_FILTER,
-      useClass: GlobalExceptionFilter,
+      useExisting: GlobalExceptionFilter,
     },
     {
       provide: APP_FILTER,

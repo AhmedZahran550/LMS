@@ -56,7 +56,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('theme', next);
 
     if (user) {
-      api.patch('/profile/preferences', { mode: next }).then(() => {
+      api.patch('/profile/me/preferences', { mode: next }).then(() => {
         updateUser({ preferences: { ...user.preferences, mode: next } as any });
       }).catch(() => {});
     }

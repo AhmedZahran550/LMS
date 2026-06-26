@@ -36,47 +36,42 @@ export function Sidebar() {
   const profileHref = user.role === UserRole.INSTRUCTOR ? '/instructor/profile' : '/profile';
 
   return (
-    <div className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
-      <div className="flex h-16 items-center border-b border-slate-200 px-6">
-        <span className="text-xl font-bold text-indigo-600 tracking-tight">{t('LMS Platform')}</span>
+    <aside className="hidden md:flex flex-col h-full w-64 bg-[var(--sv-surface-container-low)] shadow-sm border-e border-[var(--sv-outline-variant)] py-6 px-4 z-30">
+      <div className="mb-8 px-2">
+        <h1 className="text-2xl font-bold text-[var(--sv-primary)]">{t('LMS Platform')}</h1>
+        <p className="text-xs text-[var(--sv-on-surface-variant)]">{t('Education Platform')}</p>
       </div>
       
-      <div className="flex-1 overflow-y-auto py-4">
-        <nav className="space-y-1 px-3">
-          {links.map((link) => {
-            const isActive = link.href === '/instructor' || link.href === '/'
-              ? pathname === link.href
-              : pathname === link.href || pathname.startsWith(link.href + '/');
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-slate-700 hover:bg-slate-100'
+      <nav className="flex-1 space-y-2">
+        {links.map((link) => {
+          const isActive = link.href === '/instructor' || link.href === '/'
+            ? pathname === link.href
+            : pathname === link.href || pathname.startsWith(link.href + '/');
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={`flex items-center gap-4 p-4 rounded-lg transition-all duration-150 ${
+                isActive
+                  ? 'text-[var(--sv-primary)] font-bold border-e-4 border-[var(--sv-primary)] bg-[var(--sv-surface-container-high)]'
+                  : 'text-[var(--sv-on-surface-variant)] hover:text-[var(--sv-primary)] hover:bg-[var(--sv-surface-container-high)] active:scale-95'
+              }`}
+            >
+              <link.icon
+                className={`h-5 w-5 flex-shrink-0 ${
+                  isActive ? 'text-[var(--sv-primary)]' : 'text-[var(--sv-on-surface-variant)]'
                 }`}
-              >
-                <link.icon
-                  className={`me-3 h-5 w-5 flex-shrink-0 ${
-                    isActive ? 'text-indigo-700' : 'text-slate-400'
-                  }`}
-                />
-                {t(link.name)}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
+              />
+              <span className="text-base">{t(link.name)}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
-      <div className="border-t border-slate-200 p-4 space-y-1">
+      <div className="mt-auto border-t border-[var(--sv-outline-variant)] pt-6">
         <Link 
           href={profileHref}
-          className={`flex items-center p-2 rounded-md transition-colors group ${
-            pathname.startsWith(profileHref) 
-              ? 'bg-indigo-50' 
-              : 'hover:bg-slate-100'
-          }`}
+          className="flex items-center gap-4 mb-6 px-2 hover:bg-[var(--sv-surface-container-high)] p-2 rounded-lg transition-colors group"
         >
           <Avatar
             src={user.profileImageUrl}
@@ -84,11 +79,9 @@ export function Sidebar() {
             lastName={user.lastName}
             size="sm"
           />
-          <div className="ms-3 overflow-hidden flex-1">
-            <p className={`text-sm font-semibold truncate transition-colors ${
-              pathname.startsWith(profileHref) ? 'text-indigo-700' : 'text-slate-700 group-hover:text-indigo-600'
-            }`}>{user.firstName} {user.lastName}</p>
-            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+          <div className="overflow-hidden flex-1">
+            <p className="text-sm font-bold text-[var(--sv-on-surface)] truncate">{user.firstName} {user.lastName}</p>
+            <p className="text-xs text-[var(--sv-on-surface-variant)] truncate">{user.email}</p>
           </div>
         </Link>
         <button
@@ -96,12 +89,12 @@ export function Sidebar() {
             logout();
             window.location.href = '/login';
           }}
-          className="flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+          className="flex items-center gap-4 w-full p-4 rounded-lg text-[var(--sv-error)] hover:bg-[var(--sv-error-container)] transition-colors active:scale-95 duration-150"
         >
-          <LogOut className="me-3 h-5 w-5 text-slate-400" />
-          {t('Logout')}
+          <LogOut className="h-5 w-5" />
+          <span className="text-base">{t('Logout')}</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 }

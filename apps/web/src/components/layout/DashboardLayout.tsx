@@ -6,12 +6,18 @@ import ProtectedLayout from '@/components/layout/ProtectedLayout';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedLayout>
-      <div className="flex h-screen overflow-hidden bg-slate-50">
-        <Sidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <Navbar />
-          <main className="flex-1 overflow-y-auto bg-slate-50 p-8">
-            {children}
+      <div className="bg-background text-on-background min-h-screen">
+        <div className="flex h-screen overflow-hidden">
+          <Sidebar />
+          <main className="flex-1 flex flex-col h-full overflow-y-auto relative bg-background">
+            <Navbar />
+            <div className="p-6 md:p-8 max-w-[1200px] mx-auto w-full">
+              {children}
+            </div>
+            {/* Background Decorative Shader/Effect */}
+            <div className="fixed bottom-0 ltr:right-0 rtl:left-0 w-[500px] h-[500px] opacity-10 pointer-events-none z-0 ltr:translate-x-1/4 rtl:-translate-x-1/4 translate-y-1/4">
+              <div className="w-full h-full bg-gradient-to-tr from-[var(--sv-primary)] to-[var(--sv-secondary-container)] rounded-full blur-[120px]"></div>
+            </div>
           </main>
         </div>
       </div>

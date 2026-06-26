@@ -3,7 +3,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { courseApis } from '@/lib/courseApis';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Video, Users, BookOpen } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTranslation } from 'react-i18next';
@@ -19,44 +18,45 @@ export default function InstructorDashboard() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      {/* Welcome Section */}
+      <section className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t('Welcome, {{name}}', { name: user?.firstName })}</h1>
-          <p className="text-slate-500 mt-1">{t('Here is an overview of your teaching activity.')}</p>
+          <h2 className="text-4xl font-bold text-[var(--sv-on-surface)]">{t('Welcome, {{name}}', { name: user?.firstName })}</h2>
+          <p className="text-lg text-[var(--sv-on-surface-variant)] mt-1">{t('Here is an overview of your teaching activity.')}</p>
         </div>
-      </div>
+      </section>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-slate-600">{t('Total Courses')}</CardTitle>
-            <BookOpen className="h-4 w-4 text-slate-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats?.totalCourses || 0}</div>
-          </CardContent>
-        </Card>
+        <div className="bg-[var(--sv-surface-container-low)] rounded-xl p-6 shadow-sm border border-[var(--sv-outline-variant)]/30 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-base font-bold text-[var(--sv-on-surface-variant)]">{t('Total Courses')}</h4>
+            <div className="w-12 h-12 rounded-full bg-[var(--sv-primary-container)]/20 flex items-center justify-center">
+              <BookOpen className="h-6 w-6 text-[var(--sv-primary)]" />
+            </div>
+          </div>
+          <div className="text-4xl font-black text-[var(--sv-on-surface)]">{stats?.totalCourses || 0}</div>
+        </div>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-slate-600">{t('Total Videos')}</CardTitle>
-            <Video className="h-4 w-4 text-slate-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats?.totalVideos || 0}</div>
-          </CardContent>
-        </Card>
+        <div className="bg-[var(--sv-surface-container-low)] rounded-xl p-6 shadow-sm border border-[var(--sv-outline-variant)]/30 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-base font-bold text-[var(--sv-on-surface-variant)]">{t('Total Videos')}</h4>
+            <div className="w-12 h-12 rounded-full bg-[var(--sv-secondary-fixed)]/20 flex items-center justify-center">
+              <Video className="h-6 w-6 text-[var(--sv-secondary)]" />
+            </div>
+          </div>
+          <div className="text-4xl font-black text-[var(--sv-on-surface)]">{stats?.totalVideos || 0}</div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-slate-600">{t('Total Students')}</CardTitle>
-            <Users className="h-4 w-4 text-slate-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats?.totalStudents || 0}</div>
-          </CardContent>
-        </Card>
+        <div className="bg-[var(--sv-surface-container-low)] rounded-xl p-6 shadow-sm border border-[var(--sv-outline-variant)]/30 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-base font-bold text-[var(--sv-on-surface-variant)]">{t('Total Students')}</h4>
+            <div className="w-12 h-12 rounded-full bg-[var(--sv-accent-500)]/20 flex items-center justify-center">
+              <Users className="h-6 w-6 text-[var(--sv-accent-500)]" />
+            </div>
+          </div>
+          <div className="text-4xl font-black text-[var(--sv-on-surface)]">{stats?.totalStudents || 0}</div>
+        </div>
       </div>
     </div>
   );
