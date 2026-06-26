@@ -101,14 +101,14 @@ export function Navbar() {
           >
             <Bell className="h-6 w-6" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 end-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white animate-bounce">
+              <span className="absolute top-1 ltr:right-1 rtl:left-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white ring-2 ring-white animate-bounce">
                 {unreadCount}
               </span>
             )}
           </button>
 
           {showNotifications && (
-            <div className="absolute end-0 mt-2 w-80 rounded-xl border border-slate-150 bg-white p-2 shadow-lg ring-1 ring-black/5 z-50">
+            <div className="absolute ltr:right-0 rtl:left-0 mt-2 w-80 rounded-xl border border-slate-150 bg-white p-2 shadow-lg ring-1 ring-black/5 z-50">
               <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
                 <span className="text-sm font-bold text-slate-800">{t('Notifications')}</span>
                 {unreadCount > 0 && (
@@ -131,7 +131,7 @@ export function Navbar() {
                     <div
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
-                      className={"flex flex-col gap-1 rounded-lg px-4 py-2.5 text-left transition-colors cursor-pointer " + (
+                      className={"flex flex-col gap-1 rounded-lg px-4 py-2.5 text-start transition-colors cursor-pointer " + (
                         notification.isRead
                           ? 'text-slate-600 hover:bg-slate-50'
                           : 'bg-indigo-50/40 text-slate-800 hover:bg-indigo-50/70'
@@ -164,7 +164,7 @@ export function Navbar() {
           </button>
 
           {showUserMenu && (
-            <div className="absolute end-0 mt-2 w-56 origin-top-right rtl:origin-top-left rounded-xl border border-slate-150 bg-white p-1.5 shadow-lg ring-1 ring-black/5 z-50">
+            <div className="absolute ltr:right-0 rtl:left-0 mt-2 w-56 origin-top-right rtl:origin-top-left rounded-xl border border-slate-150 bg-white p-1.5 shadow-lg ring-1 ring-black/5 z-50">
               <div className="border-b border-slate-100 px-4 py-3">
                 <p className="text-sm font-semibold text-slate-800">{user.firstName} {user.lastName}</p>
                 <p className="truncate text-xs text-slate-500">{user.email}</p>
