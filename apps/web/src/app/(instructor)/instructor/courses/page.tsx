@@ -94,9 +94,9 @@ export default function InstructorCoursesPage() {
 
       <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
           <Input 
-            className="pl-9" 
+            className="ps-9" 
             placeholder={t('Search your courses...')} 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -164,7 +164,7 @@ export default function InstructorCoursesPage() {
                             visibility: e.target.value as CourseVisibility 
                           })}
                           disabled={updatingCourseId === course.id}
-                          className={`appearance-none rounded-full pl-2 pr-6 py-1 text-xs font-medium ring-1 ring-inset cursor-pointer transition-colors ${
+                          className={`appearance-none rounded-full ps-2 pe-6 py-1 text-xs font-medium ring-1 ring-inset cursor-pointer transition-colors ${
                             course.visibility === CourseVisibility.PUBLIC 
                               ? 'bg-green-50 text-green-700 ring-green-600/20 hover:bg-green-100' 
                               : 'bg-slate-50 text-slate-600 ring-slate-500/10 hover:bg-slate-100'
@@ -173,7 +173,7 @@ export default function InstructorCoursesPage() {
                           <option value={CourseVisibility.PUBLIC}>{t('Public')}</option>
                           <option value={CourseVisibility.PRIVATE}>{t('Private')}</option>
                         </select>
-                        <ChevronDown className={`absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none ${
+                        <ChevronDown className={`absolute end-1.5 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none ${
                           course.visibility === CourseVisibility.PUBLIC ? 'text-green-600' : 'text-slate-500'
                         }`} />
                       </div>

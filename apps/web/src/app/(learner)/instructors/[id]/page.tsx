@@ -85,7 +85,7 @@ export default function InstructorProfilePage() {
     <div className="space-y-8">
       <div>
         <Link href="/courses" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 mb-6 transition-colors">
-          <ChevronLeft className="mr-1 h-4 w-4" />
+          <ChevronLeft className="me-1 h-4 w-4" />
           {t('Back to Catalog')}
         </Link>
         
@@ -135,7 +135,7 @@ export default function InstructorProfilePage() {
                 </CardHeader>
                 <CardContent className="flex-1">
                   <div className="flex items-center text-sm text-slate-500">
-                    <Users className="mr-2 h-4 w-4" />
+                    <Users className="me-2 h-4 w-4" />
                     {t('Instructor: {{name}}', { name: `${instructor.firstName} ${instructor.lastName}` })}
                   </div>
                 </CardContent>

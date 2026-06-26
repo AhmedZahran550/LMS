@@ -92,7 +92,7 @@ export function CourseSettingsTab({ courseId, courseData }: { courseId: string, 
                   onClick={() => setIsEditingSettings(true)}
                   variant="outline"
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 me-2" />
                   {t('Edit Course')}
                 </Button>
               ) : (
@@ -102,7 +102,7 @@ export function CourseSettingsTab({ courseId, courseData }: { courseId: string, 
                     onClick={() => updateCourseMutation.mutate()}
                     isLoading={updateCourseMutation.isPending}
                   >
-                    <Save className="h-4 w-4 mr-2" />
+                    <Save className="h-4 w-4 me-2" />
                     {t('Save Changes')}
                   </Button>
                   <Button 

@@ -57,21 +57,21 @@ export default function InstructorCourseDetailPage() {
           className={`flex items-center px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'content' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
           onClick={() => setActiveTab('content')}
         >
-          <VideoIcon className="w-4 h-4 mr-2" />
+          <VideoIcon className="w-4 h-4 me-2" />
           {t('Course Content')}
         </button>
         <button 
           className={`flex items-center px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'students' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
           onClick={() => setActiveTab('students')}
         >
-          <Users className="w-4 h-4 mr-2" />
+          <Users className="w-4 h-4 me-2" />
           {t('Students & Enrollments')}
         </button>
         <button 
           className={`flex items-center px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'settings' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
           onClick={() => setActiveTab('settings')}
         >
-          <Settings className="w-4 h-4 mr-2" />
+          <Settings className="w-4 h-4 me-2" />
           {t('Settings')}
         </button>
       </div>

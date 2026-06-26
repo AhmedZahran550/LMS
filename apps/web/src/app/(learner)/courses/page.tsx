@@ -98,9 +98,9 @@ export default function CourseCatalogPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
           <Input 
-            className="pl-9" 
+            className="ps-9" 
             placeholder={activeTab === 'courses' ? t('Search courses...') : t('Search instructors...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -151,7 +151,7 @@ export default function CourseCatalogPage() {
                   </CardHeader>
                   <CardContent className="flex-1">
                     <div className="flex items-center text-sm text-slate-500">
-                      <Users className="mr-2 h-4 w-4" />
+                      <Users className="me-2 h-4 w-4" />
                       {t('Instructor: {{name}}', { name: `${course.instructor?.firstName} ${course.instructor?.lastName}` })}
                     </div>
                   </CardContent>

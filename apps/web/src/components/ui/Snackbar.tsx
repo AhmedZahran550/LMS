@@ -51,13 +51,13 @@ export function SnackbarProvider({ children }: { children: React.ReactNode }) {
   return (
     <SnackbarContext.Provider value={{ showSnackbar }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm">
+      <div className="fixed bottom-4 end-4 z-[9999] flex flex-col gap-2 max-w-sm">
         {snackbars.map((snackbar) => {
           const Icon = icons[snackbar.type];
           return (
             <div
               key={snackbar.id}
-              className={`flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg ${styles[snackbar.type]} animate-in slide-in-from-right-2 transition-all`}
+              className={`flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg ${styles[snackbar.type]} animate-in slide-in-from-end-2 transition-all`}
             >
               <Icon className="h-5 w-5 shrink-0 mt-0.5" />
               <p className="text-sm font-medium flex-1">{snackbar.message}</p>

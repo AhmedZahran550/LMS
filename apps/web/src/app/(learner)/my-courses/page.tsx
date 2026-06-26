@@ -48,9 +48,9 @@ export default function MyCoursesPage() {
               <Card key={enrollment.id} className="flex flex-col">
                 <CardHeader>
                   <div className="flex justify-between items-start mb-2">
-                    {isApproved && <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"><CheckCircle2 className="mr-1 h-3 w-3"/> {t('Approved')}</span>}
-                    {isPending && <span className="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20"><Clock className="mr-1 h-3 w-3"/> {t('Pending')}</span>}
-                    {isRejected && <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10"><XCircle className="mr-1 h-3 w-3"/> {t('Rejected')}</span>}
+                    {isApproved && <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"><CheckCircle2 className="me-1 h-3 w-3"/> {t('Approved')}</span>}
+                    {isPending && <span className="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20"><Clock className="me-1 h-3 w-3"/> {t('Pending')}</span>}
+                    {isRejected && <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10"><XCircle className="me-1 h-3 w-3"/> {t('Rejected')}</span>}
                   </div>
                   <CardTitle>{course.title}</CardTitle>
                   <CardDescription className="line-clamp-2 mt-2">{course.description}</CardDescription>

@@ -137,19 +137,19 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
             <CardDescription>{t('Manage and organize uploaded files.')}</CardDescription>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" /> {t('Add Content')}
+            <Plus className="h-4 w-4 me-2" /> {t('Add Content')}
           </Button>
         </CardHeader>
         <CardContent>
           {/* Filters Area */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-slate-400" />
               </div>
               <Input
                 placeholder={t('Search content...')}
-                className="pl-10"
+                className="ps-10"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -235,7 +235,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                             size="sm"
                             onClick={() => setActiveContent(content)}
                           >
-                            <Eye className="h-4 w-4 mr-1" /> {t('View')}
+                            <Eye className="h-4 w-4 me-1" /> {t('View')}
                           </Button>
                           <Button
                             variant="ghost"
@@ -318,7 +318,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
             isLoading={uploadMutation.isPending}
             className="w-full"
           >
-            <Upload className="mr-2 h-4 w-4" /> {t('Upload Content')}
+            <Upload className="me-2 h-4 w-4" /> {t('Upload Content')}
           </Button>
         </div>
       </Dialog>

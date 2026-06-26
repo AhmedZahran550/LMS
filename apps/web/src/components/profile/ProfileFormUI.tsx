@@ -136,9 +136,9 @@ export function ProfileFormUI({
                   <Input
                     value={profile?.email || ''}
                     disabled
-                    className="bg-slate-50 border-slate-200 text-slate-500 pl-10 cursor-not-allowed select-all"
+                    className="bg-slate-50 border-slate-200 text-slate-500 ps-10 cursor-not-allowed select-all"
                   />
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 </div>
                 <p className="text-xs text-slate-400 mt-1">{t('For security reasons, your email address cannot be changed.')}</p>
               </div>

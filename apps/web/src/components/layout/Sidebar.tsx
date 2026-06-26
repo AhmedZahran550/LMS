@@ -58,7 +58,7 @@ export function Sidebar() {
                 }`}
               >
                 <link.icon
-                  className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                  className={`me-3 h-5 w-5 flex-shrink-0 ${
                     isActive ? 'text-indigo-700' : 'text-slate-400'
                   }`}
                 />
@@ -84,7 +84,7 @@ export function Sidebar() {
             lastName={user.lastName}
             size="sm"
           />
-          <div className="ml-3 overflow-hidden flex-1">
+          <div className="ms-3 overflow-hidden flex-1">
             <p className={`text-sm font-semibold truncate transition-colors ${
               pathname.startsWith(profileHref) ? 'text-indigo-700' : 'text-slate-700 group-hover:text-indigo-600'
             }`}>{user.firstName} {user.lastName}</p>
@@ -98,7 +98,7 @@ export function Sidebar() {
           }}
           className="flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
         >
-          <LogOut className="mr-3 h-5 w-5 text-slate-400" />
+          <LogOut className="me-3 h-5 w-5 text-slate-400" />
           {t('Logout')}
         </button>
       </div>

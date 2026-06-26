@@ -12,8 +12,8 @@ export default function Hero() {
     <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
       {/* Background Gradients */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-violet-500/20 dark:bg-violet-600/20 blur-[120px]" />
-        <div className="absolute top-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 dark:bg-indigo-600/20 blur-[100px]" />
+        <div className="absolute -top-[20%] -start-[10%] w-[50%] h-[50%] rounded-full bg-violet-500/20 dark:bg-violet-600/20 blur-[120px]" />
+        <div className="absolute top-[10%] -end-[10%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 dark:bg-indigo-600/20 blur-[100px]" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 flex flex-col items-center text-center">
@@ -57,7 +57,7 @@ export default function Hero() {
         >
           <Link
             href="/register"
-            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold shadow-xl hover:scale-105 transition-transform"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 dark:bg-white text-white dark:text-black font-semibold shadow-xl hover:scale-105 transition-transform"
           >
             {t('Start Learning Free')} <ArrowRight className="w-5 h-5" />
           </Link>

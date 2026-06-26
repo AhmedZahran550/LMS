@@ -37,14 +37,14 @@ export function Dialog({ open, onOpenChange, title, description, children, class
         <Button 
           variant="ghost" 
           size="icon" 
-          className="absolute right-4 top-4 rounded-full h-8 w-8 text-slate-500 hover:text-slate-900"
+          className="absolute end-4 top-4 rounded-full h-8 w-8 text-slate-500 hover:text-slate-900"
           onClick={() => onOpenChange(false)}
         >
           <X className="h-4 w-4" />
         </Button>
         
         {(title || description) && (
-          <div className="mb-6 pr-8 flex-shrink-0">
+          <div className="mb-6 pe-8 flex-shrink-0">
             {title && <h2 className="text-xl font-semibold tracking-tight text-slate-900">{title}</h2>}
             {description && <p className="text-sm text-slate-500 mt-1">{description}</p>}
           </div>

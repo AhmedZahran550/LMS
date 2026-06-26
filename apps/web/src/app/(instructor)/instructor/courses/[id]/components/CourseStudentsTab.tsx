@@ -84,7 +84,7 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
               <div className="flex space-x-2">
                 <Input placeholder="learner@example.com" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
                 <Button onClick={() => inviteMutation.mutate()} isLoading={inviteMutation.isPending}>
-                  <Mail className="h-4 w-4 mr-2" /> {t('Invite')}
+                  <Mail className="h-4 w-4 me-2" /> {t('Invite')}
                 </Button>
               </div>
             </div>
@@ -109,10 +109,10 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
                   </div>
                   <div className="flex space-x-2 shrink-0">
                     <Button size="sm" variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.APPROVED })}>
-                      <Check className="h-4 w-4 mr-1" /> {t('Approve')}
+                      <Check className="h-4 w-4 me-1" /> {t('Approve')}
                     </Button>
                     <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.REJECTED })}>
-                      <X className="h-4 w-4 mr-1" /> {t('Reject')}
+                      <X className="h-4 w-4 me-1" /> {t('Reject')}
                     </Button>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
                       <TableRow key={e.id}>
                         <TableCell>
                           <div className="flex items-center">
-                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center mr-3 shrink-0">
+                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center me-3 shrink-0">
                               <Users className="h-4 w-4 text-slate-400" />
                             </div>
                             <div>
@@ -174,7 +174,7 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
                             }}
                             isLoading={removeStudentMutation.isPending && removeStudentMutation.variables === e.id}
                           >
-                            <Trash2 className="h-4 w-4 mr-1" /> {t('Remove')}
+                            <Trash2 className="h-4 w-4 me-1" /> {t('Remove')}
                           </Button>
                         </TableCell>
                       </TableRow>

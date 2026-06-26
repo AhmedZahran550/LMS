@@ -13,7 +13,7 @@ export default function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 backdrop-blur-md bg-white/70 dark:bg-black/50 border-b border-black/5 dark:border-white/10"
+      className="fixed top-0 start-0 end-0 z-50 flex items-center justify-between px-6 py-4 backdrop-blur-md bg-white/70 dark:bg-black/50 border-b border-black/5 dark:border-white/10"
     >
       <div className="flex items-center gap-2">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center">
@@ -32,7 +32,7 @@ export default function Navbar() {
         <Link href="/login" className="text-sm font-medium text-slate-900 dark:text-white hover:opacity-80 transition-opacity">
           {t('Log in')}
         </Link>
-        <Link href="/register" className="px-4 py-2 rounded-full text-sm font-medium bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 transition-transform shadow-lg hover:shadow-xl">
+        <Link href="/register" className="px-4 py-2 rounded-full text-sm font-medium bg-slate-900 text-white dark:bg-white dark:text-black hover:scale-105 transition-transform shadow-lg hover:shadow-xl">
           {t('Get Started')}
         </Link>
       </div>
