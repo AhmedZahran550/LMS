@@ -223,5 +223,19 @@
   "e.g. Advanced TypeScript": "مثال: TypeScript متقدم",
   "learner@example.com": "متعلّم@example.com",
   "e.g. Introduction Lecture": "مثال: محاضرة تمهيدية",
-  "Content description...": "وصف المحتوى..."
+  "Content description...": "وصف المحتوى...",
+  "Verify your email": "تحقق من بريدك الإلكتروني",
+  "Enter the 6-digit code sent to": "أدخل الرمز المكون من 6 أرقام المرسل إلى",
+  "OTP expires in": "تنتهي صلاحية الرمز خلال",
+  "OTP Code": "رمز التحقق",
+  "Verify Email": "تأكيد البريد الإلكتروني",
+  "Resend OTP": "إعادة إرسال الرمز",
+  "Sending...": "جارٍ الإرسال...",
+  "Back to login": "العودة إلى تسجيل الدخول",
+  "Verification": "التحقق",
+  "No email provided. Please register first.": "لم يتم توفير بريد إلكتروني. يرجى التسجيل أولاً.",
+  "OTP has expired. Request a new one.": "انتهت صلاحية الرمز. اطلب رمزاً جديداً.",
+  "OTP sent! Redirecting to verification...": "تم إرسال الرمز! جارٍ التوجيه إلى التحقق...",
+  "Failed to send OTP": "فشل إرسال الرمز",
+  "Send OTP": "إرسال الرمز"
 }

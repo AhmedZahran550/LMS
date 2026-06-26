@@ -106,11 +106,11 @@ export class EnrollmentsService extends DBService<Enrollment> {
     const subjectKey = isApproved ? 'notifications.subjects.enrollment_approved' : 'notifications.subjects.enrollment_rejected';
     const messageKey = isApproved ? 'notifications.messages.enrollment_approved' : 'notifications.messages.enrollment_rejected';
 
-    const subject = this.i18nService.translate('translation.' + subjectKey, { lang: learnerLang });
+    const subject = this.i18nService.translate('translation.' + subjectKey, { lang: learnerLang }) as string;
     const message = this.i18nService.translate('translation.' + messageKey, {
       lang: learnerLang,
       args: { course: enrollment.course.title },
-    });
+    }) as string;
 
     await this.notificationsService.create(
       enrollment.learnerId,

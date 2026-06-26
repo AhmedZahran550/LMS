@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { LoginFormUI } from './LoginFormUI';
-import { useLoginMutation, useResendVerificationMutation } from '@/hooks/useAuthMutations';
+import { useLoginMutation, useSendOtpMutation } from '@/hooks/useAuthMutations';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole } from '@lms/shared-types';
 
@@ -25,7 +25,7 @@ export function LoginForm() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const loginMutation = useLoginMutation();
-  const resendMutation = useResendVerificationMutation();
+  const sendOtpMutation = useSendOtpMutation();
   const [serverError, setServerError] = useState<{ message: string; code?: string } | null>(null);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
@@ -60,14 +60,30 @@ export function LoginForm() {
       }
     } catch (err: any) {
       const data = err.response?.data;
-      setServerError({
-        message: data?.message || t('Login failed. Please check your credentials.'),
-        code: data?.errorCode,
-      });
+      
+      if (data?.errorCode === 'VERIFY_EMAIL') {
+        setServerError(null);
+        const email = getValues('email');
+        try {
+          await sendOtpMutation.mutateAsync(email);
+          setResendSuccess(t('OTP sent! Redirecting to verification...'));
+          setTimeout(() => router.push(`/verify-email?email=${encodeURIComponent(email)}`), 1000);
+        } catch (sendErr: any) {
+          setServerError({
+            message: sendErr.response?.data?.message || t('Failed to send OTP'),
+            code: 'SEND_OTP_FAILED',
+          });
+        }
+      } else {
+        setServerError({
+          message: data?.message || t('Login failed. Please check your credentials.'),
+          code: data?.errorCode,
+        });
+      }
     }
   };
 
-  const handleResendVerification = async () => {
+  const handleSendOtp = async () => {
     const email = getValues('email');
     if (!email) {
       setResendError(t('Please enter your email first.'));
@@ -76,10 +92,11 @@ export function LoginForm() {
     setResendError(null);
     setResendSuccess(null);
     try {
-      const response = await resendMutation.mutateAsync(email);
-      setResendSuccess(response.message || t('Verification email resent successfully.'));
+      await sendOtpMutation.mutateAsync(email);
+      setResendSuccess(t('OTP sent! Redirecting to verification...'));
+      setTimeout(() => router.push(`/verify-email?email=${encodeURIComponent(email)}`), 1000);
     } catch (err: any) {
-      setResendError(err.response?.data?.message || t('Failed to resend verification email.'));
+      setResendError(err.response?.data?.message || t('Failed to send OTP'));
     }
   };
 
@@ -90,8 +107,8 @@ export function LoginForm() {
       serverError={serverError}
       isLoading={loginMutation.isPending}
       onSubmit={handleSubmit(onSubmit)}
-      onResendVerification={handleResendVerification}
-      isResending={resendMutation.isPending}
+      onResendVerification={handleSendOtp}
+      isResending={sendOtpMutation.isPending}
       resendSuccess={resendSuccess}
       resendError={resendError}
     />

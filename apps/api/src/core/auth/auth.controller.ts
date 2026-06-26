@@ -6,7 +6,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { SendOtpDto } from './dto/send-otp.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 
@@ -31,10 +31,10 @@ export class AuthController {
     return this.authService.verifyEmail(verifyEmailDto);
   }
 
-  @Post('resend-verification')
+  @Post('send-otp')
   @HttpCode(HttpStatus.OK)
-  async resendVerification(@Body() resendVerificationDto: ResendVerificationDto) {
-    return this.authService.resendVerification(resendVerificationDto);
+  async sendOtp(@Body() sendOtpDto: SendOtpDto) {
+    return this.authService.sendOtp(sendOtpDto);
   }
 
   @Post('forgot-password')

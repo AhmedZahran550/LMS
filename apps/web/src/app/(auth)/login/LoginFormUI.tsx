@@ -54,7 +54,7 @@ export function LoginFormUI({
                     disabled={isResending}
                     className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline disabled:opacity-50"
                   >
-                    {isResending ? t('Loading...') : t('Resend verification email')}
+                    {isResending ? t('Loading...') : t('Send OTP')}
                   </button>
                 </div>
               )}

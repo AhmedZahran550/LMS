@@ -41,12 +41,6 @@ export class UsersService extends DBService<
     return this.usersRepository.save(user);
   }
 
-  async findByVerificationToken(token: string): Promise<User | null> {
-    return this.usersRepository.findOne({
-      where: { emailVerificationToken: token },
-    });
-  }
-
   async findByResetToken(token: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { resetPasswordToken: token },

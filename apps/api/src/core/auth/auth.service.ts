@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
@@ -11,7 +11,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { SendOtpDto } from './dto/send-otp.dto';
 import { User } from '../../db/entities/user.entity';
 
 @Injectable()
@@ -23,6 +23,13 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
+  private generateOtp(): string {
+    // TODO: Use random OTP for production
+    // const otp = crypto.randomInt(100000, 999999).toString();
+    const otp = '999999';
+    return otp;
+  }
+
   async register(registerDto: RegisterDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
@@ -30,25 +37,28 @@ export class AuthService {
     }
 
     const hashedPassword = await argon2.hash(registerDto.password);
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
 
     const user = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
     });
 
+    const otp = this.generateOtp();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
     user.isEmailVerified = false;
-    user.emailVerificationToken = emailVerificationToken;
+    user.emailVerificationToken = otp;
+    user.emailVerificationOtpExpiresAt = expiresAt;
     await this.usersService.save(user);
+
     try {
-      const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
-      const verifyUrl = frontendUrl + '/verify-email?token=' + emailVerificationToken;
-      this.mailService.sendVerificationEmail(user.email, verifyUrl);
+      await this.mailService.sendOtpEmail(user.email, otp);
     } catch (error) {
-      console.log('error in verification email', error);
+      console.log('error in sending OTP email', error);
     }
 
-    return { message: 'Registration successful. Please check your email to verify your account.' };
+    return { email: user.email };
   }
 
   async login(loginDto: LoginDto) {
@@ -57,13 +67,16 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (!user.isEmailVerified) {
-      throw new UnauthorizedException('Please verify your email before logging in');
-    }
-
     const isPasswordValid = await argon2.verify(user.password, loginDto.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.isEmailVerified) {
+      throw new HttpException(
+        { message: 'Please verify your email before logging in', errorCode: 'VERIFY_EMAIL' },
+        401,
+      );
     }
 
     if (!user.isActive) {
@@ -99,20 +112,33 @@ export class AuthService {
     }
   }
 
-  async verifyEmail({ token }: VerifyEmailDto) {
-    const user = await this.usersService.findByVerificationToken(token);
+  async verifyEmail({ email, otp }: VerifyEmailDto) {
+    const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new BadRequestException('Invalid or expired verification token');
+      throw new BadRequestException('Invalid verification request');
+    }
+
+    if (user.isEmailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    if (user.emailVerificationToken !== otp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    if (!user.emailVerificationOtpExpiresAt || user.emailVerificationOtpExpiresAt < new Date()) {
+      throw new BadRequestException('OTP has expired');
     }
 
     user.isEmailVerified = true;
     user.emailVerificationToken = null;
+    user.emailVerificationOtpExpiresAt = null;
     await this.usersService.save(user);
 
-    return { message: 'Email verified successfully' };
+    return this.generateTokens(user);
   }
 
-  async resendVerification({ email }: ResendVerificationDto) {
+  async sendOtp({ email }: SendOtpDto) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new BadRequestException('User with this email does not exist');
@@ -122,15 +148,21 @@ export class AuthService {
       throw new BadRequestException('Email is already verified');
     }
 
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-    user.emailVerificationToken = emailVerificationToken;
+    const otp = this.generateOtp();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
+    user.emailVerificationToken = otp;
+    user.emailVerificationOtpExpiresAt = expiresAt;
     await this.usersService.save(user);
 
-    const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
-    const verifyUrl = frontendUrl + '/verify-email?token=' + emailVerificationToken;
-    await this.mailService.sendVerificationEmail(user.email, verifyUrl);
+    try {
+      await this.mailService.sendOtpEmail(user.email, otp);
+    } catch (error) {
+      console.log('error in sending OTP email', error);
+    }
 
-    return { message: 'Verification email sent successfully' };
+    return { message: 'OTP sent successfully', email: user.email };
   }
 
   async forgotPassword({ email }: ForgotPasswordDto) {

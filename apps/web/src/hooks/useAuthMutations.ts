@@ -13,8 +13,14 @@ export const useRegisterMutation = () => {
   });
 };
 
-export const useResendVerificationMutation = () => {
+export const useVerifyOtpMutation = () => {
   return useMutation({
-    mutationFn: (email: string) => authApis.resendVerification(email),
+    mutationFn: ({ email, otp }: { email: string; otp: string }) => authApis.verifyOtp(email, otp),
+  });
+};
+
+export const useSendOtpMutation = () => {
+  return useMutation({
+    mutationFn: (email: string) => authApis.sendOtp(email),
   });
 };

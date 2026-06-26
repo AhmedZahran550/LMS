@@ -50,12 +50,12 @@ export class MailService {
     });
   }
 
-  async sendVerificationEmail(to: string, verificationUrl: string) {
+  async sendOtpEmail(to: string, otp: string) {
     await this.mailProvider.sendMail({
       to,
       subject: 'Verify your email address',
       template: 'email-verification',
-      context: { verificationUrl },
+      context: { otp },
     });
   }
 

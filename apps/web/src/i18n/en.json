@@ -223,5 +223,19 @@
   "e.g. Advanced TypeScript": "e.g. Advanced TypeScript",
   "learner@example.com": "learner@example.com",
   "e.g. Introduction Lecture": "e.g. Introduction Lecture",
-  "Content description...": "Content description..."
+  "Content description...": "Content description...",
+  "Verify your email": "Verify your email",
+  "Enter the 6-digit code sent to": "Enter the 6-digit code sent to",
+  "OTP expires in": "OTP expires in",
+  "OTP Code": "OTP Code",
+  "Verify Email": "Verify Email",
+  "Resend OTP": "Resend OTP",
+  "Sending...": "Sending...",
+  "Back to login": "Back to login",
+  "Verification": "Verification",
+  "No email provided. Please register first.": "No email provided. Please register first.",
+  "OTP has expired. Request a new one.": "OTP has expired. Request a new one.",
+  "OTP sent! Redirecting to verification...": "OTP sent! Redirecting to verification...",
+  "Failed to send OTP": "Failed to send OTP",
+  "Send OTP": "Send OTP"
 }
