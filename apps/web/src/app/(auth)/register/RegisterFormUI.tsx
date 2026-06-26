@@ -23,22 +23,22 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <div className="w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-[0_15px_35px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 flex flex-col gap-6">
+    <div className="w-full bg-[var(--sv-bg-card)]/95 backdrop-blur-md shadow-[0_15px_35px_rgba(0,0,0,0.05)] border border-slate-200 rounded-2xl p-8 flex flex-col gap-6">
       <div className="text-center space-y-2 mb-2">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('Create an account')}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{t('Join our platform as a Learner or Instructor.')}</p>
+        <h1 className="text-2xl font-bold text-slate-900">{t('Create an account')}</h1>
+        <p className="text-sm text-slate-500">{t('Join our platform as a Learner or Instructor.')}</p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
         {serverError && (
-          <div className="text-sm text-red-500 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-3 rounded-lg">
+          <div className="text-sm text-red-500 bg-red-50 border border-red-200 p-3 rounded-lg">
             {serverError}
           </div>
         )}
         
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="firstName">{t('First name')}</label>
+            <label className="text-sm font-medium text-slate-700 block mb-1.5" htmlFor="firstName">{t('First name')}</label>
             <Input
               id="firstName"
               placeholder={t('Enter your name')}
@@ -49,7 +49,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
             )}
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="lastName">{t('Last name')}</label>
+            <label className="text-sm font-medium text-slate-700 block mb-1.5" htmlFor="lastName">{t('Last name')}</label>
             <Input
               id="lastName"
               placeholder={t('Enter your surname')}
@@ -62,9 +62,9 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="email">{t('Email address')}</label>
+          <label className="text-sm font-medium text-slate-700 block mb-1.5" htmlFor="email">{t('Email address')}</label>
           <div className="relative group">
-            <span className="absolute inset-y-0 start-3 my-auto h-5 w-5 flex items-center text-slate-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+            <span className="absolute inset-y-0 start-3 my-auto h-5 w-5 flex items-center text-slate-400 group-focus-within:text-indigo-600 transition-colors pointer-events-none">
               <Mail className="w-5 h-5" />
             </span>
             <Input
@@ -81,7 +81,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
         </div>
         
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">{t('I want to join as:')}</label>
+          <label className="text-sm font-medium text-slate-700 block mb-1.5">{t('I want to join as:')}</label>
           <div className="flex gap-4">
             <div className="flex-1">
               <input
@@ -93,7 +93,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
               />
               <label 
                 htmlFor="role-student" 
-                className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 peer-checked:border-indigo-600 dark:peer-checked:border-indigo-500 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400"
+                className="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-xl cursor-pointer transition-all hover:bg-slate-50 text-slate-500 peer-checked:bg-indigo-50 peer-checked:border-indigo-600 peer-checked:text-indigo-600"
               >
                 <BookOpen className="w-6 h-6 mb-2" />
                 <span className="text-sm font-semibold">{t('Student')}</span>
@@ -109,7 +109,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
               />
               <label 
                 htmlFor="role-instructor" 
-                className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 peer-checked:border-indigo-600 dark:peer-checked:border-indigo-500 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400"
+                className="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-xl cursor-pointer transition-all hover:bg-slate-50 text-slate-500 peer-checked:bg-indigo-50 peer-checked:border-indigo-600 peer-checked:text-indigo-600"
               >
                 <Brain className="w-6 h-6 mb-2" />
                 <span className="text-sm font-semibold">{t('Instructor')}</span>
@@ -123,12 +123,12 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="password">{t('Password')}</label>
+            <label className="text-sm font-medium text-slate-700 block mb-1.5" htmlFor="password">{t('Password')}</label>
             <div className="relative group">
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none transition-colors"
+                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -146,12 +146,12 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5" htmlFor="confirmPassword">{t('Confirm Password')}</label>
+            <label className="text-sm font-medium text-slate-700 block mb-1.5" htmlFor="confirmPassword">{t('Confirm Password')}</label>
             <div className="relative group">
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none transition-colors"
+                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -176,9 +176,9 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
         </Button>
 
         <div className="pt-2 text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-slate-500">
             {t('Already have an account?')}{' '}
-            <Link href="/login" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link href="/login" className="font-bold text-indigo-600 hover:underline">
               {t('Sign in')}
             </Link>
           </p>
