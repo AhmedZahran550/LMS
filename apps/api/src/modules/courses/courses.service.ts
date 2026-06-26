@@ -11,7 +11,7 @@ import { DBService } from '../../db/db.service';
 import { Course } from '../../db/entities/course.entity';
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
-import { CourseVisibility, PaginatedResponse } from "@lms/shared-types";
+import { CourseVisibility, PaginatedResponse, ContentType } from "@lms/shared-types";
 
 export const COURSE_PAGINATION_CONFIG: PaginateConfig<Course> = {
   sortableColumns: ["createdAt", "title"],
@@ -88,7 +88,7 @@ export class CoursesService extends DBService<
         .from("course_content", "content")
         .innerJoin("course", "course", "content.courseId = course.id")
         .where("course.instructorId = :instructorId", { instructorId })
-        .andWhere("content.contentType = 'VIDEO'")
+        .andWhere("content.contentType = :type", { type: ContentType.VIDEO })
         .getRawOne(),
       this.coursesRepository.manager.createQueryBuilder()
         .select("COUNT(DISTINCT enrollment.learnerId)", "total")
