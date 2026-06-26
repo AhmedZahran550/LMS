@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { courseApis } from '@/lib/courseApis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -13,15 +16,31 @@ import { CourseVisibility } from '@lms/shared-types';
 import Link from 'next/link';
 import { Search, ChevronDown } from 'lucide-react';
 
+function getCreateCourseSchema(t: (key: string) => string) {
+  return z.object({
+    title: z.string().min(3, t('Title must be at least 3 characters')),
+    description: z.string().min(10, t('Description must be at least 10 characters')),
+  });
+}
+type CreateCourseFormData = z.infer<ReturnType<typeof getCreateCourseSchema>>;
+
 export default function InstructorCoursesPage() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDesc, setNewDesc] = useState('');
   const [search, setSearch] = useState('');
   const [visibilityFilter, setVisibilityFilter] = useState('ALL');
   const [updatingCourseId, setUpdatingCourseId] = useState<string | null>(null);
+
+  const createCourseSchema = React.useMemo(() => getCreateCourseSchema(t), [t]);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateCourseFormData>({
+    resolver: zodResolver(createCourseSchema),
+  });
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,20 +60,23 @@ export default function InstructorCoursesPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data: CreateCourseFormData) => {
       return await courseApis.createCourse({
-        title: newTitle,
-        description: newDesc,
+        title: data.title,
+        description: data.description,
         visibility: CourseVisibility.PRIVATE, // default
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
       setIsCreating(false);
-      setNewTitle('');
-      setNewDesc('');
+      reset();
     }
   });
+
+  const onSubmit = (data: CreateCourseFormData) => {
+    createMutation.mutate(data);
+  };
 
   const updateVisibilityMutation = useMutation({
     mutationFn: async ({ courseId, visibility }: { courseId: string; visibility: CourseVisibility }) => {
@@ -116,27 +138,30 @@ export default function InstructorCoursesPage() {
 
       {isCreating && (
         <Card className="border-indigo-200 bg-indigo-50/50">
-          <CardHeader>
-            <CardTitle>{t('Create a new course')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">{t('Course Title')}</label>
-              <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder={t('e.g. Advanced TypeScript')} />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">{t('Description')}</label>
-              <textarea 
-                className="flex w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" 
-                rows={3}
-                value={newDesc}
-                onChange={e => setNewDesc(e.target.value)}
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={() => createMutation.mutate()} isLoading={createMutation.isPending}>{t('Save Course')}</Button>
-          </CardFooter>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardHeader>
+              <CardTitle>{t('Create a new course')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">{t('Course Title')}</label>
+                <Input {...register('title')} placeholder={t('e.g. Advanced TypeScript')} />
+                {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message?.toString()}</p>}
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">{t('Description')}</label>
+                <textarea 
+                  {...register('description')}
+                  className="flex w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" 
+                  rows={3}
+                />
+                {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description.message?.toString()}</p>}
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" isLoading={createMutation.isPending}>{t('Save Course')}</Button>
+            </CardFooter>
+          </form>
         </Card>
       )}
 
