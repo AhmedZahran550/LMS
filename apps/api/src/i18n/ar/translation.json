@@ -31,6 +31,7 @@
     "CONFLICT": "تعارض",
     "BAD_REQUEST": "طلب غير صحيح",
     "UNIQUE_VIOLATION": "هذه القيمة موجودة بالفعل",
+    "INVALID_FORMAT": "تنسيق غير صحيح",
     "INTERNAL_ERROR": "حدث خطأ غير متوقع",
     "REFRESH_TOKEN_MISSING": "رمز التحديث مفقود",
     "NOT_FOUND": "غير موجود"

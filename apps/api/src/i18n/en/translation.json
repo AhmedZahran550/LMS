@@ -31,6 +31,7 @@
     "CONFLICT": "Conflict",
     "BAD_REQUEST": "Bad request",
     "UNIQUE_VIOLATION": "This value already exists",
+    "INVALID_FORMAT": "Invalid format",
     "INTERNAL_ERROR": "An unexpected error occurred",
     "REFRESH_TOKEN_MISSING": "Refresh token is missing",
     "NOT_FOUND": "Not found"
