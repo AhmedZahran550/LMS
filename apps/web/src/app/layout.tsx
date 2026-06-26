@@ -13,13 +13,19 @@ export const metadata: Metadata = {
   description: "Learn and grow with our comprehensive learning management system",
 };
 
-export default function RootLayout({
+import { cookies } from "next/headers";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("i18next")?.value?.substring(0, 2) === "en" ? "en" : "ar";
+  const dir = lang === "ar" ? "rtl" : "ltr";
+
   return (
-    <html lang="ar" dir="rtl">
+    <html lang={lang} dir={dir}>
       <body className={`${inter.className} antialiased overflow-x-hidden`}>
         <ThemeProvider>
           <I18nProvider>

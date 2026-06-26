@@ -15,10 +15,13 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
 
+    document.title = i18n.t('LMS Platform');
+
     const handleLanguageChanged = (lng: string) => {
       const normalized = normalizeLang(lng);
       document.documentElement.dir = normalized === 'ar' ? 'rtl' : 'ltr';
       document.documentElement.lang = normalized;
+      document.title = i18n.t('LMS Platform');
     };
 
     i18n.on('languageChanged', handleLanguageChanged);
