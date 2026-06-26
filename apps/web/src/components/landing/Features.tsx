@@ -10,24 +10,24 @@ export default function Features() {
 
   const features = [
     {
-      icon: <School className="w-10 h-10 text-indigo-600 dark:text-indigo-400 group-hover:text-white transition-colors" />,
+      icon: <School className="w-10 h-10 text-indigo-600 group-hover:text-white transition-colors" />,
       title: t('Certified Courses'),
       description: t('We offer courses accredited by top educational institutions and global companies to ensure career quality.'),
-      bgColor: "bg-indigo-100 dark:bg-indigo-900/40",
+      bgColor: "bg-indigo-100",
       hoverBg: "group-hover:bg-indigo-600"
     },
     {
-      icon: <UserCheck className="w-10 h-10 text-cyan-600 dark:text-cyan-400 group-hover:text-white transition-colors" />,
+      icon: <UserCheck className="w-10 h-10 text-cyan-600 group-hover:text-white transition-colors" />,
       title: t('Expert Instructors'),
       description: t('Learn directly from industry leaders and practicing experts who possess years of real-world experience.'),
-      bgColor: "bg-cyan-100 dark:bg-cyan-900/40",
+      bgColor: "bg-cyan-100",
       hoverBg: "group-hover:bg-cyan-600"
     },
     {
-      icon: <Clock className="w-10 h-10 text-orange-600 dark:text-orange-400 group-hover:text-white transition-colors" />,
+      icon: <Clock className="w-10 h-10 text-orange-600 group-hover:text-white transition-colors" />,
       title: t('Flexible Learning'),
       description: t('Schedule your studies around your available time. Learn anywhere, anytime via our responsive platform.'),
-      bgColor: "bg-orange-100 dark:bg-orange-900/40",
+      bgColor: "bg-orange-100",
       hoverBg: "group-hover:bg-orange-600"
     }
   ];
@@ -35,14 +35,14 @@ export default function Features() {
   return (
     <>
       {/* Features Section */}
-      <section id="features" className="py-24 bg-slate-50 dark:bg-slate-900/50">
+      <section id="features" className="py-24 bg-transparent">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center mb-16">
             <motion.span 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase text-sm"
+              className="text-indigo-600 font-bold tracking-widest uppercase text-sm"
             >
               {t('Why Us?')}
             </motion.span>
@@ -51,7 +51,7 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-3xl md:text-4xl font-bold mt-2 text-slate-900 dark:text-slate-100"
+              className="text-3xl md:text-4xl font-bold mt-2 text-slate-900"
             >
               {t('An Unparalleled Learning Experience')}
             </motion.h2>
@@ -65,13 +65,13 @@ export default function Features() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group"
+                className="bg-[var(--sv-bg-card)] p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group"
               >
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-colors ${feature.bgColor} ${feature.hoverBg}`}>
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">{feature.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <h3 className="text-xl font-bold mb-4 text-slate-900">{feature.title}</h3>
+                <p className="text-slate-600 leading-relaxed">
                   {feature.description}
                 </p>
               </motion.div>
@@ -81,17 +81,17 @@ export default function Features() {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-24 relative overflow-hidden bg-white dark:bg-black">
+      <section className="py-24 relative overflow-hidden bg-transparent">
         <div className="max-w-[1200px] mx-auto px-6 text-center">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-8 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl border border-indigo-600/10 dark:border-indigo-400/10 shadow-sm"
+              className="p-8 bg-slate-50/70 backdrop-blur-md rounded-3xl border border-indigo-600/10 shadow-sm"
             >
-              <span className="block text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-2">+10,000</span>
-              <span className="text-xl font-medium text-slate-600 dark:text-slate-400">{t('Active Students')}</span>
+              <span className="block text-5xl font-black text-indigo-600 mb-2">+10,000</span>
+              <span className="text-xl font-medium text-slate-600">{t('Active Students')}</span>
             </motion.div>
             
             <motion.div 
@@ -99,10 +99,10 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="p-8 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl border border-indigo-600/10 dark:border-indigo-400/10 shadow-sm"
+              className="p-8 bg-slate-50/70 backdrop-blur-md rounded-3xl border border-indigo-600/10 shadow-sm"
             >
-              <span className="block text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-2">+500</span>
-              <span className="text-xl font-medium text-slate-600 dark:text-slate-400">{t('Specialized Courses')}</span>
+              <span className="block text-5xl font-black text-indigo-600 mb-2">+500</span>
+              <span className="text-xl font-medium text-slate-600">{t('Specialized Courses')}</span>
             </motion.div>
             
             <motion.div 
@@ -110,20 +110,20 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="p-8 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-3xl border border-indigo-600/10 dark:border-indigo-400/10 shadow-sm"
+              className="p-8 bg-slate-50/70 backdrop-blur-md rounded-3xl border border-indigo-600/10 shadow-sm"
             >
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-5xl font-black text-indigo-600 dark:text-indigo-400">4.9</span>
+                <span className="text-5xl font-black text-indigo-600">4.9</span>
                 <Star className="w-10 h-10 text-orange-400 fill-orange-400" />
               </div>
-              <span className="text-xl font-medium text-slate-600 dark:text-slate-400">{t('Student Rating')}</span>
+              <span className="text-xl font-medium text-slate-600">{t('Student Rating')}</span>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-white dark:bg-black">
+      <section className="py-24 bg-transparent">
         <div className="max-w-[1200px] mx-auto px-6">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
