@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { LoginFormUI } from './LoginFormUI';
@@ -10,14 +11,17 @@ import { useLoginMutation, useResendVerificationMutation } from '@/hooks/useAuth
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole } from '@lms/shared-types';
 
-const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
+type LoginFormData = z.infer<ReturnType<typeof getLoginSchema>>;
 
-type LoginFormData = z.infer<typeof loginSchema>;
+function getLoginSchema(t: (key: string) => string) {
+  return z.object({
+    email: z.string().min(1, t('Email is required')).email(t('Invalid email address')),
+    password: z.string().min(1, t('Password is required')),
+  });
+}
 
 export function LoginForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const loginMutation = useLoginMutation();
@@ -25,6 +29,8 @@ export function LoginForm() {
   const [serverError, setServerError] = useState<{ message: string; code?: string } | null>(null);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
+
+  const loginSchema = useMemo(() => getLoginSchema(t), [t]);
 
   const {
     register,
@@ -55,7 +61,7 @@ export function LoginForm() {
     } catch (err: any) {
       const data = err.response?.data;
       setServerError({
-        message: data?.message || 'Login failed. Please check your credentials.',
+        message: data?.message || t('Login failed. Please check your credentials.'),
         code: data?.errorCode,
       });
     }
@@ -64,16 +70,16 @@ export function LoginForm() {
   const handleResendVerification = async () => {
     const email = getValues('email');
     if (!email) {
-      setResendError('Please enter your email first.');
+      setResendError(t('Please enter your email first.'));
       return;
     }
     setResendError(null);
     setResendSuccess(null);
     try {
       const response = await resendMutation.mutateAsync(email);
-      setResendSuccess(response.message || 'Verification email resent successfully.');
+      setResendSuccess(response.message || t('Verification email resent successfully.'));
     } catch (err: any) {
-      setResendError(err.response?.data?.message || 'Failed to resend verification email.');
+      setResendError(err.response?.data?.message || t('Failed to resend verification email.'));
     }
   };
 

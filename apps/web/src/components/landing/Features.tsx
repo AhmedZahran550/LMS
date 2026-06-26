@@ -51,7 +51,7 @@ export default function Features() {
             transition={{ duration: 0.5 }}
             className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-white mb-6"
           >
-            {t('Everything you need to ')}<span className="text-violet-600 dark:text-violet-400">{t('succeed')}</span>
+            {t('Everything you need to')} <span className="text-violet-600 dark:text-violet-400">{t('succeed')}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

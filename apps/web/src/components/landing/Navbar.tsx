@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 export default function Navbar() {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ export default function Navbar() {
         <Link href="#testimonials" className="hover:text-slate-900 dark:hover:text-white transition-colors">{t('Testimonials')}</Link>
       </div>
       <div className="flex items-center gap-2 sm:gap-4">
+        <ThemeToggle />
         <LanguageSwitcher />
         <Link href="/login" className="text-sm font-medium text-slate-900 dark:text-white hover:opacity-80 transition-opacity">
           {t('Log in')}

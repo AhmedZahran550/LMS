@@ -10,6 +10,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Bell, LogOut, User, Check } from 'lucide-react';
 import Link from 'next/link';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { ThemeToggle } from './ThemeToggle';
 
 export function Navbar() {
   const router = useRouter();
@@ -91,6 +92,7 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <LanguageSwitcher />
         <div className="relative" ref={bellRef}>
           <button

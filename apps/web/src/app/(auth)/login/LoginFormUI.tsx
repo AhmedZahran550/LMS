@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -73,7 +75,7 @@ export function LoginFormUI({
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('you@example.com')}
               {...register('email')}
             />
             {errors.email && (

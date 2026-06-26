@@ -1,5 +1,10 @@
 import { UserRole } from './enums';
 
+export interface UserPreferences {
+  lang: 'ar' | 'en';
+  mode: 'light' | 'dark';
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -8,6 +13,7 @@ export interface UserProfile {
   role: UserRole;
   isActive: boolean;
   profileImageUrl?: string | null;
+  preferences?: UserPreferences;
   createdAt: string;
 }
 

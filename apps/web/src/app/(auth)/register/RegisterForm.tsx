@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -14,32 +14,36 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { CheckCircle } from 'lucide-react';
 
-const registerSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Invalid email address'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .max(50, 'Password must be at most 50 characters long')
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
-      'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character'
-    ),
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-  role: z.nativeEnum(UserRole),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-});
+function getRegisterSchema(t: (key: string) => string) {
+  return z.object({
+    firstName: z.string().min(1, t('First name is required')),
+    lastName: z.string().min(1, t('Last name is required')),
+    email: z.string().email(t('Invalid email address')),
+    password: z
+      .string()
+      .min(8, t('Password must be at least 8 characters long'))
+      .max(50, t('Password must be at most 50 characters long'))
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
+        t('Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character')
+      ),
+    confirmPassword: z.string().min(1, t('Please confirm your password')),
+    role: z.nativeEnum(UserRole),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t("Passwords don't match"),
+    path: ['confirmPassword'],
+  });
+}
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+type RegisterFormData = z.infer<ReturnType<typeof getRegisterSchema>>;
 
 export function RegisterForm() {
   const router = useRouter();
   const registerMutation = useRegisterMutation();
   const { t } = useTranslation();
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const registerSchema = useMemo(() => getRegisterSchema(t), [t]);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [countdown, setCountdown] = useState(10);
@@ -72,10 +76,10 @@ export function RegisterForm() {
     try {
       const { confirmPassword, ...apiData } = data;
       const response = await registerMutation.mutateAsync(apiData);
-      setSuccessMessage(response.message || 'Registration successful. Please check your email to verify your account.');
+      setSuccessMessage(response.message || t('Registration successful. Please check your email to verify your account.'));
       setIsSuccess(true);
     } catch (err: any) {
-      setServerError(err.response?.data?.message || 'Registration failed. Please try again later.');
+      setServerError(err.response?.data?.message || t('Registration failed. Please try again later.'));
     }
   };
 
