@@ -9,9 +9,12 @@ function normalizeLang(lng: string) {
   return base === 'en' ? 'en' : 'ar';
 }
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
+export function I18nProvider({ children, lang }: { children: React.ReactNode, lang: string }) {
+  if (i18n.language !== lang) {
+    i18n.changeLanguage(lang);
+  }
+
   useEffect(() => {
-    const lang = normalizeLang(i18n.language);
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
 

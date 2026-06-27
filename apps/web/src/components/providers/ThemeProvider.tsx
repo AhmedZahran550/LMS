@@ -54,6 +54,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const next = theme === 'light' ? 'dark' : 'light';
     applyTheme(next);
     localStorage.setItem('theme', next);
+    sessionStorage.setItem('theme_changed_locally', 'true');
 
     if (user) {
       api.patch('/profile/me/preferences', { mode: next }).then(() => {

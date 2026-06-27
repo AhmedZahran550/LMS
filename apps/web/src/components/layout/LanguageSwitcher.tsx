@@ -9,6 +9,18 @@ export function LanguageSwitcher() {
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ar' ? 'en' : 'ar';
     i18n.changeLanguage(newLang);
+    sessionStorage.setItem('lang_changed_locally', 'true');
+    
+    // Check if user is logged in using a direct token or store check to avoid circular deps if needed
+    // But since it's an API call we can just import api and useAuthStore.
+    // However, it's safer to just let the ThemeProvider handle language updates too, or we can handle it here:
+    const { user, updateUser } = require('@/store/useAuthStore').useAuthStore.getState();
+    const { api } = require('@/lib/api');
+    if (user) {
+      api.patch('/profile/me/preferences', { lang: newLang }).then(() => {
+        updateUser({ preferences: { ...user.preferences, lang: newLang } });
+      }).catch(() => {});
+    }
   };
 
   return (

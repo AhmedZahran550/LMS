@@ -60,6 +60,25 @@ export function VerifyOtpForm({ email }: { email: string }) {
     try {
       const response = await verifyMutation.mutateAsync({ email, otp });
       const { user, accessToken, refreshToken } = response;
+      const themeChanged = sessionStorage.getItem('theme_changed_locally') === 'true';
+      const langChanged = sessionStorage.getItem('lang_changed_locally') === 'true';
+      if (themeChanged || langChanged) {
+        const payload: any = {};
+        if (themeChanged) payload.mode = localStorage.getItem('theme');
+        if (langChanged) payload.lang = require('i18next').default?.language || window.localStorage.getItem('i18next') || 'ar';
+        
+        try {
+          const { api } = require('@/lib/api');
+          await api.patch('/profile/me/preferences', payload, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (!user.preferences) user.preferences = { lang: 'ar', mode: 'light' };
+          if (payload.mode) user.preferences.mode = payload.mode;
+          if (payload.lang) user.preferences.lang = payload.lang;
+        } catch (e) {}
+      }
+      
+      sessionStorage.removeItem('theme_changed_locally');
+      sessionStorage.removeItem('lang_changed_locally');
+
       setAuth(user, accessToken, refreshToken);
 
       if (user.role === UserRole.INSTRUCTOR) {

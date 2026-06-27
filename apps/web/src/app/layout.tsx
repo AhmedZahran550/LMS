@@ -39,11 +39,11 @@ export default async function RootLayout({
   return (
     <html lang={lang} dir={dir} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${inter.variable} ${plusJakartaSans.variable} font-sans antialiased overflow-x-hidden`}>
         <ThemeProvider>
-          <I18nProvider>
+          <I18nProvider lang={lang}>
             <QueryProvider>
               <SnackbarProvider>
                 {children}
