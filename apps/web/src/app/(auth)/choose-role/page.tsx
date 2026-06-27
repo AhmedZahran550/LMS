@@ -49,11 +49,10 @@ export default function ChooseRolePage() {
       clearTempToken();
       setAuth(data.user, data.accessToken, data.refreshToken);
 
-      if (data.user.role === UserRole.INSTRUCTOR) {
-        router.replace('/instructor');
-      } else {
-        router.replace('/my-courses');
-      }
+      const target = data.user.role === UserRole.INSTRUCTOR ? '/instructor' : '/my-courses';
+      setTimeout(() => {
+        window.location.href = target;
+      }, 50);
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
       setLoading(false);
