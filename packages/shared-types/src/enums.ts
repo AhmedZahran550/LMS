@@ -1,3 +1,9 @@
+export enum AuthProvider {
+  LOCAL = 'local',
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+}
+
 export enum UserRole {
   ADMIN = 'admin',
   INSTRUCTOR = 'instructor',

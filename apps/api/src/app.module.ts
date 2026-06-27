@@ -17,6 +17,7 @@ import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import mailConfig from './config/mail.config';
 import storageConfig from './config/storage.config';
+import oauthConfig from './config/oauth.config';
 
 import { AdminApiModule } from './api/admin/admin-api.module';
 import { InstructorApiModule } from './api/instructor/instructor-api.module';
@@ -28,7 +29,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig],
+      load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig, oauthConfig],
       envFilePath: '.env',
     }),
     DatabaseModule,

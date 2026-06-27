@@ -1,5 +1,5 @@
 import { Entity, Column } from 'typeorm';
-import { UserRole } from '@lms/shared-types';
+import { UserRole, AuthProvider } from '@lms/shared-types';
 import { Exclude } from 'class-transformer';
 import { BaseEntity } from './base.entity';
 
@@ -11,6 +11,16 @@ export class User extends BaseEntity {
   @Column()
   @Exclude()
   password!: string;
+
+  @Column({
+    type: 'enum',
+    enum: AuthProvider,
+    default: AuthProvider.LOCAL,
+  })
+  provider!: AuthProvider;
+
+  @Column({ type: 'varchar', nullable: true })
+  providerId?: string | null;
 
   @Column()
   firstName!: string;
