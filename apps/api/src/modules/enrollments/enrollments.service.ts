@@ -47,7 +47,22 @@ export class EnrollmentsService extends DBService<Enrollment> {
 
     const existing = await this.enrollmentsRepository.findOne({ where: { learnerId, courseId } });
     if (existing) {
-      throw new ConflictException('Enrollment request already exists');
+      if (existing.status === EnrollmentStatus.PENDING) {
+        throw new ConflictException('Enrollment request already exists');
+      }
+      if (existing.status === EnrollmentStatus.APPROVED) {
+        throw new ConflictException('You are already enrolled in this course');
+      }
+      // REJECTED → soft delete old record and create a new one
+      await this.enrollmentsRepository.softRemove(existing);
+      const enrollment = this.enrollmentsRepository.create({
+        learnerId,
+        courseId,
+        status: EnrollmentStatus.PENDING,
+      });
+      const saved = await this.enrollmentsRepository.save(enrollment);
+      await this.sendEnrollmentRequestNotification(learnerId, course, saved.id);
+      return saved;
     }
 
     const enrollment = this.enrollmentsRepository.create({
@@ -57,7 +72,11 @@ export class EnrollmentsService extends DBService<Enrollment> {
     });
 
     const saved = await this.enrollmentsRepository.save(enrollment);
+    await this.sendEnrollmentRequestNotification(learnerId, course, saved.id);
+    return saved;
+  }
 
+  private async sendEnrollmentRequestNotification(learnerId: string, course: any, enrollmentId: string): Promise<void> {
     const learner = await this.usersService.findByIdOrFail(learnerId);
     const instructorLang = course.instructor?.preferences?.lang || 'ar';
 
@@ -72,12 +91,10 @@ export class EnrollmentsService extends DBService<Enrollment> {
       NotificationType.ENROLLMENT_REQUEST,
       subject,
       message,
-      { enrollmentId: saved.id, courseId, learnerId },
+      { enrollmentId, courseId: course.id, learnerId },
       'course',
-      courseId,
+      course.id,
     );
-
-    return saved;
   }
 
   async respondToEnrollment(id: string, instructorId: string, respondDto: RespondEnrollmentDto): Promise<Enrollment> {
@@ -135,7 +152,21 @@ export class EnrollmentsService extends DBService<Enrollment> {
 
     const existing = await this.enrollmentsRepository.findOne({ where: { learnerId: user.id, courseId } });
     if (existing) {
-      throw new ConflictException('User is already enrolled or requested');
+      if (existing.status === EnrollmentStatus.PENDING) {
+        throw new ConflictException('User already has a pending enrollment request');
+      }
+      if (existing.status === EnrollmentStatus.APPROVED) {
+        throw new ConflictException('User is already enrolled');
+      }
+      // REJECTED → soft delete old record and create a new one
+      await this.enrollmentsRepository.softRemove(existing);
+      const enrollment = this.enrollmentsRepository.create({
+        learnerId: user.id,
+        courseId,
+        status: EnrollmentStatus.APPROVED,
+        respondedAt: new Date(),
+      });
+      return this.enrollmentsRepository.save(enrollment);
     }
 
     const enrollment = this.enrollmentsRepository.create({

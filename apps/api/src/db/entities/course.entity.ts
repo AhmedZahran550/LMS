@@ -34,12 +34,12 @@ export class Course extends BaseEntity {
   @Column({ default: true })
   isActive!: boolean;
 
-  @Column()
-  instructorId!: string;
+  @Column({ nullable: true })
+  instructorId?: string | null;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: "SET NULL" })
   @JoinColumn({ name: "instructorId" })
-  instructor!: User;
+  instructor?: User | null;
 
   @OneToMany(() => CourseContent, (content) => content.course)
   contents!: CourseContent[];
