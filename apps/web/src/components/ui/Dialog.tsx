@@ -28,16 +28,16 @@ export function Dialog({ open, onOpenChange, title, description, children, class
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div 
-        className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" 
+        className="fixed inset-0 bg-[var(--sv-bg-overlay)] backdrop-blur-sm transition-opacity" 
         onClick={() => onOpenChange(false)}
       />
       <div 
-        className={`bg-white rounded-xl shadow-lg border border-slate-200 z-50 w-full max-w-lg p-6 relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col ${className}`}
+        className={`bg-[var(--sv-bg-card)] rounded-xl shadow-lg border border-[var(--sv-border)] z-50 w-full max-w-lg p-6 relative animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col ${className}`}
       >
         <Button 
           variant="ghost" 
           size="icon" 
-          className="absolute end-4 top-4 rounded-full h-8 w-8 text-slate-500 hover:text-slate-900"
+          className="absolute end-4 top-4 rounded-full h-8 w-8 text-[var(--sv-text-muted)] hover:text-[var(--sv-text-primary)]"
           onClick={() => onOpenChange(false)}
         >
           <X className="h-4 w-4" />
@@ -45,8 +45,8 @@ export function Dialog({ open, onOpenChange, title, description, children, class
         
         {(title || description) && (
           <div className="mb-6 pe-8 flex-shrink-0">
-            {title && <h2 className="text-xl font-semibold tracking-tight text-slate-900">{title}</h2>}
-            {description && <p className="text-sm text-slate-500 mt-1">{description}</p>}
+            {title && <h2 className="text-xl font-semibold tracking-tight text-[var(--sv-text-primary)]">{title}</h2>}
+            {description && <p className="text-sm text-[var(--sv-text-muted)] mt-1">{description}</p>}
           </div>
         )}
         

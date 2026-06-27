@@ -6,9 +6,12 @@ interface AuthState {
   user: UserProfile | null;
   accessToken: string | null;
   refreshToken: string | null;
+  tempToken: string | null;
   _hasHydrated: boolean;
   setAuth: (user: UserProfile, accessToken: string, refreshToken: string) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
+  setTempToken: (token: string) => void;
+  clearTempToken: () => void;
   setHasHydrated: (state: boolean) => void;
   updateUser: (user: Partial<UserProfile>) => void;
   logout: () => void;
@@ -20,14 +23,17 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       refreshToken: null,
+      tempToken: null,
       _hasHydrated: false,
       setAuth: (user, accessToken, refreshToken) => set({ user, accessToken, refreshToken }),
       setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+      setTempToken: (tempToken) => set({ tempToken }),
+      clearTempToken: () => set({ tempToken: null }),
       setHasHydrated: (state) => set({ _hasHydrated: state }),
       updateUser: (updatedUser) => set((state) => ({
         user: state.user ? { ...state.user, ...updatedUser } : null
       })),
-      logout: () => set({ user: null, accessToken: null, refreshToken: null }),
+      logout: () => set({ user: null, accessToken: null, refreshToken: null, tempToken: null }),
     }),
     {
       name: 'lms-auth-storage',
@@ -35,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
+        tempToken: state.tempToken,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

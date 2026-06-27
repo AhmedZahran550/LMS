@@ -145,7 +145,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-slate-400" />
+                <Search className="h-4 w-4 text-[var(--sv-text-muted)]" />
               </div>
               <Input
                 placeholder={t('Search content...')}
@@ -174,7 +174,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
             </div>
           </div>
 
-          <div className="rounded-md border border-slate-200">
+          <div className="rounded-md border border-[var(--sv-border)]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -189,14 +189,14 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                 {isLoading ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--sv-primary)] mx-auto"></div>
                     </TableCell>
                   </TableRow>
                 ) : contents.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}
-                      className="text-center py-8 text-slate-500"
+                      className="text-center py-8 text-[var(--sv-text-muted)]"
                     >
                       {t('No content found.')}
                     </TableCell>
@@ -204,15 +204,15 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                 ) : (
                   contents.map((content: any, i: number) => (
                     <TableRow key={content.id}>
-                      <TableCell className="font-medium text-slate-500">
+                      <TableCell className="font-medium text-[var(--sv-text-muted)]">
                         {(page - 1) * (meta?.itemsPerPage || 10) + i + 1}
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-slate-900">
+                        <div className="font-medium text-[var(--sv-text-primary)]">
                           {content.title}
                         </div>
                         {content.description && (
-                          <div className="text-xs text-slate-500 line-clamp-1">
+                          <div className="text-xs text-[var(--sv-text-muted)] line-clamp-1">
                             {content.description}
                           </div>
                         )}
@@ -225,7 +225,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                           {t(content.contentType)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-slate-500">
+                      <TableCell className="text-[var(--sv-text-muted)]">
                         {(content.size / (1024 * 1024)).toFixed(2)} MB
                       </TableCell>
                       <TableCell className="text-right">
@@ -240,7 +240,7 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-[var(--sv-error)] hover:text-[var(--sv-error-700)] hover:bg-[var(--sv-error-50)]"
                             onClick={() => {
                               if (
                                 confirm(t("Are you sure you want to delete this content?"))
@@ -300,12 +300,12 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
               ref={fileInputRef}
               onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
             />
-            <p className="text-xs text-slate-500 mt-1">{t('Supported: Video, PDF, Image, PPTX')}</p>
+            <p className="text-xs text-[var(--sv-text-muted)] mt-1">{t('Supported: Video, PDF, Image, PPTX')}</p>
           </div>
           <div>
             <label className="text-sm font-medium mb-1 block">{t('Description')}</label>
             <textarea
-              className="w-full text-sm p-3 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full text-sm p-3 border rounded-md border-[var(--sv-border-input)] bg-[var(--sv-bg-input)] text-[var(--sv-text-primary)] placeholder:text-[var(--sv-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--sv-ring-focus)]"
               placeholder={t('Content description...')}
               rows={3}
               value={contentDesc}

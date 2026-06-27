@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { randomUUID } from "crypto";
 
 interface OAuthStateEntry {
-  role: string;
+  role?: string;
   expiresAt: Date;
 }
 
@@ -11,7 +11,7 @@ export class OAuthStateStore {
   private readonly store = new Map<string, OAuthStateEntry>();
   private readonly TTL_MS = 10 * 60 * 1000;
 
-  save(role: string): string {
+  save(role?: string): string {
     const state = randomUUID();
     this.store.set(state, {
       role,
@@ -20,11 +20,11 @@ export class OAuthStateStore {
     return state;
   }
 
-  consume(state: string): string | null {
+  consume(state: string): string | undefined {
     const entry = this.store.get(state);
     if (!entry || entry.expiresAt < new Date()) {
       this.store.delete(state);
-      return null;
+      return undefined;
     }
     this.store.delete(state);
     return entry.role;

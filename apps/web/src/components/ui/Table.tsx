@@ -26,21 +26,21 @@ TableBody.displayName = 'TableBody';
 
 const TableFooter = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
-    <tfoot ref={ref} className={cn('border-t bg-slate-100/50 font-medium [&>tr]:last:border-b-0', className)} {...props} />
+    <tfoot ref={ref} className={cn('border-t bg-[var(--sv-surface-container-high)]/50 font-medium [&>tr]:last:border-b-0', className)} {...props} />
   )
 );
 TableFooter.displayName = 'TableFooter';
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
-    <tr ref={ref} className={cn('border-b transition-colors hover:bg-slate-100/50 data-[state=selected]:bg-slate-100', className)} {...props} />
+    <tr ref={ref} className={cn('border-b transition-colors hover:bg-[var(--sv-surface-container-high)]/50 data-[state=selected]:bg-[var(--sv-surface-container-high)]', className)} {...props} />
   )
 );
 TableRow.displayName = 'TableRow';
 
 const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
-    <th ref={ref} className={cn('h-12 px-4 text-left align-middle font-medium text-slate-500 [&:has([role=checkbox])]:pe-0', className)} {...props} />
+    <th ref={ref} className={cn('h-12 px-4 text-left align-middle font-medium text-[var(--sv-text-muted)] [&:has([role=checkbox])]:pe-0', className)} {...props} />
   )
 );
 TableHead.displayName = 'TableHead';
@@ -54,7 +54,7 @@ TableCell.displayName = 'TableCell';
 
 const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
   ({ className, ...props }, ref) => (
-    <caption ref={ref} className={cn('mt-4 text-sm text-slate-500', className)} {...props} />
+    <caption ref={ref} className={cn('mt-4 text-sm text-[var(--sv-text-muted)]', className)} {...props} />
   )
 );
 TableCaption.displayName = 'TableCaption';

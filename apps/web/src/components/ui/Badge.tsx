@@ -7,14 +7,14 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-indigo-100 text-indigo-800',
-        secondary: 'border-transparent bg-slate-100 text-slate-800',
-        destructive: 'border-transparent bg-red-100 text-red-800',
-        outline: 'text-slate-700 border-slate-200',
-        video: 'border-transparent bg-purple-100 text-purple-800',
-        pdf: 'border-transparent bg-red-100 text-red-700',
-        image: 'border-transparent bg-emerald-100 text-emerald-800',
-        presentation: 'border-transparent bg-orange-100 text-orange-800',
+        default: 'border-transparent bg-[var(--sv-primary-container)] text-[var(--sv-on-primary-container)]',
+        secondary: 'border-transparent bg-[var(--sv-surface-container-high)] text-[var(--sv-on-surface-variant)]',
+        destructive: 'border-transparent bg-[var(--sv-error)]/15 text-[var(--sv-error)]',
+        outline: 'text-[var(--sv-on-surface-variant)] border-[var(--sv-border)]',
+        video: 'border-transparent bg-[var(--sv-accent-100)] text-[var(--sv-accent-800)]',
+        pdf: 'border-transparent bg-[var(--sv-error-100)] text-[var(--sv-error-800)]',
+        image: 'border-transparent bg-[var(--sv-success-100)] text-[var(--sv-success-800)]',
+        presentation: 'border-transparent bg-[var(--sv-warning-100)] text-[var(--sv-warning-800)]',
       },
     },
     defaultVariants: {

@@ -106,8 +106,8 @@ export default function InstructorCoursesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t('Manage Courses')}</h1>
-          <p className="text-slate-500 mt-1">{t('Create and manage your educational content.')}</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--sv-text-primary)]">{t('Manage Courses')}</h1>
+          <p className="text-[var(--sv-text-secondary)] mt-1">{t('Create and manage your educational content.')}</p>
         </div>
         <Button onClick={() => setIsCreating(!isCreating)}>
           {isCreating ? t('Cancel') : t('Create New Course')}
@@ -116,7 +116,7 @@ export default function InstructorCoursesPage() {
 
       <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
+          <Search className="absolute start-3 top-3 h-4 w-4 text-[var(--sv-text-muted)]" />
           <Input 
             className="ps-9" 
             placeholder={t('Search your courses...')} 
@@ -137,7 +137,7 @@ export default function InstructorCoursesPage() {
       </div>
 
       {isCreating && (
-        <Card className="border-indigo-200 bg-indigo-50/50">
+        <Card className="border-[var(--sv-primary-200)] bg-[var(--sv-primary-50)]/50">
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardHeader>
               <CardTitle>{t('Create a new course')}</CardTitle>
@@ -146,16 +146,16 @@ export default function InstructorCoursesPage() {
               <div>
                 <label className="text-sm font-medium mb-1 block">{t('Course Title')}</label>
                 <Input {...register('title')} placeholder={t('e.g. Advanced TypeScript')} />
-                {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message?.toString()}</p>}
+                {errors.title && <p className="text-xs text-[var(--sv-error)] mt-1">{errors.title.message?.toString()}</p>}
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">{t('Description')}</label>
                 <textarea 
                   {...register('description')}
-                  className="flex w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" 
+                  className="flex w-full rounded-md border border-[var(--sv-border-input)] bg-transparent px-3 py-2 text-sm text-[var(--sv-text-primary)] placeholder:text-[var(--sv-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--sv-ring-focus)] focus:border-transparent" 
                   rows={3}
                 />
-                {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description.message?.toString()}</p>}
+                {errors.description && <p className="text-xs text-[var(--sv-error)] mt-1">{errors.description.message?.toString()}</p>}
               </div>
             </CardContent>
             <CardFooter>
@@ -167,13 +167,13 @@ export default function InstructorCoursesPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--sv-primary)]"></div>
         </div>
       ) : (
         <div className="space-y-6">
           {courses.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-              <p className="text-slate-500">{t('No courses found.')}</p>
+            <div className="text-center py-12 bg-[var(--sv-bg-card)] rounded-lg border border-[var(--sv-border)]">
+              <p className="text-[var(--sv-text-secondary)]">{t('No courses found.')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -191,15 +191,15 @@ export default function InstructorCoursesPage() {
                           disabled={updatingCourseId === course.id}
                           className={`appearance-none rounded-full ps-2 pe-6 py-1 text-xs font-medium ring-1 ring-inset cursor-pointer transition-colors ${
                             course.visibility === CourseVisibility.PUBLIC 
-                              ? 'bg-green-50 text-green-700 ring-green-600/20 hover:bg-green-100' 
-                              : 'bg-slate-50 text-slate-600 ring-slate-500/10 hover:bg-slate-100'
+                              ? 'bg-[var(--sv-success-100)] text-[var(--sv-success-800)] ring-[var(--sv-success-600)]/30 hover:bg-[var(--sv-success-50)]' 
+                              : 'bg-[var(--sv-surface-container-high)] text-[var(--sv-on-surface-variant)] ring-[var(--sv-outline)]/20 hover:bg-[var(--sv-surface-container)]'
                           }`}
                         >
                           <option value={CourseVisibility.PUBLIC}>{t('Public')}</option>
                           <option value={CourseVisibility.PRIVATE}>{t('Private')}</option>
                         </select>
                         <ChevronDown className={`absolute end-1.5 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none ${
-                          course.visibility === CourseVisibility.PUBLIC ? 'text-green-600' : 'text-slate-500'
+                          course.visibility === CourseVisibility.PUBLIC ? 'text-[var(--sv-success-600)]' : 'text-[var(--sv-text-muted)]'
                         }`} />
                       </div>
                     </div>

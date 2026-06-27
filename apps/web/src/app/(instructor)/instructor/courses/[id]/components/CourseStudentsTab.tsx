@@ -99,19 +99,19 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
           <CardContent>
             <div className="space-y-3">
               {pendingRequests.length === 0 && (
-                <p className="text-sm text-slate-500 text-center py-4">{t('No pending enrollment requests.')}</p>
+                <p className="text-sm text-[var(--sv-text-muted)] text-center py-4">{t('No pending enrollment requests.')}</p>
               )}
               {pendingRequests.map((e: any) => (
-                <div key={e.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 border rounded-md bg-yellow-50/30 gap-3">
+                <div key={e.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 border rounded-md bg-[var(--sv-warning-50)]/30 gap-3 border-[var(--sv-border)]">
                   <div className="text-sm">
                     <p className="font-medium">{e.learner?.firstName} {e.learner?.lastName}</p>
                     <p className="text-xs text-slate-500">{e.learner?.email}</p>
                   </div>
                   <div className="flex space-x-2 shrink-0">
-                    <Button size="sm" variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.APPROVED })}>
+                    <Button size="sm" variant="outline" className="text-[var(--sv-success-600)] hover:text-[var(--sv-success-700)] hover:bg-[var(--sv-success-50)]" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.APPROVED })}>
                       <Check className="h-4 w-4 me-1" /> {t('Approve')}
                     </Button>
-                    <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.REJECTED })}>
+                    <Button size="sm" variant="outline" className="text-[var(--sv-error)] hover:text-[var(--sv-error-700)] hover:bg-[var(--sv-error-50)]" onClick={() => respondEnrollmentMutation.mutate({ id: e.id, status: EnrollmentStatus.REJECTED })}>
                       <X className="h-4 w-4 me-1" /> {t('Reject')}
                     </Button>
                   </div>
@@ -129,7 +129,7 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
             <CardDescription>{t('View and manage students currently enrolled in the course.')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border border-slate-200">
+            <div className="rounded-md border border-[var(--sv-border)]">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -141,7 +141,7 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
                 <TableBody>
                   {approvedStudents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8 text-slate-500">
+                      <TableCell colSpan={3} className="text-center py-8 text-[var(--sv-text-muted)]">
                         {t('No students enrolled yet.')}
                       </TableCell>
                     </TableRow>
@@ -150,23 +150,23 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
                       <TableRow key={e.id}>
                         <TableCell>
                           <div className="flex items-center">
-                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center me-3 shrink-0">
-                              <Users className="h-4 w-4 text-slate-400" />
+                            <div className="h-8 w-8 rounded-full bg-[var(--sv-surface-container-high)] flex items-center justify-center me-3 shrink-0">
+                              <Users className="h-4 w-4 text-[var(--sv-text-muted)]" />
                             </div>
                             <div>
-                              <p className="font-medium text-slate-900">{e.learner?.firstName} {e.learner?.lastName}</p>
-                              <p className="text-xs text-slate-500">{e.learner?.email}</p>
+                              <p className="font-medium text-[var(--sv-text-primary)]">{e.learner?.firstName} {e.learner?.lastName}</p>
+                    <p className="text-xs text-[var(--sv-text-muted)]">{e.learner?.email}</p>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-slate-500">
+                        <TableCell className="text-[var(--sv-text-muted)]">
                           {new Date(e.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-right">
                           <Button 
                             size="sm" 
                             variant="ghost" 
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50" 
+                            className="text-[var(--sv-error)] hover:text-[var(--sv-error-700)] hover:bg-[var(--sv-error-50)]" 
                             onClick={() => {
                               if (confirm(t('Are you sure you want to remove this student from the course?'))) {
                                 removeStudentMutation.mutate(e.id);

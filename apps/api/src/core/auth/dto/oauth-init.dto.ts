@@ -1,8 +1,8 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { UserRole } from '@lms/shared-types';
 
 export class OAuthInitDto {
+  @IsOptional()
   @IsEnum(UserRole)
-  @IsNotEmpty()
-  role!: UserRole;
+  role?: UserRole;
 }

@@ -1,8 +1,8 @@
-import { Controller, Post, Get, Body, UseGuards, HttpCode, HttpStatus, Req, Res, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, HttpCode, HttpStatus, Req, Res, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { AuthProvider } from '@lms/shared-types';
+import { AuthProvider, UserRole } from '@lms/shared-types';
 import { AuthService } from './auth.service';
 import { SocialAuthService } from './services/social-auth.service';
 import { OAuthStateStore } from './services/oauth-state.store';
@@ -14,6 +14,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { OAuthInitDto } from './dto/oauth-init.dto';
+import { CompleteRegistrationDto } from './dto/complete-registration.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 
@@ -94,19 +95,14 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
-    const role = this.oauthStateStore.consume(state);
-    if (!role) {
-      throw new BadRequestException('Invalid or expired OAuth state');
-    }
-    const tokens = await this.socialAuthService.validateOrCreateUser(
+    const role = this.oauthStateStore.consume(state) ?? undefined;
+    const result = await this.socialAuthService.validateOrCreateUser(
       AuthProvider.GOOGLE,
       req.user,
       role,
     );
-    const frontendUrl = this.configService.get<string>('app.frontendUrl');
-    return res.redirect(
-      `${frontendUrl}/auth/callback#access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`,
-    );
+    const origin = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
+    return res.type('text/html').send(this.buildSuccessHtml(result, origin));
   }
 
   @Get('facebook')
@@ -129,18 +125,40 @@ export class AuthController {
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
   async facebookAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
-    const role = this.oauthStateStore.consume(state);
-    if (!role) {
-      throw new BadRequestException('Invalid or expired OAuth state');
-    }
-    const tokens = await this.socialAuthService.validateOrCreateUser(
+    const role = this.oauthStateStore.consume(state) ?? undefined;
+    const result = await this.socialAuthService.validateOrCreateUser(
       AuthProvider.FACEBOOK,
       req.user,
       role,
     );
-    const frontendUrl = this.configService.get<string>('app.frontendUrl');
-    return res.redirect(
-      `${frontendUrl}/auth/callback#access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`,
-    );
+    const origin = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
+    return res.type('text/html').send(this.buildSuccessHtml(result, origin));
+  }
+
+  @Post('complete-registration')
+  @HttpCode(HttpStatus.OK)
+  async completeRegistration(@Body() dto: CompleteRegistrationDto) {
+    return this.socialAuthService.completeRegistration(dto.tempToken, dto.role);
+  }
+
+  private buildSuccessHtml(payload: Record<string, unknown>, origin: string): string {
+    const data = JSON.stringify({ type: 'OAUTH_SUCCESS', ...payload });
+    const escapedOrigin = origin.replace(/'/g, "\\'");
+    return `<!DOCTYPE html>
+<html><body><script>
+try{window.opener.postMessage(${data},'${escapedOrigin}')}catch(e){}
+try{window.close()}catch(e){}
+window.location.replace('about:blank');
+<\/script></body></html>`;
+  }
+
+  private buildErrorHtml(message: string): string {
+    const payload = JSON.stringify({ type: 'OAUTH_ERROR', message });
+    return `<!DOCTYPE html>
+<html><body><script>
+try{window.opener.postMessage(${payload},'*')}catch(e){}
+try{window.close()}catch(e){}
+window.location.replace('about:blank');
+<\/script></body></html>`;
   }
 }

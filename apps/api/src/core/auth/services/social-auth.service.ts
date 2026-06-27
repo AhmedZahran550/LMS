@@ -30,7 +30,7 @@ export class SocialAuthService {
   async validateOrCreateUser(
     provider: AuthProvider,
     profile: SocialProfile,
-    role: string,
+    role?: string,
   ) {
     let user = await this.usersRepository.findOne({
       where: { provider, providerId: profile.id },
@@ -39,7 +39,8 @@ export class SocialAuthService {
       if (!user.isActive) {
         throw new UnauthorizedException('Account is inactive');
       }
-      return this.generateTokens(user);
+      const tokens = await this.generateTokens(user);
+      return { ...tokens, needsRole: false };
     }
 
     user = await this.usersService.findByEmail(profile.email);
@@ -54,30 +55,92 @@ export class SocialAuthService {
       }
       user.isEmailVerified = true;
       await this.usersService.save(user);
-      return this.generateTokens(user);
+      const tokens = await this.generateTokens(user);
+      return { ...tokens, needsRole: false };
     }
 
-    const validRoles = Object.values(UserRole) as string[];
-    if (!validRoles.includes(role)) {
-      throw new BadRequestException('Invalid role');
+    // New user — some flows provide a role upfront, others defer to /choose-role
+    if (role) {
+      const validRoles = Object.values(UserRole) as string[];
+      if (!validRoles.includes(role)) {
+        throw new BadRequestException('Invalid role');
+      }
+      const user = await this.createSocialUser(provider, profile, role as UserRole);
+      const tokens = await this.generateTokens(user);
+      return { ...tokens, needsRole: false };
     }
 
+    // No role given → issue a temp token for /choose-role
+    const tempToken = this.jwtService.sign(
+      {
+        temp: true,
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        provider,
+        providerId: profile.id,
+        picture: profile.picture,
+      },
+      { expiresIn: '5m' },
+    );
+
+    return {
+      tempToken,
+      needsRole: true,
+      user: {
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      },
+    };
+  }
+
+  async completeRegistration(tempToken: string, role: UserRole) {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(tempToken);
+    } catch {
+      throw new BadRequestException('Invalid or expired registration token');
+    }
+    if (!payload.temp) {
+      throw new BadRequestException('Invalid token type');
+    }
+
+    const user = await this.createSocialUser(
+      payload.provider,
+      {
+        id: payload.providerId,
+        email: payload.email,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        picture: payload.picture,
+      },
+      role,
+    );
+
+    const tokens = await this.generateTokens(user);
+    return { ...tokens, needsRole: false };
+  }
+
+  private async createSocialUser(
+    provider: AuthProvider,
+    profile: SocialProfile,
+    role: UserRole,
+  ): Promise<User> {
     const hashedPassword = await argon2.hash(crypto.randomUUID());
-    user = await this.usersService.create({
+    const user = await this.usersService.create({
       email: profile.email,
       password: hashedPassword,
       firstName: profile.firstName,
       lastName: profile.lastName,
-      role: role as any,
+      role,
       isActive: true,
     });
     user.provider = provider;
     user.providerId = profile.id;
     user.profileImageUrl = profile.picture ?? null;
     user.isEmailVerified = true;
-    await this.usersService.save(user);
-
-    return this.generateTokens(user);
+    return this.usersService.save(user);
   }
 
   private async generateTokens(user: User) {

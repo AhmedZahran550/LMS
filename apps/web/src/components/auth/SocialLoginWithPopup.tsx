@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap, Brain, X } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
 import { UserRole, UserProfile } from '@lms/shared-types';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || '';
 const API_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`;
+const API_ORIGIN = (() => {
+  try { return new URL(rawApiUrl).origin; } catch { return ''; }
+})();
 
 function GoogleIcon() {
   return (
@@ -30,62 +32,120 @@ function FacebookIcon() {
   );
 }
 
+function redirectByRole(user: UserProfile, router: ReturnType<typeof useRouter>) {
+  if (user.role === UserRole.INSTRUCTOR) {
+    router.replace('/instructor');
+  } else if (user.role === UserRole.ADMIN) {
+    router.replace('/admin');
+  } else {
+    router.replace('/my-courses');
+  }
+}
+
 export function SocialLoginWithPopup() {
   const { t } = useTranslation();
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
-  const [showPopup, setShowPopup] = useState(false);
-  const [pendingUrl, setPendingUrl] = useState('');
-  const [role, setRole] = useState<UserRole>(UserRole.LEARNER);
+  const setTempToken = useAuthStore((state) => state.setTempToken);
+  const [oauthError, setOauthError] = useState<string | null>(null);
+  const popupRef = useRef<Window | null>(null);
+
+  const closePopup = useCallback(() => {
+    const win = popupRef.current;
+    if (win) {
+      try {
+        win.location.href = 'about:blank';
+      } catch {
+        // maybe cross-origin, best-effort
+      }
+      try {
+        win.close();
+      } catch {
+        // best-effort
+      }
+    }
+    popupRef.current = null;
+  }, []);
+
+  const onAuthSuccess = useCallback(
+    (result: {
+      user: UserProfile;
+      accessToken: string;
+      refreshToken: string;
+      needsRole: false;
+    } | {
+      user: { email: string; firstName: string; lastName: string };
+      tempToken: string;
+      needsRole: true;
+    }) => {
+      setOauthError(null);
+      const win = popupRef.current;
+      closePopup();
+      if (win && !win.closed) {
+        const interval = setInterval(() => {
+          if (win.closed) { clearInterval(interval); return; }
+          try { win.location.href = 'about:blank'; } catch {}
+          try { win.close(); } catch {}
+        }, 200);
+        setTimeout(() => clearInterval(interval), 3000);
+      }
+
+      if (result.needsRole) {
+        setTempToken(result.tempToken);
+        router.replace('/choose-role');
+      } else {
+        setAuth(result.user, result.accessToken, result.refreshToken);
+        redirectByRole(result.user, router);
+      }
+    },
+    [setAuth, setTempToken, router, closePopup],
+  );
+
+  const onAuthError = useCallback((message: string) => {
+    setOauthError(message);
+  }, []);
 
   const handleOAuthMessage = useCallback(
     (event: MessageEvent) => {
-      if (event.data?.type !== 'OAUTH_SUCCESS') return;
-      const { user, accessToken, refreshToken } = event.data as {
-        user: UserProfile;
-        accessToken: string;
-        refreshToken: string;
-      };
-      setAuth(user, accessToken, refreshToken);
-      if (user.role === UserRole.INSTRUCTOR) {
-        router.replace('/instructor');
-      } else if (user.role === UserRole.ADMIN) {
-        router.replace('/admin');
-      } else {
-        router.replace('/my-courses');
+      if (event.origin !== API_ORIGIN) return;
+      if (event.data?.type === 'OAUTH_SUCCESS') {
+        onAuthSuccess(event.data as any);
+      } else if (event.data?.type === 'OAUTH_ERROR') {
+        onAuthError(event.data.message || 'Authentication failed');
       }
     },
-    [setAuth, router],
+    [onAuthSuccess, onAuthError],
   );
 
   useEffect(() => {
     window.addEventListener('message', handleOAuthMessage);
-    return () => window.removeEventListener('message', handleOAuthMessage);
+    return () => {
+      window.removeEventListener('message', handleOAuthMessage);
+    };
   }, [handleOAuthMessage]);
 
-  const handleGoogle = () => {
-    setPendingUrl(`${API_URL}/auth/google?role=`);
-    setRole(UserRole.LEARNER);
-    setShowPopup(true);
-  };
-
-  const handleFacebook = () => {
-    setPendingUrl(`${API_URL}/auth/facebook?role=`);
-    setRole(UserRole.LEARNER);
-    setShowPopup(true);
-  };
-
-  const handleContinue = () => {
-    window.open(`${pendingUrl}${role}`, 'oauth-popup', 'width=600,height=700,popup=1');
-    setShowPopup(false);
+  const openProvider = (provider: 'google' | 'facebook') => {
+    const url = `${API_URL}/auth/${provider}`;
+    const popup = window.open(url, 'oauth-popup', 'width=600,height=700,popup=1');
+    if (!popup || popup.closed) {
+      window.location.href = url;
+    } else {
+      popupRef.current = popup;
+    }
   };
 
   return (
     <>
+      {oauthError && (
+        <div className="flex items-center gap-2 text-sm text-[var(--sv-error)] bg-[var(--sv-error-50)] p-3 rounded-lg border border-[var(--sv-error)]/20 mb-3">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{oauthError}</span>
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         <button
           type="button"
-          onClick={handleGoogle}
+          onClick={() => openProvider('google')}
           className="flex items-center justify-center gap-3 w-full h-11 px-4 rounded-lg border border-[var(--sv-border)] bg-[var(--sv-bg-card)] text-[var(--sv-text-primary)] text-sm font-medium hover:bg-[var(--sv-surface-container-high)] transition-colors shadow-sm"
         >
           <GoogleIcon />
@@ -93,73 +153,13 @@ export function SocialLoginWithPopup() {
         </button>
         <button
           type="button"
-          onClick={handleFacebook}
+          onClick={() => openProvider('facebook')}
           className="flex items-center justify-center gap-3 w-full h-11 px-4 rounded-lg bg-[#1877F2] text-white text-sm font-medium hover:brightness-110 transition-all shadow-sm"
         >
           <FacebookIcon />
           {t('Continue with Facebook')}
         </button>
       </div>
-
-      {showPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-[var(--sv-bg-card)] rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 relative border border-[var(--sv-border)]">
-            <button
-              type="button"
-              onClick={() => setShowPopup(false)}
-              className="absolute top-3 end-3 text-[var(--sv-text-muted)] hover:text-[var(--sv-text-primary)] transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="text-center mb-6">
-              <h3 className="text-lg font-bold text-[var(--sv-text-primary)]">{t('Join as')}</h3>
-              <p className="text-sm text-[var(--sv-text-secondary)] mt-1">{t('Choose your role to continue')}</p>
-            </div>
-
-            <div className="flex flex-col gap-3 mb-6">
-              <button
-                type="button"
-                onClick={() => setRole(UserRole.LEARNER)}
-                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                  role === UserRole.LEARNER
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-600'
-                    : 'border-[var(--sv-border)] text-[var(--sv-text-muted)] hover:bg-[var(--sv-surface-container-high)]'
-                }`}
-              >
-                <GraduationCap className="w-6 h-6 shrink-0" />
-                <div className="text-start">
-                  <p className="text-sm font-semibold">{t('Learner')}</p>
-                  <p className="text-xs opacity-70">{t('Browse and enroll in courses')}</p>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole(UserRole.INSTRUCTOR)}
-                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                  role === UserRole.INSTRUCTOR
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-600'
-                    : 'border-[var(--sv-border)] text-[var(--sv-text-muted)] hover:bg-[var(--sv-surface-container-high)]'
-                }`}
-              >
-                <Brain className="w-6 h-6 shrink-0" />
-                <div className="text-start">
-                  <p className="text-sm font-semibold">{t('Instructor')}</p>
-                  <p className="text-xs opacity-70">{t('Create and manage courses')}</p>
-                </div>
-              </button>
-            </div>
-
-            <Button
-              type="button"
-              className="w-full h-11 text-base shadow-md"
-              onClick={handleContinue}
-            >
-              {t('Continue')}
-            </Button>
-          </div>
-        </div>
-      )}
     </>
   );
 }
