@@ -37,6 +37,15 @@ export default function AuthCallbackPage() {
         const user = res.data;
         setAuth(user, accessToken, refreshToken);
 
+        if (window.opener) {
+          window.opener.postMessage(
+            { type: 'OAUTH_SUCCESS', user, accessToken, refreshToken },
+            window.origin,
+          );
+          window.close();
+          return;
+        }
+
         const role = user.role;
         if (role === UserRole.INSTRUCTOR) {
           router.replace('/instructor');

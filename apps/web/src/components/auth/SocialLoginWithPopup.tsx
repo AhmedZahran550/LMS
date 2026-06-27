@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { GraduationCap, Brain, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { UserRole } from '@lms/shared-types';
+import { UserRole, UserProfile } from '@lms/shared-types';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || '';
 const API_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`;
@@ -30,9 +32,36 @@ function FacebookIcon() {
 
 export function SocialLoginWithPopup() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const setAuth = useAuthStore((state) => state.setAuth);
   const [showPopup, setShowPopup] = useState(false);
   const [pendingUrl, setPendingUrl] = useState('');
   const [role, setRole] = useState<UserRole>(UserRole.LEARNER);
+
+  const handleOAuthMessage = useCallback(
+    (event: MessageEvent) => {
+      if (event.data?.type !== 'OAUTH_SUCCESS') return;
+      const { user, accessToken, refreshToken } = event.data as {
+        user: UserProfile;
+        accessToken: string;
+        refreshToken: string;
+      };
+      setAuth(user, accessToken, refreshToken);
+      if (user.role === UserRole.INSTRUCTOR) {
+        router.replace('/instructor');
+      } else if (user.role === UserRole.ADMIN) {
+        router.replace('/admin');
+      } else {
+        router.replace('/my-courses');
+      }
+    },
+    [setAuth, router],
+  );
+
+  useEffect(() => {
+    window.addEventListener('message', handleOAuthMessage);
+    return () => window.removeEventListener('message', handleOAuthMessage);
+  }, [handleOAuthMessage]);
 
   const handleGoogle = () => {
     setPendingUrl(`${API_URL}/auth/google?role=`);
@@ -47,7 +76,8 @@ export function SocialLoginWithPopup() {
   };
 
   const handleContinue = () => {
-    window.location.href = `${pendingUrl}${role}`;
+    window.open(`${pendingUrl}${role}`, 'oauth-popup', 'width=600,height=700,popup=1');
+    setShowPopup(false);
   };
 
   return (
