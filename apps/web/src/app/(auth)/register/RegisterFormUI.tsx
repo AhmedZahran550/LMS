@@ -13,7 +13,7 @@ import { SocialLoginWithPopup } from '@/components/auth/SocialLoginWithPopup';
 interface RegisterFormUIProps {
   register: UseFormRegister<any>;
   errors: FieldErrors<any>;
-  serverError: string | null;
+  serverError: { message: string; code?: string } | null;
   isLoading: boolean;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
 }
@@ -114,8 +114,15 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
 
         <form onSubmit={onSubmit} className="space-y-5">
           {serverError && (
-            <div className="text-sm text-red-500 bg-red-50 border border-red-200 p-3 rounded-lg">
-              {serverError}
+            <div className="text-sm text-red-500 bg-red-50 p-3 rounded-lg border border-red-200">
+              <div>{serverError.message}</div>
+              {serverError.code === 'EMAIL_EXISTS' && (
+                <div className="mt-1">
+                  <Link href="/login" className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline">
+                    {t('Sign in instead')}
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 

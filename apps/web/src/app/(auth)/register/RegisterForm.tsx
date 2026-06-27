@@ -37,7 +37,7 @@ export function RegisterForm() {
   const router = useRouter();
   const registerMutation = useRegisterMutation();
   const { t } = useTranslation();
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<{ message: string; code?: string } | null>(null);
 
   const registerSchema = useMemo(() => getRegisterSchema(t), [t]);
 
@@ -59,7 +59,11 @@ export function RegisterForm() {
       await registerMutation.mutateAsync(apiData);
       router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (err: any) {
-      setServerError(err.response?.data?.message || t('Registration failed. Please try again later.'));
+      const data = err.response?.data;
+      setServerError({
+        message: data?.message || t('Registration failed. Please try again later.'),
+        code: data?.errorCode,
+      });
     }
   };
 

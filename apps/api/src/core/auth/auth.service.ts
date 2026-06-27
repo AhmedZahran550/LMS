@@ -52,11 +52,9 @@ export class AuthService {
     user.emailVerificationOtpExpiresAt = expiresAt;
     await this.usersService.save(user);
 
-    try {
-      await this.mailService.sendOtpEmail(user.email, otp);
-    } catch (error) {
+    this.mailService.sendOtpEmail(user.email, otp).catch((error) => {
       console.log('error in sending OTP email', error);
-    }
+    });
 
     return { email: user.email };
   }
@@ -156,11 +154,9 @@ export class AuthService {
     user.emailVerificationOtpExpiresAt = expiresAt;
     await this.usersService.save(user);
 
-    try {
-      await this.mailService.sendOtpEmail(user.email, otp);
-    } catch (error) {
+    this.mailService.sendOtpEmail(user.email, otp).catch((error) => {
       console.log('error in sending OTP email', error);
-    }
+    });
 
     return { message: 'OTP sent successfully', email: user.email };
   }
@@ -181,7 +177,9 @@ export class AuthService {
 
     const frontendUrl = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
     const resetUrl = frontendUrl + '/reset-password?token=' + resetToken;
-    await this.mailService.sendPasswordResetEmail(user.email, resetUrl);
+    this.mailService.sendPasswordResetEmail(user.email, resetUrl).catch((error) => {
+      console.log('error in sending password reset email', error);
+    });
 
     return { message: 'If an account exists, a password reset link has been sent.' };
   }
