@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, BadRequestException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -6,7 +6,7 @@ import { Repository } from "typeorm";
 import * as crypto from "crypto";
 import * as argon2 from "argon2";
 import { User } from "../../../db/entities/user.entity";
-import { AuthProvider } from "@lms/shared-types";
+import { AuthProvider, UserRole } from "@lms/shared-types";
 import { UsersService } from "../../../modules/users/users.service";
 
 export interface SocialProfile {
@@ -36,11 +36,17 @@ export class SocialAuthService {
       where: { provider, providerId: profile.id },
     });
     if (user) {
+      if (!user.isActive) {
+        throw new UnauthorizedException('Account is inactive');
+      }
       return this.generateTokens(user);
     }
 
     user = await this.usersService.findByEmail(profile.email);
     if (user) {
+      if (!user.isActive) {
+        throw new UnauthorizedException('Account is inactive');
+      }
       user.provider = provider;
       user.providerId = profile.id;
       if (profile.picture && !user.profileImageUrl) {
@@ -49,6 +55,11 @@ export class SocialAuthService {
       user.isEmailVerified = true;
       await this.usersService.save(user);
       return this.generateTokens(user);
+    }
+
+    const validRoles = Object.values(UserRole) as string[];
+    if (!validRoles.includes(role)) {
+      throw new BadRequestException('Invalid role');
     }
 
     const hashedPassword = await argon2.hash(crypto.randomUUID());

@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards, HttpCode, HttpStatus, Req, Res, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, HttpCode, HttpStatus, Req, Res, Query, BadRequestException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
@@ -13,6 +13,7 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
+import { OAuthInitDto } from './dto/oauth-init.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 
@@ -74,8 +75,8 @@ export class AuthController {
   }
 
   @Get('google')
-  async googleAuth(@Query('role') role: string, @Res() res: Response) {
-    const state = this.oauthStateStore.save(role || 'learner');
+  async googleAuth(@Query() query: OAuthInitDto, @Res() res: Response) {
+    const state = this.oauthStateStore.save(query.role);
     const config = this.configService.get('oauth.google') as {
       clientId: string;
       clientSecret: string;
@@ -93,7 +94,10 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
-    const role = this.oauthStateStore.consume(state) || 'learner';
+    const role = this.oauthStateStore.consume(state);
+    if (!role) {
+      throw new BadRequestException('Invalid or expired OAuth state');
+    }
     const tokens = await this.socialAuthService.validateOrCreateUser(
       AuthProvider.GOOGLE,
       req.user,
@@ -101,13 +105,13 @@ export class AuthController {
     );
     const frontendUrl = this.configService.get<string>('app.frontendUrl');
     return res.redirect(
-      `${frontendUrl}/auth/callback?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`,
+      `${frontendUrl}/auth/callback#access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`,
     );
   }
 
   @Get('facebook')
-  async facebookAuth(@Query('role') role: string, @Res() res: Response) {
-    const state = this.oauthStateStore.save(role || 'learner');
+  async facebookAuth(@Query() query: OAuthInitDto, @Res() res: Response) {
+    const state = this.oauthStateStore.save(query.role);
     const config = this.configService.get('oauth.facebook') as {
       appId: string;
       appSecret: string;
@@ -125,7 +129,10 @@ export class AuthController {
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
   async facebookAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
-    const role = this.oauthStateStore.consume(state) || 'learner';
+    const role = this.oauthStateStore.consume(state);
+    if (!role) {
+      throw new BadRequestException('Invalid or expired OAuth state');
+    }
     const tokens = await this.socialAuthService.validateOrCreateUser(
       AuthProvider.FACEBOOK,
       req.user,
@@ -133,7 +140,7 @@ export class AuthController {
     );
     const frontendUrl = this.configService.get<string>('app.frontendUrl');
     return res.redirect(
-      `${frontendUrl}/auth/callback?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`,
+      `${frontendUrl}/auth/callback#access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`,
     );
   }
 }

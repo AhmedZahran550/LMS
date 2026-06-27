@@ -1,9 +1,10 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, Unique } from 'typeorm';
 import { UserRole, AuthProvider } from '@lms/shared-types';
 import { Exclude } from 'class-transformer';
 import { BaseEntity } from './base.entity';
 
 @Entity()
+@Unique(['provider', 'providerId'])
 export class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
