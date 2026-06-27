@@ -43,7 +43,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </header>
 
       <main className="flex-grow flex items-center justify-center px-4 py-12 relative z-10">
-        <div className="w-full max-w-md">
+        <div className="w-full">
           {children}
         </div>
       </main>
