@@ -15,6 +15,7 @@ export default function ChooseRolePage() {
   const { t } = useTranslation();
   const router = useRouter();
   const tempToken = useAuthStore((state) => state.tempToken);
+  const _hasHydrated = useAuthStore((state) => state._hasHydrated);
   const setAuth = useAuthStore((state) => state.setAuth);
   const clearTempToken = useAuthStore((state) => state.clearTempToken);
   const [selected, setSelected] = useState<UserRole | null>(null);
@@ -22,10 +23,10 @@ export default function ChooseRolePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!tempToken) {
+    if (_hasHydrated && !tempToken) {
       router.replace('/login');
     }
-  }, [tempToken, router]);
+  }, [tempToken, router, _hasHydrated]);
 
   const handleContinue = async () => {
     if (!selected || !tempToken) return;
@@ -59,7 +60,7 @@ export default function ChooseRolePage() {
     }
   };
 
-  if (!tempToken) {
+  if (!_hasHydrated || !tempToken) {
     return null;
   }
 
