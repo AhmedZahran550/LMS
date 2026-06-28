@@ -24,3 +24,16 @@ export const useSendOtpMutation = () => {
     mutationFn: (email: string) => authApis.sendOtp(email),
   });
 };
+
+export const useForgotPasswordMutation = () => {
+  return useMutation({
+    mutationFn: (email: string) => authApis.forgotPassword(email),
+  });
+};
+
+export const useResetPasswordMutation = () => {
+  return useMutation({
+    mutationFn: ({ token, newPassword }: { token: string; newPassword: string }) =>
+      authApis.resetPassword(token, newPassword),
+  });
+};

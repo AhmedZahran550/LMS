@@ -19,6 +19,7 @@ interface LoginFormUIProps {
   isResending: boolean;
   resendSuccess: string | null;
   resendError: string | null;
+  resetSuccess?: string | null;
 }
 
 function GoogleIcon({ className = 'w-5 h-5' }: { className?: string }) {
@@ -50,6 +51,7 @@ export function LoginFormUI({
   isResending,
   resendSuccess,
   resendError,
+  resetSuccess,
 }: LoginFormUIProps) {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
@@ -130,6 +132,13 @@ export function LoginFormUI({
         </div>
 
         <form onSubmit={onSubmit} className="space-y-5">
+          {resetSuccess && (
+            <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              <span>{resetSuccess}</span>
+            </div>
+          )}
+
           {serverError && (
             <div className="text-sm text-red-500 bg-red-50 p-3 rounded-lg space-y-2 border border-red-200">
               <div>{serverError.message}</div>
@@ -184,7 +193,7 @@ export function LoginFormUI({
               <label className="text-sm font-medium text-slate-700" htmlFor="password">
                 {t('Password')}
               </label>
-              <Link href="#" className="text-xs font-medium text-indigo-600 hover:underline transition-all">
+              <Link href="/forgot-password" className="text-xs font-medium text-indigo-600 hover:underline transition-all">
                 {t('Forgot password?')}
               </Link>
             </div>

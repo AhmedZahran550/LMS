@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,6 +23,8 @@ function getLoginSchema(t: (key: string) => string) {
 export function LoginForm() {
   const { t } = useTranslation();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resetSuccess = searchParams.get('reset') === 'true' ? t('Password reset successfully! Sign in with your new password.') : null;
   const setAuth = useAuthStore((state) => state.setAuth);
   const loginMutation = useLoginMutation();
   const sendOtpMutation = useSendOtpMutation();
@@ -132,6 +134,7 @@ export function LoginForm() {
       isResending={sendOtpMutation.isPending}
       resendSuccess={resendSuccess}
       resendError={resendError}
+      resetSuccess={resetSuccess}
     />
   );
 }
