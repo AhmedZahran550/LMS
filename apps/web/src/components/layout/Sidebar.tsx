@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Compass, LayoutDashboard, LogOut, Settings, Video } from 'lucide-react';
+import { BookOpen, Compass, LayoutDashboard, LogOut, Settings, Video, CreditCard } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole } from '@lms/shared-types';
 import { Avatar } from '@/components/ui/Avatar';
@@ -22,6 +22,7 @@ export function Sidebar() {
         return [
           { name: 'Dashboard', href: '/instructor', icon: LayoutDashboard },
           { name: 'My Courses', href: '/instructor/courses', icon: Video },
+          { name: 'Subscription', href: '/instructor/subscription', icon: CreditCard },
         ];
       case UserRole.LEARNER:
       default:

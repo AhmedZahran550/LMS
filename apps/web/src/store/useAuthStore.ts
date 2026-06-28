@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { UserProfile } from '@lms/shared-types';
+import { UserProfile, SubscriptionInfo } from '@lms/shared-types';
 
 interface AuthState {
   user: UserProfile | null;
@@ -14,6 +14,7 @@ interface AuthState {
   clearTempToken: () => void;
   setHasHydrated: (state: boolean) => void;
   updateUser: (user: Partial<UserProfile>) => void;
+  updateSubscription: (updates: Partial<SubscriptionInfo>) => void;
   logout: () => void;
 }
 
@@ -32,6 +33,12 @@ export const useAuthStore = create<AuthState>()(
       setHasHydrated: (state) => set({ _hasHydrated: state }),
       updateUser: (updatedUser) => set((state) => ({
         user: state.user ? { ...state.user, ...updatedUser } : null
+      })),
+      updateSubscription: (updates) => set((state) => ({
+        user: state.user ? {
+          ...state.user,
+          subscription: state.user.subscription ? { ...state.user.subscription, ...updates } : updates as SubscriptionInfo
+        } : null
       })),
       logout: () => set({ user: null, accessToken: null, refreshToken: null, tempToken: null }),
     }),

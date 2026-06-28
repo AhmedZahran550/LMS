@@ -6,6 +6,9 @@ import { Enrollment } from "../db/entities/enrollment.entity";
 import { Log } from "../db/entities/log.entity";
 import { Notification } from "../db/entities/notification.entity";
 import { CourseContent } from "./entities/course-content.entity";
+import { SubscriptionPlan } from "./entities/subscription-plan.entity";
+import { InstructorSubscription } from "./entities/instructor-subscription.entity";
+import { Payment } from "./entities/payment.entity";
 import { AppDataSource } from "./datasource";
 
 @Global()
@@ -19,6 +22,9 @@ import { AppDataSource } from "./datasource";
       Log,
       Notification,
       CourseContent,
+      SubscriptionPlan,
+      InstructorSubscription,
+      Payment,
     ]),
   ],
   exports: [TypeOrmModule],

@@ -12,6 +12,7 @@ import { Course } from '../../db/entities/course.entity';
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 import { CourseVisibility, PaginatedResponse, ContentType } from "@lms/shared-types";
+import { SubscriptionGuardService } from '../subscriptions/services/subscription-guard.service';
 
 export const COURSE_PAGINATION_CONFIG: PaginateConfig<Course> = {
   sortableColumns: ["createdAt", "title"],
@@ -41,8 +42,16 @@ export class CoursesService extends DBService<
   constructor(
     @InjectRepository(Course)
     private readonly coursesRepository: Repository<Course>,
+    private readonly subscriptionGuard: SubscriptionGuardService,
   ) {
     super(coursesRepository, COURSE_PAGINATION_CONFIG);
+  }
+
+  async create(createDto: CreateCourseDto, additionalData?: DeepPartial<Course>): Promise<Course> {
+    if (additionalData?.instructorId) {
+      await this.subscriptionGuard.checkCourseCreation(additionalData.instructorId as string);
+    }
+    return super.create(createDto, additionalData);
   }
 
   async findById(id: string): Promise<Course> {

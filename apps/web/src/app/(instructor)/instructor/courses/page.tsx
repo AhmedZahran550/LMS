@@ -14,7 +14,9 @@ import { Select } from '@/components/ui/Select';
 import { Pagination } from '@/components/ui/Pagination';
 import { CourseVisibility } from '@lms/shared-types';
 import Link from 'next/link';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, AlertCircle } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useSubscriptionGuard } from '@/components/subscription/useSubscriptionGuard';
 
 function getCreateCourseSchema(t: (key: string) => string) {
   return z.object({
@@ -27,6 +29,8 @@ type CreateCourseFormData = z.infer<ReturnType<typeof getCreateCourseSchema>>;
 export default function InstructorCoursesPage() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const { updateSubscription } = useAuthStore();
+  const { checkCanCreateCourse } = useSubscriptionGuard();
   const [isCreating, setIsCreating] = useState(false);
   const [search, setSearch] = useState('');
   const [visibilityFilter, setVisibilityFilter] = useState('ALL');
@@ -61,16 +65,23 @@ export default function InstructorCoursesPage() {
 
   const createMutation = useMutation({
     mutationFn: async (data: CreateCourseFormData) => {
+      const { allowed, reason } = checkCanCreateCourse();
+      if (!allowed) throw new Error(reason || 'Subscription limit reached');
       return await courseApis.createCourse({
         title: data.title,
         description: data.description,
-        visibility: CourseVisibility.PRIVATE, // default
+        visibility: CourseVisibility.PRIVATE,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
+      const current = useAuthStore.getState().user?.subscription?.coursesCount || 0;
+      updateSubscription({ coursesCount: current + 1 });
       setIsCreating(false);
       reset();
+    },
+    onError: (err: any) => {
+      alert(err.message || err.response?.data?.message || t('Failed to create course'));
     }
   });
 

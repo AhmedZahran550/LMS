@@ -5,6 +5,7 @@ import * as crypto from 'crypto';
 import * as argon2 from 'argon2';
 import { UsersService } from '../../modules/users/users.service';
 import { MailService } from '../../modules/mail/mail.service';
+import { SubscriptionService } from '../../modules/subscriptions/services/subscription.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -21,6 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private mailService: MailService,
+    private subscriptionService: SubscriptionService,
   ) {}
 
   private generateOtp(): string {
@@ -217,6 +219,25 @@ export class AuthService {
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
 
+    let subscription: any = null;
+    if (user.role === 'instructor') {
+      try {
+        const usage = await this.subscriptionService.getUsage(user.id);
+        subscription = {
+          plan: usage.plan?.name || null,
+          status: usage.subscription?.status || null,
+          coursesCount: usage.coursesCount,
+          totalStudents: usage.totalStudents,
+          totalStorageBytes: usage.totalStorageBytes,
+          maxCourses: usage.plan?.maxCourses || 0,
+          maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
+          maxStorageBytes: usage.plan?.maxStorageBytes || 0,
+        };
+      } catch {
+        subscription = null;
+      }
+    }
+
     const userProfile = {
       id: user.id,
       email: user.email,
@@ -227,6 +248,7 @@ export class AuthService {
       profileImageUrl: user.profileImageUrl,
       preferences: user.preferences || { lang: 'ar', mode: 'light' },
       createdAt: user.createdAt.toISOString(),
+      subscription,
     };
 
     return {

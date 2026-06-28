@@ -8,6 +8,7 @@ import * as argon2 from "argon2";
 import { User } from "../../../db/entities/user.entity";
 import { AuthProvider, UserRole } from "@lms/shared-types";
 import { UsersService } from "../../../modules/users/users.service";
+import { SubscriptionService } from "../../../modules/subscriptions/services/subscription.service";
 
 export interface SocialProfile {
   id: string;
@@ -25,6 +26,7 @@ export class SocialAuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async validateOrCreateUser(
@@ -162,6 +164,25 @@ export class SocialAuthService {
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
 
+    let subscription: any = null;
+    if (user.role === UserRole.INSTRUCTOR) {
+      try {
+        const usage = await this.subscriptionService.getUsage(user.id);
+        subscription = {
+          plan: usage.plan?.name || null,
+          status: usage.subscription?.status || null,
+          coursesCount: usage.coursesCount,
+          totalStudents: usage.totalStudents,
+          totalStorageBytes: usage.totalStorageBytes,
+          maxCourses: usage.plan?.maxCourses || 0,
+          maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
+          maxStorageBytes: usage.plan?.maxStorageBytes || 0,
+        };
+      } catch {
+        subscription = null;
+      }
+    }
+
     const userProfile = {
       id: user.id,
       email: user.email,
@@ -173,6 +194,7 @@ export class SocialAuthService {
       profileImageUrl: user.profileImageUrl,
       preferences: user.preferences || { lang: "ar", mode: "light" },
       createdAt: user.createdAt.toISOString(),
+      subscription,
     };
 
     return {

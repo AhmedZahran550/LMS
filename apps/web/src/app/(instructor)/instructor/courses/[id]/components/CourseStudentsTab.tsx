@@ -19,9 +19,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { courseApis } from '@/lib/courseApis';
 import { enrollmentApis } from '@/lib/enrollmentApis';
 import { EnrollmentStatus } from '@lms/shared-types';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export function CourseStudentsTab({ courseId, enrollments }: { courseId: string, enrollments: any[] }) {
   const { t } = useTranslation();
+  const { updateSubscription } = useAuthStore();
   const queryClient = useQueryClient();
   const [inviteEmail, setInviteEmail] = useState('');
   
@@ -31,22 +33,33 @@ export function CourseStudentsTab({ courseId, enrollments }: { courseId: string,
 
   const respondEnrollmentMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: EnrollmentStatus }) => {
-      await enrollmentApis.respondEnrollment(id, status);
+      return enrollmentApis.respondEnrollment(id, status);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['course-enrollments', courseId] })
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['course-enrollments', courseId] });
+      if (variables.status === EnrollmentStatus.APPROVED) {
+        const current = useAuthStore.getState().user?.subscription?.totalStudents || 0;
+        updateSubscription({ totalStudents: current + 1 });
+      }
+    },
+    onError: (err: any) => {
+      alert(err.message || err.response?.data?.message || t('Failed to respond to enrollment'));
+    }
   });
 
   const inviteMutation = useMutation({
     mutationFn: async () => {
-      await courseApis.inviteInstructor(courseId, inviteEmail);
+      return courseApis.inviteInstructor(courseId, inviteEmail);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-enrollments', courseId] });
+      const current = useAuthStore.getState().user?.subscription?.totalStudents || 0;
+      updateSubscription({ totalStudents: current + 1 });
       setInviteEmail('');
       alert(t('Invitation sent successfully!'));
     },
     onError: (err: any) => {
-      alert(err.response?.data?.message || t('Failed to invite user'));
+      alert(err.message || err.response?.data?.message || t('Failed to invite user'));
     }
   });
 

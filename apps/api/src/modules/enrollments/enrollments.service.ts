@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { I18nService } from 'nestjs-i18n';
 import { EnrollmentStatus, CourseVisibility, NotificationType } from '@lms/shared-types';
+import { SubscriptionGuardService } from '../subscriptions/services/subscription-guard.service';
 
 export const ENROLLMENT_PAGINATION_CONFIG: PaginateConfig<Enrollment> = {
   sortableColumns: ['createdAt', 'status'],
@@ -34,6 +35,7 @@ export class EnrollmentsService extends DBService<Enrollment> {
     private readonly usersService: UsersService,
     private readonly notificationsService: NotificationsService,
     private readonly i18nService: I18nService,
+    private readonly subscriptionGuard: SubscriptionGuardService,
   ) {
     super(enrollmentsRepository, ENROLLMENT_PAGINATION_CONFIG);
   }
@@ -111,6 +113,10 @@ export class EnrollmentsService extends DBService<Enrollment> {
       throw new ForbiddenException('You do not own this course');
     }
 
+    if (respondDto.status === EnrollmentStatus.APPROVED) {
+      await this.subscriptionGuard.checkStudentAcceptance(instructorId, enrollment.courseId);
+    }
+
     enrollment.status = respondDto.status;
     enrollment.respondedAt = new Date();
 
@@ -144,6 +150,7 @@ export class EnrollmentsService extends DBService<Enrollment> {
 
   async inviteLearner(courseId: string, instructorId: string, inviteDto: InviteLearnerDto): Promise<Enrollment> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
+    await this.subscriptionGuard.checkStudentAcceptance(instructorId, courseId);
 
     const user = await this.usersService.findByEmail(inviteDto.email);
     if (!user) {

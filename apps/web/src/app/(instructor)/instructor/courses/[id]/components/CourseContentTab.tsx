@@ -39,10 +39,14 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { courseApis } from "@/lib/courseApis";
 import { ContentType } from "@lms/shared-types";
+import { useAuthStore } from '@/store/useAuthStore';
+import { useSubscriptionGuard } from '@/components/subscription/useSubscriptionGuard';
 
 export function CourseContentTab({ courseId }: { courseId: string }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { updateSubscription } = useAuthStore();
+  const { checkCanUploadContent } = useSubscriptionGuard();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // States for paginated table
@@ -82,6 +86,8 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
   const uploadMutation = useMutation({
     mutationFn: async () => {
       if (!selectedFile) return;
+      const { allowed, reason } = checkCanUploadContent(selectedFile.size);
+      if (!allowed) throw new Error(reason || 'Storage limit reached');
       const formData = new FormData();
       formData.append("title", contentTitle);
       formData.append("description", contentDesc);
@@ -94,11 +100,18 @@ export function CourseContentTab({ courseId }: { courseId: string }) {
     onSuccess: () => {
       refetch();
       queryClient.invalidateQueries({ queryKey: ["learner-course-contents"] });
+      if (selectedFile) {
+        const current = useAuthStore.getState().user?.subscription?.totalStorageBytes || 0;
+        updateSubscription({ totalStorageBytes: current + selectedFile.size });
+      }
       setIsAddModalOpen(false);
       setContentTitle("");
       setContentDesc("");
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    },
+    onError: (err: any) => {
+      alert(err.message || err.response?.data?.message || t('Failed to upload content'));
     },
   });
 

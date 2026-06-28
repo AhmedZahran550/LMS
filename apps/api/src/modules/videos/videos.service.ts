@@ -19,6 +19,7 @@ import { I18nService } from "nestjs-i18n";
 import { ReorderVideosDto } from "./dto/reorder-videos.dto";
 import { ContentType, EnrollmentStatus, NotificationType } from "@lms/shared-types";
 import { ForbiddenException } from "@nestjs/common";
+import { SubscriptionGuardService } from "../subscriptions/services/subscription-guard.service";
 
 export const CONTENT_PAGINATION_CONFIG: PaginateConfig<CourseContent> = {
   sortableColumns: ["createdAt", "orderIndex", "title"],
@@ -62,6 +63,7 @@ export class CourseContentService extends DBService<
     private readonly storageService: StorageService,
     private readonly notificationsService: NotificationsService,
     private readonly i18nService: I18nService,
+    private readonly subscriptionGuard: SubscriptionGuardService,
   ) {
     super(contentRepository, CONTENT_PAGINATION_CONFIG);
   }
@@ -72,6 +74,7 @@ export class CourseContentService extends DBService<
     createDto: CreateVideoDto,
     file: Express.Multer.File,
   ): Promise<CourseContent> {
+    await this.subscriptionGuard.checkContentUpload(instructorId, file?.size || 0);
     const course = await this.coursesService.findInstructorCourse(courseId, instructorId);
 
     if (!file) {

@@ -10,6 +10,7 @@ import { AuthModule } from './core/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { LogsModule } from './modules/logs/logs.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { I18nModule } from './i18n/i18n.module';
 
 import appConfig from './config/app.config';
@@ -38,6 +39,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
     StorageModule,
     LogsModule,
     I18nModule,
+    SubscriptionsModule,
     AdminApiModule,
     InstructorApiModule,
     LearnerApiModule,

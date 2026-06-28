@@ -5,11 +5,13 @@ import { ValidationPipe, BadRequestException } from "@nestjs/common";
 import { ValidationError } from "class-validator";
 import { ConfigService } from "@nestjs/config";
 import { join } from "path";
+import * as bodyParser from "body-parser";
 import { AppModule } from "./app.module";
 import { LoggingInterceptor } from "./core/interceptors/logging.interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   const configService = app.get(ConfigService);
 
   app.useStaticAssets(join(process.cwd(), "uploads"), {
@@ -27,6 +29,12 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/docs", app, document);
+
+  app.use(bodyParser.json({
+    verify: (req: any, res, buf) => {
+      req.rawBody = buf.toString();
+    },
+  }));
 
   const allowedOrigins = configService.get<string[]>("app.allowedOrigins");
 

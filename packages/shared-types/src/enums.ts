@@ -33,3 +33,24 @@ export enum ContentType {
   IMAGE = 'image',
   PRESENTATION = 'presentation',
 }
+
+export enum SubscriptionPlanType {
+  FREE = 'free',
+  PRO = 'pro',
+  PLUS = 'plus',
+}
+
+export enum SubscriptionStatus {
+  TRIALING = 'trialing',
+  ACTIVE = 'active',
+  PAST_DUE = 'past_due',
+  CANCELLED = 'cancelled',
+  EXPIRED = 'expired',
+}
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  SUCCEEDED = 'succeeded',
+  FAILED = 'failed',
+  REFUNDED = 'refunded',
+}
