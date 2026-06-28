@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, Compass, LayoutDashboard, LogOut, Settings, Video, CreditCard } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { UserRole } from '@lms/shared-types';
+import { UserRole, SubscriptionStatus } from '@lms/shared-types';
 import { Avatar } from '@/components/ui/Avatar';
 
 export function Sidebar() {
@@ -64,6 +64,25 @@ export function Sidebar() {
                 }`}
               />
               <span className="text-base">{t(link.name)}</span>
+              {link.name === 'Subscription' && user.subscription?.status && (
+                <div className="ml-auto flex items-center gap-1.5">
+                  <span className="text-xs font-medium text-[var(--sv-on-surface-variant)] capitalize truncate max-w-[60px]">
+                    {user.subscription.plan}
+                  </span>
+                  <span
+                    className={`inline-block h-2 w-2 rounded-full ${
+                      user.subscription.status === SubscriptionStatus.ACTIVE
+                        ? 'bg-[var(--sv-success-500)]'
+                        : user.subscription.status === SubscriptionStatus.TRIALING
+                          ? 'bg-[var(--sv-accent-500)]'
+                          : user.subscription.status === SubscriptionStatus.CANCELLED
+                            ? 'bg-[var(--sv-on-surface-variant)]'
+                            : 'bg-[var(--sv-error)]'
+                    }`}
+                    title={user.subscription.status}
+                  />
+                </div>
+              )}
             </Link>
           );
         })}

@@ -22,6 +22,7 @@ function getCreateCourseSchema(t: (key: string) => string) {
   return z.object({
     title: z.string().min(3, t('Title must be at least 3 characters')),
     description: z.string().min(10, t('Description must be at least 10 characters')),
+    visibility: z.nativeEnum(CourseVisibility),
   });
 }
 type CreateCourseFormData = z.infer<ReturnType<typeof getCreateCourseSchema>>;
@@ -44,6 +45,7 @@ export default function InstructorCoursesPage() {
     formState: { errors },
   } = useForm<CreateCourseFormData>({
     resolver: zodResolver(createCourseSchema),
+    defaultValues: { visibility: CourseVisibility.PUBLIC },
   });
   
   // Pagination State
@@ -70,7 +72,7 @@ export default function InstructorCoursesPage() {
       return await courseApis.createCourse({
         title: data.title,
         description: data.description,
-        visibility: CourseVisibility.PRIVATE,
+        visibility: data.visibility,
       });
     },
     onSuccess: () => {
@@ -167,6 +169,14 @@ export default function InstructorCoursesPage() {
                   rows={3}
                 />
                 {errors.description && <p className="text-xs text-[var(--sv-error)] mt-1">{errors.description.message?.toString()}</p>}
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">{t('Visibility')}</label>
+                <Select {...register('visibility')}>
+                  <option value={CourseVisibility.PUBLIC}>{t('Public')}</option>
+                  <option value={CourseVisibility.PRIVATE}>{t('Private')}</option>
+                </Select>
+                <p className="text-xs text-[var(--sv-text-muted)] mt-1">{t('Public courses appear in search results. Private courses require an invitation link.')}</p>
               </div>
             </CardContent>
             <CardFooter>

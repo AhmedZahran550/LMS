@@ -168,16 +168,18 @@ export class SocialAuthService {
     if (user.role === UserRole.INSTRUCTOR) {
       try {
         const usage = await this.subscriptionService.getUsage(user.id);
-        subscription = {
-          plan: usage.plan?.name || null,
-          status: usage.subscription?.status || null,
-          coursesCount: usage.coursesCount,
-          totalStudents: usage.totalStudents,
-          totalStorageBytes: usage.totalStorageBytes,
-          maxCourses: usage.plan?.maxCourses || 0,
-          maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
-          maxStorageBytes: usage.plan?.maxStorageBytes || 0,
-        };
+        if (usage) {
+          subscription = {
+            plan: usage.plan?.name || null,
+            status: usage.subscription?.status || null,
+            coursesCount: usage.coursesCount,
+            totalStudents: usage.totalStudents,
+            totalStorageBytes: usage.totalStorageBytes,
+            maxCourses: usage.plan?.maxCourses || 0,
+            maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
+            maxStorageBytes: usage.plan?.maxStorageBytes || 0,
+          };
+        }
       } catch {
         subscription = null;
       }

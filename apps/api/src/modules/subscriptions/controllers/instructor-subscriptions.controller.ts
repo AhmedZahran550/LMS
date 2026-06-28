@@ -88,6 +88,76 @@ export class InstructorSubscriptionsController {
     return { url: session.url };
   }
 
+  @Post('choose-plan')
+  async choosePlan(
+    @CurrentUser() user: any,
+    @Body() dto: CreateCheckoutSessionDto,
+  ) {
+    const planType = dto.planType;
+
+    if (planType === SubscriptionPlanType.FREE) {
+      const subscription = await this.subscriptionService.createSubscription(
+        user.id,
+        planType,
+      );
+      const plan = subscription.plan;
+      return {
+        plan: plan?.name || null,
+        status: subscription.status,
+        coursesCount: 0,
+        totalStudents: 0,
+        totalStorageBytes: 0,
+        maxCourses: plan?.maxCourses || 0,
+        maxStudentsPerCourse: plan?.maxStudentsPerCourse || 0,
+        maxStorageBytes: plan?.maxStorageBytes || 0,
+      };
+    }
+
+    // Pro/Plus → redirect to Stripe checkout
+    const priceId = await this.subscriptionService.getStripePriceId(planType);
+
+    const frontendUrl = process.env.FRONTEND_URL || process.env.WEB_URL || 'http://localhost:3000';
+    const successUrl = dto.successUrl || `${frontendUrl}/choose-plan?success=true`;
+    const cancelUrl = dto.cancelUrl || `${frontendUrl}/choose-plan`;
+
+    const session = await this.stripeService.createCheckoutSession(
+      user.id,
+      user.email,
+      priceId,
+      successUrl,
+      cancelUrl,
+    );
+
+    return { url: session.url };
+  }
+
+  @Post('refresh-subscription')
+  async refreshSubscription(@CurrentUser() user: any) {
+    const usage = await this.subscriptionService.getUsage(user.id);
+    if (!usage) {
+      return {
+        plan: null,
+        status: null,
+        coursesCount: 0,
+        totalStudents: 0,
+        totalStorageBytes: 0,
+        maxCourses: 0,
+        maxStudentsPerCourse: 0,
+        maxStorageBytes: 0,
+      };
+    }
+    return {
+      plan: usage.plan?.name || null,
+      status: usage.subscription?.status || null,
+      coursesCount: usage.coursesCount,
+      totalStudents: usage.totalStudents,
+      totalStorageBytes: usage.totalStorageBytes,
+      maxCourses: usage.plan?.maxCourses || 0,
+      maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
+      maxStorageBytes: usage.plan?.maxStorageBytes || 0,
+    };
+  }
+
   @Post('cancel')
   async cancel(@CurrentUser() user: any) {
     await this.subscriptionService.cancelSubscription(user.id);

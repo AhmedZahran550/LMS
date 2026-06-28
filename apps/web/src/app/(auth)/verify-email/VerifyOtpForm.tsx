@@ -80,7 +80,9 @@ export function VerifyOtpForm({ email }: { email: string }) {
 
       setAuth(user, accessToken, refreshToken);
 
-      if (user.role === UserRole.INSTRUCTOR) {
+      if (user.role === UserRole.INSTRUCTOR && !user.subscription?.status) {
+        router.push('/choose-plan');
+      } else if (user.role === UserRole.INSTRUCTOR) {
         router.push('/instructor');
       } else if (user.role === UserRole.ADMIN) {
         router.push('/admin');

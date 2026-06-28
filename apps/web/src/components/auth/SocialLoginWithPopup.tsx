@@ -33,7 +33,9 @@ function FacebookIcon() {
 }
 
 function redirectByRole(user: UserProfile, router: ReturnType<typeof useRouter>) {
-  if (user.role === UserRole.INSTRUCTOR) {
+  if (user.role === UserRole.INSTRUCTOR && !user.subscription?.status) {
+    router.replace('/choose-plan');
+  } else if (user.role === UserRole.INSTRUCTOR) {
     router.replace('/instructor');
   } else if (user.role === UserRole.ADMIN) {
     router.replace('/admin');

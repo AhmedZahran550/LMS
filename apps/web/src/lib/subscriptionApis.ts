@@ -25,4 +25,14 @@ export const subscriptionApis = {
     const response = await roleApi.post("/subscription/cancel");
     return response.data;
   },
+
+  choosePlan: async (planType: string) => {
+    const response = await roleApi.post("/subscription/choose-plan", { planType });
+    return response.data;
+  },
+
+  refreshSubscription: async () => {
+    const response = await roleApi.post("/subscription/refresh-subscription");
+    return response.data;
+  },
 };

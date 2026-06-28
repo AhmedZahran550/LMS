@@ -168,14 +168,7 @@ export class SubscriptionService {
   async getUsage(instructorId: string) {
     const subscription = await this.getActiveSubscription(instructorId);
     if (!subscription) {
-      const freePlan = await this.getFreePlan();
-      return {
-        plan: freePlan,
-        subscription: null,
-        coursesCount: 0,
-        totalStudents: 0,
-        totalStorageBytes: 0,
-      };
+      return null;
     }
 
     const [coursesCount, studentsResult, storageResult] = await Promise.all([
@@ -204,6 +197,42 @@ export class SubscriptionService {
       totalStudents: parseInt(studentsResult?.total || '0', 10),
       totalStorageBytes: parseInt(storageResult?.total || '0', 10),
     };
+  }
+
+  async createSubscription(
+    instructorId: string,
+    planType: SubscriptionPlanType,
+  ): Promise<InstructorSubscription> {
+    const plan = await this.getPlanByType(planType);
+    const now = new Date();
+
+    let status: SubscriptionStatus;
+    let endDate: Date | null;
+    let trialEndDate: Date | null;
+
+    if (planType === SubscriptionPlanType.FREE) {
+      status = SubscriptionStatus.TRIALING;
+      trialEndDate = new Date(now.getTime() + plan.trialDays * 86400000);
+      endDate = trialEndDate;
+    } else {
+      status = SubscriptionStatus.ACTIVE;
+      endDate = new Date(now.getTime() + 30 * 86400000);
+      trialEndDate = null;
+    }
+
+    const subscription = this.subscriptionRepository.create({
+      instructorId,
+      planId: plan.id,
+      status,
+      startDate: now,
+      endDate,
+      trialEndDate,
+      autoRenew: planType !== SubscriptionPlanType.FREE,
+    });
+
+    const saved = await this.subscriptionRepository.save(subscription);
+    saved.plan = plan;
+    return saved;
   }
 
   async upgradeSubscription(

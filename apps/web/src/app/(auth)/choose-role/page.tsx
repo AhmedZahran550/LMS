@@ -49,7 +49,14 @@ export default function ChooseRolePage() {
       clearTempToken();
       setAuth(data.user, data.accessToken, data.refreshToken);
 
-      const target = data.user.role === UserRole.INSTRUCTOR ? '/instructor' : '/my-courses';
+      let target: string;
+      if (data.user.role === UserRole.INSTRUCTOR && !data.user.subscription?.status) {
+        target = '/choose-plan';
+      } else if (data.user.role === UserRole.INSTRUCTOR) {
+        target = '/instructor';
+      } else {
+        target = '/my-courses';
+      }
       setTimeout(() => {
         window.location.href = target;
       }, 50);

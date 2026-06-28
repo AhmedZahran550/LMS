@@ -2,6 +2,7 @@ import {
   Injectable,
   ForbiddenException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -29,8 +30,22 @@ export class SubscriptionGuardService {
     private readonly enrollmentRepository: Repository<Enrollment>,
   ) {}
 
+  private async getSubscriptionOrThrow(instructorId: string) {
+    const subscription = await this.subscriptionService.getActiveSubscription(
+      instructorId,
+    );
+    if (!subscription) {
+      throw new NotFoundException({
+        message:
+          'No subscription found. Please choose a plan before creating courses.',
+        code: ErrorCodes.SUBSCRIPTION_NOT_FOUND,
+      });
+    }
+    return subscription;
+  }
+
   async checkCourseCreation(instructorId: string): Promise<void> {
-    const subscription = await this.subscriptionService.getOrCreateFreeSubscription(instructorId);
+    const subscription = await this.getSubscriptionOrThrow(instructorId);
 
     if (subscription.status === SubscriptionStatus.EXPIRED) {
       throw new ForbiddenException({
@@ -67,7 +82,7 @@ export class SubscriptionGuardService {
     instructorId: string,
     fileSize: number,
   ): Promise<void> {
-    const subscription = await this.subscriptionService.getOrCreateFreeSubscription(instructorId);
+    const subscription = await this.getSubscriptionOrThrow(instructorId);
 
     if (subscription.status === SubscriptionStatus.EXPIRED) {
       throw new ForbiddenException({
@@ -106,7 +121,7 @@ export class SubscriptionGuardService {
   }
 
   async checkStudentAcceptance(instructorId: string, courseId?: string): Promise<void> {
-    const subscription = await this.subscriptionService.getOrCreateFreeSubscription(instructorId);
+    const subscription = await this.getSubscriptionOrThrow(instructorId);
 
     if (subscription.status === SubscriptionStatus.EXPIRED) {
       throw new ForbiddenException({
