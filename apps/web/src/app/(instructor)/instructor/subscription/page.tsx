@@ -150,9 +150,9 @@ export default function InstructorSubscriptionPage() {
               />
               <UsageBar
                 label={t('Storage')}
-                current={sub.totalStorageBytes}
-                max={sub.maxStorageBytes}
-                unit="B"
+                current={parseFloat((sub.totalStorageBytes / (1024 * 1024 * 1024)).toFixed(1))}
+                max={sub.maxStorageBytes === 0 ? 0 : parseFloat((sub.maxStorageBytes / (1024 * 1024 * 1024)).toFixed(1))}
+                unit="GB"
               />
             </div>
           </CardContent>
