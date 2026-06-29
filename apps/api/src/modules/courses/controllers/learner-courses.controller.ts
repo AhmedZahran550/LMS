@@ -1,4 +1,5 @@
 import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { Paginate, PaginateQuery } from "nestjs-paginate";
 import { CoursesService } from "../courses.service";
 import { JwtAuthGuard } from "../../../core/auth/guards/jwt-auth.guard";
@@ -9,7 +10,9 @@ import {
   PaginatedResponse,
   CourseVisibility,
 } from "@lms/shared-types";
+import { CoursesSwagger } from "../../../swagger/courses.swagger";
 
+@ApiTags("Learner Courses")
 @Controller("learner/courses")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.LEARNER)
@@ -17,6 +20,7 @@ export class LearnerCoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Get()
+  @CoursesSwagger.findAllPublicCourses()
   async findAll(@Paginate() query: PaginateQuery) {
     return this.coursesService.findAll({
       ...query,
@@ -25,9 +29,9 @@ export class LearnerCoursesController {
   }
 
   @Get(":id")
+  @CoursesSwagger.findOnePublicCourse()
   async findOne(@Param("id") id: string) {
     const course: any = await this.coursesService.findById(id);
-    // Remove videos from public payload unless enrolled (enrolled logic goes to my-courses)
     course.videos = [];
     if (course.instructor) {
       const { password, hashedRefreshToken, ...safeUser } = course.instructor;

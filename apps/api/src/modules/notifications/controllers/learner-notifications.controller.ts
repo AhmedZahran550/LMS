@@ -1,24 +1,30 @@
 import { Controller, Get, Patch, Param, UseGuards, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from '../notifications.service';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
+import { NotificationsSwagger } from '../../../swagger/notifications.swagger';
 
-@Controller('notifications') // Bound by RouterModule to /api/learner/notifications and can be used by others too
+@ApiTags("Notifications")
+@Controller('notifications')
 @UseGuards(JwtAuthGuard)
 export class LearnerNotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
+  @NotificationsSwagger.findAll()
   async findAll(@CurrentUser() user: any) {
     return this.notificationsService.findAllForUser(user.id);
   }
 
   @Patch(':id/read')
+  @NotificationsSwagger.markAsRead()
   async markAsRead(@CurrentUser() user: any, @Param('id') id: string) {
     return this.notificationsService.markAsRead(id, user.id);
   }
 
   @Post('read-all')
+  @NotificationsSwagger.markAllAsRead()
   async markAllAsRead(@CurrentUser() user: any) {
     await this.notificationsService.markAllAsRead(user.id);
     return { success: true };

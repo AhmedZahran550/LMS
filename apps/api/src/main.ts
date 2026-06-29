@@ -1,8 +1,10 @@
 import { NestFactory } from "@nestjs/core";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from "@nestjs/swagger";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { ValidationPipe, BadRequestException } from "@nestjs/common";
 import { ValidationError } from "class-validator";
+import { MetadataStorage, getFromContainer } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 import { ConfigService } from "@nestjs/config";
 import { join } from "path";
 import { AppModule } from "./app.module";
@@ -20,14 +22,38 @@ async function bootstrap() {
   app.setGlobalPrefix("api");
 
   // Setup Swagger API Documentation
+  const options: SwaggerDocumentOptions = {
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+  };
+
   const config = new DocumentBuilder()
     .setTitle("LMS API")
     .setDescription("The LMS API description")
     .setVersion("1.0")
     .addBearerAuth()
     .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api/docs", app, document);
+  const document = SwaggerModule.createDocument(app, config, options);
+
+  const metadata = (getFromContainer(MetadataStorage) as any).validationMetadatas;
+  if (metadata) {
+    document.components = document.components || {};
+    document.components.schemas = {
+      ...(document.components.schemas || {}),
+      ...(validationMetadatasToSchemas(metadata) as Record<string, any>),
+    };
+  }
+
+  SwaggerModule.setup("api/docs", app, document, {
+    jsonDocumentUrl: "api/docs-json",
+    swaggerOptions: {
+      docExpansion: "none",
+    },
+    customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css",
+    customJs: [
+      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.min.js",
+    ],
+  });
 
   app.useBodyParser('json', {
     verify: (req: any, res: any, buf: Buffer) => {

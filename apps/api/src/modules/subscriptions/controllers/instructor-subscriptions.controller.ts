@@ -7,6 +7,7 @@ import {
   Req,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { SubscriptionService } from '../services/subscription.service';
 import { StripeService } from '../services/stripe.service';
 import { CreateCheckoutSessionDto } from '../dto/create-checkout-session.dto';
@@ -16,7 +17,9 @@ import { Roles } from '../../../core/decorators/roles.decorator';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole, SubscriptionPlanType } from '@lms/shared-types';
 import { Request } from 'express';
+import { SubscriptionsSwagger } from '../../../swagger/subscriptions.swagger';
 
+@ApiTags("Instructor Subscriptions")
 @Controller('instructor/subscription')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.INSTRUCTOR)
@@ -27,17 +30,20 @@ export class InstructorSubscriptionsController {
   ) {}
 
   @Get()
+  @SubscriptionsSwagger.getMySubscription()
   async getMySubscription(@CurrentUser() user: any) {
     const usage = await this.subscriptionService.getUsage(user.id);
     return usage;
   }
 
   @Get('plans')
+  @SubscriptionsSwagger.getPlans()
   async getPlans() {
     return this.subscriptionService.getAllActivePlans();
   }
 
   @Post('checkout')
+  @SubscriptionsSwagger.createCheckout()
   async createCheckout(
     @CurrentUser() user: any,
     @Body() dto: CreateCheckoutSessionDto,
@@ -65,6 +71,7 @@ export class InstructorSubscriptionsController {
   }
 
   @Post('portal')
+  @SubscriptionsSwagger.createPortal()
   async createPortal(
     @CurrentUser() user: any,
     @Req() req: Request,
@@ -89,6 +96,7 @@ export class InstructorSubscriptionsController {
   }
 
   @Post('choose-plan')
+  @SubscriptionsSwagger.choosePlan()
   async choosePlan(
     @CurrentUser() user: any,
     @Body() dto: CreateCheckoutSessionDto,
@@ -132,6 +140,7 @@ export class InstructorSubscriptionsController {
   }
 
   @Post('refresh-subscription')
+  @SubscriptionsSwagger.refreshSubscription()
   async refreshSubscription(@CurrentUser() user: any) {
     const usage = await this.subscriptionService.getUsage(user.id);
     if (!usage) {
@@ -159,6 +168,7 @@ export class InstructorSubscriptionsController {
   }
 
   @Post('cancel')
+  @SubscriptionsSwagger.cancelSubscription()
   async cancel(@CurrentUser() user: any) {
     await this.subscriptionService.cancelSubscription(user.id);
     return { message: 'Subscription cancelled successfully' };

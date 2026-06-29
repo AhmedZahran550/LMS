@@ -1,4 +1,5 @@
 import { Controller, Get, Patch, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Enrollment } from '../../../db/entities/enrollment.entity';
@@ -7,7 +8,9 @@ import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { UserRole, PaginatedResponse } from '@lms/shared-types';
+import { EnrollmentsSwagger } from '../../../swagger/enrollments.swagger';
 
+@ApiTags("Admin Enrollments")
 @Controller('admin/enrollments')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
@@ -18,6 +21,7 @@ export class AdminEnrollmentsController {
   ) {}
 
   @Get()
+  @EnrollmentsSwagger.findAllEnrollments()
   async findAll(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
@@ -52,6 +56,7 @@ export class AdminEnrollmentsController {
   }
 
   @Patch(':id')
+  @EnrollmentsSwagger.updateEnrollment()
   async update(@Param('id') id: string, @Body() respondDto: RespondEnrollmentDto) {
     const enrollment = await this.enrollmentsRepository.findOne({ where: { id } });
     if (enrollment) {

@@ -116,6 +116,9 @@ importers:
       class-validator:
         specifier: ^0.14.1
         version: 0.14.4
+      class-validator-jsonschema:
+        specifier: ^5.1.0
+        version: 5.1.0(class-transformer@0.5.1)(class-validator@0.14.4)
       cloudinary:
         specifier: ^2.10.0
         version: 2.10.0
@@ -2098,6 +2101,12 @@ packages:
   class-transformer@0.5.1:
     resolution: {integrity: sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==}
 
+  class-validator-jsonschema@5.1.0:
+    resolution: {integrity: sha512-FFOeqLR+Ng+iGoapZksAYwNFMSxTqQaFt32UHFrIDwa8bk72mWMWH5U/LEpvhnQh5ZD1sWZFbh3oTNBcFtt+4A==}
+    peerDependencies:
+      class-transformer: ^0.4.0 || ^0.5.0
+      class-validator: ^0.14.0
+
   class-validator@0.14.4:
     resolution: {integrity: sha512-AwNusCCam51q703dW82x95tOqQp6oC9HNUl724KxJJOfnKscI8dOloXFgyez7LbTTKWuRBA37FScqVbJEoq8Yw==}
 
@@ -3590,6 +3599,9 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
+  lodash.groupby@4.6.0:
+    resolution: {integrity: sha512-5dcWxm23+VAoz+awKmBaiBvzox8+RqMgFhi7UvX9DHZr2HdxHXM/Wrf8cfKpsW37RNrvtPn6hSwNqurSILbmJw==}
+
   lodash.includes@4.3.0:
     resolution: {integrity: sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==}
 
@@ -3933,6 +3945,9 @@ packages:
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
+
+  openapi3-ts@3.2.0:
+    resolution: {integrity: sha512-/ykNWRV5Qs0Nwq7Pc0nJ78fgILvOT/60OxEmB3v7yQ8a8Bwcm43D4diaYazG/KBn6czA+52XYy931WFLMCUeSg==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -7196,6 +7211,16 @@ snapshots:
 
   class-transformer@0.5.1: {}
 
+  class-validator-jsonschema@5.1.0(class-transformer@0.5.1)(class-validator@0.14.4):
+    dependencies:
+      class-transformer: 0.5.1
+      class-validator: 0.14.4
+      lodash.groupby: 4.6.0
+      lodash.merge: 4.6.2
+      openapi3-ts: 3.2.0
+      reflect-metadata: 0.2.2
+      tslib: 2.8.1
+
   class-validator@0.14.4:
     dependencies:
       '@types/validator': 13.15.10
@@ -9208,6 +9233,8 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
+  lodash.groupby@4.6.0: {}
+
   lodash.includes@4.3.0: {}
 
   lodash.isboolean@3.0.3: {}
@@ -9511,6 +9538,10 @@ snapshots:
   onetime@5.1.2:
     dependencies:
       mimic-fn: 2.1.0
+
+  openapi3-ts@3.2.0:
+    dependencies:
+      yaml: 2.9.0
 
   optionator@0.9.4:
     dependencies:

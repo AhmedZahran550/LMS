@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Param, UseGuards, ForbiddenException } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { EnrollmentsService } from '../enrollments.service';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
@@ -7,7 +8,9 @@ import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole } from '@lms/shared-types';
 import { CoursesService } from '../../courses/courses.service';
 import { CourseContentService } from '../../videos/videos.service';
+import { EnrollmentsSwagger } from '../../../swagger/enrollments.swagger';
 
+@ApiTags("Learner Enrollments")
 @Controller('learner')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.LEARNER)
@@ -19,6 +22,7 @@ export class LearnerEnrollmentsController {
   ) {}
 
   @Post('courses/:courseId/enroll')
+  @EnrollmentsSwagger.requestEnrollment()
   async requestEnrollment(
     @CurrentUser() user: any,
     @Param('courseId') courseId: string,
@@ -27,6 +31,7 @@ export class LearnerEnrollmentsController {
   }
 
   @Get('my-courses')
+  @EnrollmentsSwagger.getMyCourses()
   async getMyCourses(@CurrentUser() user: any) {
     const enrollments = await this.enrollmentsService.getLearnerEnrollments(user.id);
     return enrollments.map(e => {
@@ -39,6 +44,7 @@ export class LearnerEnrollmentsController {
   }
 
   @Get('my-courses/:courseId')
+  @EnrollmentsSwagger.getMyCourseDetail()
   async getMyCourseDetail(
     @CurrentUser() user: any,
     @Param('courseId') courseId: string,

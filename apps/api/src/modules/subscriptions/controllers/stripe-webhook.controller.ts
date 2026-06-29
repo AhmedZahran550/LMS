@@ -6,9 +6,12 @@ import {
   HttpCode,
   Logger,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { StripeService } from '../services/stripe.service';
+import { SubscriptionsSwagger } from '../../../swagger/subscriptions.swagger';
 
+@ApiTags("Stripe Webhook")
 @Controller('stripe')
 export class StripeWebhookController {
   private readonly logger = new Logger(StripeWebhookController.name);
@@ -17,6 +20,7 @@ export class StripeWebhookController {
 
   @Post('webhook')
   @HttpCode(200)
+  @SubscriptionsSwagger.handleWebhook()
   async handleWebhook(
     @Req() req: Request,
     @Headers('stripe-signature') signature: string,

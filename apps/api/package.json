@@ -20,8 +20,7 @@
     "migration:create": "typeorm-ts-node-commonjs migration:create src/db/migrations/$npm_config_name",
     "migration:run": "pnpm typeorm migration:run",
     "migration:revert": "pnpm typeorm migration:revert",
-    "seed": "ts-node -r tsconfig-paths/register src/db/seed.ts",
-    "generate:swagger": "ts-node -r tsconfig-paths/register src/generate-swagger.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/db/seed.ts"
   },
   "dependencies": {
     "@lms/shared-types": "workspace:*",
@@ -37,6 +36,7 @@
     "argon2": "^0.44.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "class-validator-jsonschema": "^5.1.0",
     "cloudinary": "^2.10.0",
     "dotenv": "^16.4.5",
     "multer": "1.4.5-lts.1",

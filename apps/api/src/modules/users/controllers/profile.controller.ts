@@ -9,6 +9,7 @@ import {
   UploadedFile,
   BadRequestException,
 } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UsersService } from "../users.service";
 import { UpdateProfileDto } from "../dto/update-profile.dto";
@@ -16,7 +17,9 @@ import { UpdatePreferencesDto } from "../dto/update-preferences.dto";
 import { JwtAuthGuard } from "../../../core/auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../../../core/decorators/current-user.decorator";
 import { StorageService } from "../../storage/storage.service";
+import { UsersSwagger } from "../../../swagger/users.swagger";
 
+@ApiTags("Profile")
 @Controller("profile")
 @UseGuards(JwtAuthGuard)
 export class ProfileController {
@@ -26,12 +29,14 @@ export class ProfileController {
   ) {}
 
   @Get("me")
+  @UsersSwagger.getProfile()
   async getProfile(@CurrentUser() user: any) {
     const dbUser = await this.usersService.findByIdOrFail(user.id);
     return dbUser;
   }
 
   @Patch("me")
+  @UsersSwagger.updateProfile()
   async updateProfile(@CurrentUser() user: any, @Body() dto: UpdateProfileDto) {
     const dbUser = await this.usersService.updateProfile(
       user.id,
@@ -43,6 +48,7 @@ export class ProfileController {
   }
 
   @Patch("me/preferences")
+  @UsersSwagger.updatePreferences()
   async updatePreferences(@CurrentUser() user: any, @Body() dto: UpdatePreferencesDto) {
     const dbUser = await this.usersService.updatePreferences(user.id, dto);
     const { password, hashedRefreshToken, ...safeUser } = dbUser;
@@ -51,6 +57,7 @@ export class ProfileController {
 
   @Post("me/avatar")
   @UseInterceptors(FileInterceptor("file"))
+  @UsersSwagger.uploadAvatar()
   async uploadAvatar(
     @CurrentUser() user: any,
     @UploadedFile() file: Express.Multer.File,

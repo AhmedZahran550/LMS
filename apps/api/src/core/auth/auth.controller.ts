@@ -2,6 +2,7 @@ import { Controller, Post, Get, Body, UseGuards, HttpCode, HttpStatus, Req, Res,
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthProvider, UserRole } from '@lms/shared-types';
 import { AuthService } from './auth.service';
 import { SocialAuthService } from './services/social-auth.service';
@@ -17,7 +18,9 @@ import { OAuthInitDto } from './dto/oauth-init.dto';
 import { CompleteRegistrationDto } from './dto/complete-registration.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { AuthSwagger } from '../../swagger/auth.swagger';
 
+@ApiTags("Auth")
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -28,42 +31,49 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @AuthSwagger.register()
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.login()
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
   @Post('verify-email')
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.verifyEmail()
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     return this.authService.verifyEmail(verifyEmailDto);
   }
 
   @Post('send-otp')
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.sendOtp()
   async sendOtp(@Body() sendOtpDto: SendOtpDto) {
     return this.authService.sendOtp(sendOtpDto);
   }
 
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.forgotPassword()
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.resetPassword()
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.refresh()
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refresh(refreshTokenDto);
   }
@@ -71,11 +81,13 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.logout()
   async logout(@CurrentUser() user: any) {
     return this.authService.logout(user.id);
   }
 
   @Get('google')
+  @AuthSwagger.googleAuth()
   async googleAuth(@Query() query: OAuthInitDto, @Res() res: Response) {
     const state = this.oauthStateStore.save(query.role);
     const config = this.configService.get('oauth.google') as {
@@ -94,6 +106,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
+  @AuthSwagger.googleAuthRedirect()
   async googleAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
     const role = this.oauthStateStore.consume(state) ?? undefined;
     const result = await this.socialAuthService.validateOrCreateUser(
@@ -106,6 +119,7 @@ export class AuthController {
   }
 
   @Get('facebook')
+  @AuthSwagger.facebookAuth()
   async facebookAuth(@Query() query: OAuthInitDto, @Res() res: Response) {
     const state = this.oauthStateStore.save(query.role);
     const config = this.configService.get('oauth.facebook') as {
@@ -124,6 +138,7 @@ export class AuthController {
 
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
+  @AuthSwagger.facebookAuthRedirect()
   async facebookAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
     const role = this.oauthStateStore.consume(state) ?? undefined;
     const result = await this.socialAuthService.validateOrCreateUser(
@@ -137,6 +152,7 @@ export class AuthController {
 
   @Post('complete-registration')
   @HttpCode(HttpStatus.OK)
+  @AuthSwagger.completeRegistration()
   async completeRegistration(@Body() dto: CompleteRegistrationDto) {
     return this.socialAuthService.completeRegistration(dto.tempToken, dto.role);
   }

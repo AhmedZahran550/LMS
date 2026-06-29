@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CourseContentService } from '../videos.service';
 import { CreateVideoDto } from '../dto/create-video.dto';
@@ -10,7 +11,9 @@ import { Roles } from '../../../core/decorators/roles.decorator';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole } from '@lms/shared-types';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { VideosSwagger } from '../../../swagger/videos.swagger';
 
+@ApiTags("Instructor Content")
 @Controller('instructor/courses/:courseId/content')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.INSTRUCTOR)
@@ -18,6 +21,7 @@ export class InstructorContentController {
   constructor(private readonly contentService: CourseContentService) {}
 
   @Get()
+  @VideosSwagger.findAllContent()
   async findAll(
     @CurrentUser() user: any,
     @Param('courseId') courseId: string,
@@ -28,6 +32,7 @@ export class InstructorContentController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @VideosSwagger.uploadContent()
   async upload(
     @CurrentUser() user: any,
     @Param('courseId') courseId: string,
@@ -38,6 +43,7 @@ export class InstructorContentController {
   }
 
   @Patch('reorder')
+  @VideosSwagger.reorderContent()
   async reorder(
     @CurrentUser() user: any,
     @Param('courseId') courseId: string,
@@ -47,6 +53,7 @@ export class InstructorContentController {
   }
 
   @Patch(':contentId')
+  @VideosSwagger.updateContent()
   async update(
     @CurrentUser() user: any,
     @Param('courseId') courseId: string,
@@ -57,6 +64,7 @@ export class InstructorContentController {
   }
 
   @Delete(':contentId')
+  @VideosSwagger.removeContent()
   async remove(
     @CurrentUser() user: any,
     @Param('courseId') courseId: string,
