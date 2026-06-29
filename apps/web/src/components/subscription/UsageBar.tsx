@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface UsageBarProps {
@@ -12,6 +13,7 @@ interface UsageBarProps {
 }
 
 export function UsageBar({ label, current, max, unit, className }: UsageBarProps) {
+  const { t } = useTranslation();
   const percentage = max > 0 ? Math.min((current / max) * 100, 100) : 0;
   const isUnlimited = max === 0;
 
@@ -23,7 +25,7 @@ export function UsageBar({ label, current, max, unit, className }: UsageBarProps
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-[var(--sv-on-surface)]">{label}</span>
         <span className="text-sm text-[var(--sv-on-surface-variant)]">
-          {isUnlimited ? 'Unlimited' : `${current} / ${max}${unit ? ` ${unit}` : ''}`}
+          {isUnlimited ? t('Unlimited') : `${current} / ${max}${unit ? ` ${unit}` : ''}`}
         </span>
       </div>
       {!isUnlimited && (

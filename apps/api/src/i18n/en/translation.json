@@ -30,6 +30,16 @@
     "maxLength": "Too long",
     "matches": "Invalid format"
   },
+  "subscription": {
+    "emails": {
+      "payment_confirmation_subject": "Payment Confirmed — {{plan}} Plan",
+      "payment_confirmation_body": "Your payment of {{amount}} {{currency}} for the {{plan}} plan has been received. Thank you!",
+      "renewed_subject": "Subscription Renewed — {{plan}}",
+      "renewed_body": "Your {{plan}} subscription has been renewed and is active until {{date}}.",
+      "expiring_subject": "Subscription Expiring Soon",
+      "expiring_body": "Your {{plan}} subscription expires on {{date}}. Renew now to avoid interruption."
+    }
+  },
   "errors": {
     "INVALID_CREDENTIALS": "Invalid credentials",
     "EMAIL_EXISTS": "Email already exists",
@@ -43,6 +53,13 @@
     "INVALID_FORMAT": "Invalid format",
     "INTERNAL_ERROR": "An unexpected error occurred",
     "REFRESH_TOKEN_MISSING": "Refresh token is missing",
-    "NOT_FOUND": "Not found"
+    "NOT_FOUND": "Not found",
+    "SUBSCRIPTION_NOT_FOUND": "No subscription found. Please choose a plan.",
+    "SUBSCRIPTION_EXPIRED": "Your subscription has expired. Please renew.",
+    "SUBSCRIPTION_INACTIVE": "Your subscription is inactive. Please renew.",
+    "COURSE_LIMIT_REACHED": "Course limit reached. Upgrade your plan.",
+    "STORAGE_LIMIT_REACHED": "Storage limit reached. Upgrade your plan.",
+    "STUDENT_LIMIT_REACHED": "Student limit reached. Upgrade your plan.",
+    "ACTIVE_SUBSCRIPTION_EXISTS": "You already have an active subscription."
   }
 }

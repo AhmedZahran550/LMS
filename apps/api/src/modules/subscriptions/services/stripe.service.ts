@@ -8,6 +8,8 @@ import { ConfigType } from '@nestjs/config';
 import Stripe from 'stripe';
 import stripeConfig from '../../../config/stripe.config';
 import { SubscriptionService } from './subscription.service';
+import { UsersService } from '../../users/users.service';
+import { MailService } from '../../mail/mail.service';
 import { SubscriptionPlanType } from '@lms/shared-types';
 
 @Injectable()
@@ -19,6 +21,8 @@ export class StripeService {
     @Inject(stripeConfig.KEY)
     private readonly stripeConf: ConfigType<typeof stripeConfig>,
     private readonly subscriptionService: SubscriptionService,
+    private readonly usersService: UsersService,
+    private readonly mailService: MailService,
   ) {
     this.stripe = new Stripe(this.stripeConf.secretKey, {});
   }
@@ -146,6 +150,17 @@ export class StripeService {
         paymentIntentId,
       );
     }
+
+    // Send payment confirmation email
+    const email = session.customer_details?.email || session.customer_email;
+    if (email) {
+      const amount = ((session.amount_total || 0) / 100).toFixed(2);
+      const currency = (session.currency || 'usd').toUpperCase();
+      const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      this.mailService.sendPaymentConfirmation(email, planType, amount, currency, date).catch((error) => {
+        this.logger.error('Error sending payment confirmation email', error);
+      });
+    }
   }
 
   async handleInvoicePaid(invoice: Stripe.Invoice): Promise<void> {
@@ -184,6 +199,24 @@ export class StripeService {
         paymentIntent,
         invoice.id,
       );
+    }
+
+    // Send renewal confirmation email
+    const email = invoice.customer_email || (await this.getUserEmail(subscription.instructorId));
+    if (email) {
+      const endDate = new Date(Date.now() + 30 * 86400000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      this.mailService.sendSubscriptionRenewed(email, subscription.plan?.name || '', endDate).catch((error) => {
+        this.logger.error('Error sending renewal email', error);
+      });
+    }
+  }
+
+  private async getUserEmail(instructorId: string): Promise<string | null> {
+    try {
+      const user = await this.usersService.findById(instructorId);
+      return user?.email || null;
+    } catch {
+      return null;
     }
   }
 

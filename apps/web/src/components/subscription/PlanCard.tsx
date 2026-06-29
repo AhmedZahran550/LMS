@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Check } from 'lucide-react';
@@ -37,6 +38,7 @@ export function PlanCard({
   isLoading,
   className,
 }: PlanCardProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={cn(
@@ -51,7 +53,7 @@ export function PlanCard({
     >
       {isPopular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[var(--sv-accent-500)] text-white text-xs font-bold">
-          Popular
+          {t('Popular')}
         </div>
       )}
 
@@ -62,10 +64,10 @@ export function PlanCard({
 
       <div className="mb-6">
         <span className="text-3xl font-black text-[var(--sv-on-surface)]">
-          {price === 0 ? 'Free' : `${currency === 'usd' ? '$' : currency}${(price / 100).toFixed(2)}`}
+          {price === 0 ? t('Free') : `${currency === 'usd' ? '$' : currency}${(price / 100).toFixed(2)}`}
         </span>
         {price > 0 && (
-          <span className="text-sm text-[var(--sv-on-surface-variant)] ml-1">/month</span>
+          <span className="text-sm text-[var(--sv-on-surface-variant)] ml-1">{t('/month')}</span>
         )}
       </div>
 
@@ -100,7 +102,7 @@ export function PlanCard({
           disabled={isCurrentPlan}
           className="w-full"
         >
-          {isCurrentPlan ? 'Current Plan' : buttonLabel || 'Upgrade'}
+          {isCurrentPlan ? t('Current Plan') : buttonLabel || t('Upgrade')}
         </Button>
       )}
     </div>

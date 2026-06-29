@@ -67,7 +67,7 @@ export function Sidebar() {
               {link.name === 'Subscription' && user.subscription?.status && (
                 <div className="ml-auto flex items-center gap-1.5">
                   <span className="text-xs font-medium text-[var(--sv-on-surface-variant)] capitalize truncate max-w-[60px]">
-                    {user.subscription.plan}
+                    {user.subscription.plan === 'free' ? t('Free') : user.subscription.plan === 'pro' ? t('Pro') : t('Plus')}
                   </span>
                   <span
                     className={`inline-block h-2 w-2 rounded-full ${
@@ -79,7 +79,7 @@ export function Sidebar() {
                             ? 'bg-[var(--sv-on-surface-variant)]'
                             : 'bg-[var(--sv-error)]'
                     }`}
-                    title={user.subscription.status}
+                    title={t(user.subscription.status.charAt(0).toUpperCase() + user.subscription.status.slice(1))}
                   />
                 </div>
               )}

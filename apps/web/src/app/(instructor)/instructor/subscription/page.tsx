@@ -89,7 +89,7 @@ export default function InstructorSubscriptionPage() {
     const s = status || 'inactive';
     return (
       <Badge variant={(variants[s] || 'outline') as any}>
-        {s.charAt(0).toUpperCase() + s.slice(1)}
+        {t(s.charAt(0).toUpperCase() + s.slice(1))}
       </Badge>
     );
   };
@@ -124,7 +124,7 @@ export default function InstructorSubscriptionPage() {
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold text-[var(--sv-on-surface)] capitalize">{sub.plan || 'Free'} Plan</h3>
+                <h3 className="text-xl font-bold text-[var(--sv-on-surface)] capitalize">{t('{{plan}} Plan', { plan: sub.plan || 'Free' })}</h3>
               </div>
               <Button
                 variant="outline"
@@ -165,12 +165,12 @@ export default function InstructorSubscriptionPage() {
           {plans?.map((p: any) => {
             const isCurrentPlan = sub?.plan === p.name;
             const features = [
-              { label: p.maxCourses === 0 ? 'Unlimited courses' : `Up to ${p.maxCourses} courses`, included: true },
-              { label: p.maxStudentsPerCourse === 0 ? 'Unlimited students per course' : `Up to ${p.maxStudentsPerCourse} students per course`, included: true },
-              { label: p.maxStorageBytes === 0 ? 'Unlimited storage' : `Up to ${formatBytes(p.maxStorageBytes)} storage`, included: true },
-              { label: p.trialDays > 0 ? `${p.trialDays}-day free trial` : 'No free trial', included: true },
-              { label: 'Priority support', included: p.name !== SubscriptionPlanType.FREE },
-              { label: 'Custom branding', included: p.name === SubscriptionPlanType.PLUS },
+              { label: p.maxCourses === 0 ? t('Unlimited courses') : t('Up to {{count}} courses', { count: p.maxCourses }), included: true },
+              { label: p.maxStudentsPerCourse === 0 ? t('Unlimited students per course') : t('Up to {{count}} students per course', { count: p.maxStudentsPerCourse }), included: true },
+              { label: p.maxStorageBytes === 0 ? t('Unlimited storage') : t('Up to {{size}} storage', { size: formatBytes(p.maxStorageBytes) }), included: true },
+              { label: p.trialDays > 0 ? t('{{days}}-day free trial', { days: p.trialDays }) : t('No free trial'), included: true },
+              { label: t('Priority support'), included: p.name !== SubscriptionPlanType.FREE },
+              { label: t('Custom branding'), included: p.name === SubscriptionPlanType.PLUS },
             ];
 
             return (
@@ -184,7 +184,7 @@ export default function InstructorSubscriptionPage() {
                 isCurrentPlan={isCurrentPlan}
                 isPopular={p.name === SubscriptionPlanType.PRO}
                 onSelect={isCurrentPlan ? undefined : () => handleUpgrade(p.name)}
-                buttonLabel={p.price === 0 ? 'Downgrade to Free' : 'Upgrade'}
+                buttonLabel={p.price === 0 ? t('Downgrade to Free') : t('Upgrade')}
                 isLoading={upgradingPlan === p.name}
               />
             );

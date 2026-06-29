@@ -8,6 +8,7 @@ import { Payment } from '../../db/entities/payment.entity';
 import { Course } from '../../db/entities/course.entity';
 import { CourseContent } from '../../db/entities/course-content.entity';
 import { Enrollment } from '../../db/entities/enrollment.entity';
+import { UsersModule } from '../users/users.module';
 import { SubscriptionService } from './services/subscription.service';
 import { SubscriptionGuardService } from './services/subscription-guard.service';
 import { StripeService } from './services/stripe.service';
@@ -27,6 +28,7 @@ import { StripeWebhookController } from './controllers/stripe-webhook.controller
       Enrollment,
     ]),
     ConfigModule.forFeature(stripeConfig),
+    UsersModule,
   ],
   controllers: [
     InstructorSubscriptionsController,

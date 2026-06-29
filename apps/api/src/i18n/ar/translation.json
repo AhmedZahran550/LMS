@@ -30,6 +30,16 @@
     "maxLength": "طويل جدًا",
     "matches": "تنسيق غير صالح"
   },
+  "subscription": {
+    "emails": {
+      "payment_confirmation_subject": "تم تأكيد الدفع — خطة {{plan}}",
+      "payment_confirmation_body": "تم استلام دفعتك البالغة {{amount}} {{currency}} لخطة {{plan}}. شكراً لك!",
+      "renewed_subject": "تم تجديد الاشتراك — {{plan}}",
+      "renewed_body": "تم تجديد اشتراكك في خطة {{plan}} وسيكون نشطاً حتى {{date}}.",
+      "expiring_subject": "الاشتراك على وشك الانتهاء",
+      "expiring_body": "سينتهي اشتراكك في خطة {{plan}} في {{date}}. جدد الآن لتجنب الانقطاع."
+    }
+  },
   "errors": {
     "INVALID_CREDENTIALS": "بيانات الدخول غير صحيحة",
     "EMAIL_EXISTS": "البريد الإلكتروني موجود بالفعل",
@@ -43,6 +53,13 @@
     "INVALID_FORMAT": "تنسيق غير صحيح",
     "INTERNAL_ERROR": "حدث خطأ غير متوقع",
     "REFRESH_TOKEN_MISSING": "رمز التحديث مفقود",
-    "NOT_FOUND": "غير موجود"
+    "NOT_FOUND": "غير موجود",
+    "SUBSCRIPTION_NOT_FOUND": "لا يوجد اشتراك. يرجى اختيار خطة.",
+    "SUBSCRIPTION_EXPIRED": "انتهت صلاحية اشتراكك. يرجى التجديد.",
+    "SUBSCRIPTION_INACTIVE": "اشتراكك غير نشط. يرجى التجديد.",
+    "COURSE_LIMIT_REACHED": "لقد وصلت إلى الحد الأقصى للدورات. قم بترقية خطتك.",
+    "STORAGE_LIMIT_REACHED": "لقد وصلت إلى حد التخزين. قم بترقية خطتك.",
+    "STUDENT_LIMIT_REACHED": "لقد وصلت إلى حد الطلاب. قم بترقية خطتك.",
+    "ACTIVE_SUBSCRIPTION_EXISTS": "لديك بالفعل اشتراك نشط."
   }
 }

@@ -112,12 +112,12 @@ export default function ChoosePlanPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {plans?.map((p: any) => {
               const features = [
-                { label: p.maxCourses === 0 ? 'Unlimited courses' : `Up to ${p.maxCourses} courses`, included: true },
-                { label: p.maxStudentsPerCourse === 0 ? 'Unlimited students per course' : `Up to ${p.maxStudentsPerCourse} students per course`, included: true },
-                { label: p.maxStorageBytes === 0 ? 'Unlimited storage' : `Up to ${formatBytes(p.maxStorageBytes)} storage`, included: true },
-                { label: p.trialDays > 0 ? `${p.trialDays}-day free trial` : 'No free trial', included: true },
-                { label: 'Priority support', included: p.name !== 'free' },
-                { label: 'Custom branding', included: p.name === 'plus' },
+                { label: p.maxCourses === 0 ? t('Unlimited courses') : t('Up to {{count}} courses', { count: p.maxCourses }), included: true },
+                { label: p.maxStudentsPerCourse === 0 ? t('Unlimited students per course') : t('Up to {{count}} students per course', { count: p.maxStudentsPerCourse }), included: true },
+                { label: p.maxStorageBytes === 0 ? t('Unlimited storage') : t('Up to {{size}} storage', { size: formatBytes(p.maxStorageBytes) }), included: true },
+                { label: p.trialDays > 0 ? t('{{days}}-day free trial', { days: p.trialDays }) : t('No free trial'), included: true },
+                { label: t('Priority support'), included: p.name !== 'free' },
+                { label: t('Custom branding'), included: p.name === 'plus' },
               ];
 
               const isPopular = p.name === 'pro';
@@ -133,7 +133,7 @@ export default function ChoosePlanPage() {
                   isCurrentPlan={false}
                   isPopular={isPopular}
                   onSelect={() => handleChoosePlan(p.name)}
-                  buttonLabel={p.price === 0 ? 'Choose Free' : 'Subscribe'}
+                  buttonLabel={p.price === 0 ? t('Choose Free') : t('Subscribe')}
                   isLoading={choosingPlan === p.name}
                 />
               );

@@ -67,4 +67,31 @@ export class MailService {
       context: { resetUrl },
     });
   }
+
+  async sendPaymentConfirmation(to: string, plan: string, amount: string, currency: string, date: string) {
+    await this.mailProvider.sendMail({
+      to,
+      subject: `Payment Confirmed — ${plan} Plan`,
+      template: 'payment-confirmation',
+      context: { plan, amount, currency, date },
+    });
+  }
+
+  async sendSubscriptionRenewed(to: string, plan: string, date: string) {
+    await this.mailProvider.sendMail({
+      to,
+      subject: `Subscription Renewed — ${plan}`,
+      template: 'subscription-renewed',
+      context: { plan, date },
+    });
+  }
+
+  async sendSubscriptionExpiring(to: string, plan: string, date: string) {
+    await this.mailProvider.sendMail({
+      to,
+      subject: 'Subscription Expiring Soon',
+      template: 'subscription-expiring',
+      context: { plan, date },
+    });
+  }
 }
