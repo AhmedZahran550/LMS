@@ -13,20 +13,25 @@ DataSource.prototype.initialize = async function () {
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { logger: false });
-  const config = new DocumentBuilder()
-    .setTitle('LMS API')
-    .setDescription('The LMS API description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  
-  const document = SwaggerModule.createDocument(app, config);
-  const outputPath = join(process.cwd(), 'swagger.json');
-  fs.writeFileSync(outputPath, JSON.stringify(document, null, 2));
-  
-  console.log(`Swagger JSON successfully generated at ${outputPath}`);
-  await app.close();
-  process.exit(0);
+  try {
+    const app = await NestFactory.create(AppModule);
+    const config = new DocumentBuilder()
+      .setTitle('LMS API')
+      .setDescription('The LMS API description')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    
+    const document = SwaggerModule.createDocument(app, config);
+    const outputPath = join(process.cwd(), 'swagger.json');
+    fs.writeFileSync(outputPath, JSON.stringify(document, null, 2));
+    
+    console.log(`Swagger JSON successfully generated at ${outputPath}`);
+    await app.close();
+    process.exit(0);
+  } catch (error) {
+    console.error('Failed to generate Swagger document:', error);
+    process.exit(1);
+  }
 }
 bootstrap();
