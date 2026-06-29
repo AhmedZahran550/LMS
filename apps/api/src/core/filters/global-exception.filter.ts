@@ -31,7 +31,7 @@ const MESSAGE_TO_ERROR_CODE: Record<string, string> = {
   "Invalid or expired verification token": "BAD_REQUEST",
   "User with this email does not exist": "NOT_FOUND",
   "Email is already verified": "CONFLICT",
-  "Invalid or expired password reset token": "BAD_REQUEST",
+  "Invalid or expired password reset token": "INVALID_RESET_TOKEN",
   "Resource not found.": "RESOURCE_NOT_FOUND",
 };
 

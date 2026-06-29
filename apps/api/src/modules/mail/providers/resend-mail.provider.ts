@@ -7,7 +7,7 @@ import * as path from 'path';
 
 function compileTemplate(templateName: string, context: Record<string, any>): string {
   try {
-    const templatePath = path.join(__dirname, '../../templates', `${templateName}.hbs`);
+    const templatePath = path.join(__dirname, '../templates', `${templateName}.hbs`);
     let content = fs.readFileSync(templatePath, 'utf-8');
     for (const [key, value] of Object.entries(context)) {
       content = content.replace(new RegExp(`{{${key}}}`, 'g'), String(value));

@@ -49,6 +49,7 @@
     "FORBIDDEN": "Access denied",
     "CONFLICT": "Conflict",
     "BAD_REQUEST": "Bad request",
+    "INVALID_RESET_TOKEN": "Invalid or expired password reset token",
     "UNIQUE_VIOLATION": "This value already exists",
     "INVALID_FORMAT": "Invalid format",
     "INTERNAL_ERROR": "An unexpected error occurred",

@@ -49,6 +49,7 @@
     "FORBIDDEN": "تم رفض الوصول",
     "CONFLICT": "تعارض",
     "BAD_REQUEST": "طلب غير صحيح",
+    "INVALID_RESET_TOKEN": "رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية",
     "UNIQUE_VIOLATION": "هذه القيمة موجودة بالفعل",
     "INVALID_FORMAT": "تنسيق غير صحيح",
     "INTERNAL_ERROR": "حدث خطأ غير متوقع",
