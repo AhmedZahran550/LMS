@@ -64,6 +64,58 @@ Authenticate a user and receive access & refresh tokens.
 
 ---
 
+### `GET /auth/google`
+Initiate authentication flow with Google OAuth2.
+
+---
+
+### `GET /auth/google/callback`
+Callback endpoint for Google OAuth2 authentication.
+
+**Query Parameters:**
+- `state`: OAuth state parameter string
+
+---
+
+### `GET /auth/facebook`
+Initiate authentication flow with Facebook OAuth2.
+
+---
+
+### `GET /auth/facebook/callback`
+Callback endpoint for Facebook OAuth2 authentication.
+
+**Query Parameters:**
+- `state`: OAuth state parameter string
+
+---
+
+### `POST /auth/complete-registration`
+Complete social login (OAuth) registration by choosing and assigning the user's role.
+
+**Request Body (JSON):**
+```json
+{
+  "tempToken": "oauth_temporary_token_string",
+  "role": "LEARNER" // or "INSTRUCTOR"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "accessToken": "eyJhb...",
+  "refreshToken": "eyJhb...",
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "role": "LEARNER"
+  }
+}
+```
+
+---
+
 ### `POST /auth/verify-email`
 Verify a new user's email using the 6-digit OTP code sent during registration.
 
@@ -944,3 +996,162 @@ Mark all notifications of the user as read.
   "success": true
 }
 ```
+
+---
+
+## 7. Subscription & Payments (`/instructor/subscription` & `/admin/subscriptions`)
+Manages instructor subscription plans and Stripe payments.
+
+### `GET /instructor/subscription`
+Get details about the instructor's active subscription, including current resource usage and plan limits.
+*Requires Bearer Token (Instructor)*
+
+**Response (200 OK):**
+```json
+{
+  "plan": "Pro",
+  "status": "active",
+  "coursesCount": 2,
+  "totalStudents": 15,
+  "totalStorageBytes": 104857600,
+  "maxCourses": 10,
+  "maxStudentsPerCourse": 100,
+  "maxStorageBytes": 5368709120
+}
+```
+
+---
+
+### `GET /instructor/subscription/plans`
+Get a list of all active subscription plans configured in the system.
+*Requires Bearer Token (Instructor)*
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "plan-id",
+    "name": "Pro",
+    "price": 19.99,
+    "maxCourses": 10,
+    "maxStudentsPerCourse": 100,
+    "maxStorageBytes": 5368709120
+  }
+]
+```
+
+---
+
+### `POST /instructor/subscription/checkout`
+Create a Stripe Checkout Session to subscribe to a paid plan. Returns a Stripe redirect URL.
+*Requires Bearer Token (Instructor)*
+
+**Request Body (JSON):**
+```json
+{
+  "planType": "PRO", // "FREE", "PRO", or "PLUS"
+  "successUrl": "https://example.com/success", // Optional
+  "cancelUrl": "https://example.com/cancel" // Optional
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "url": "https://checkout.stripe.com/c/pay/..."
+}
+```
+
+---
+
+### `POST /instructor/subscription/portal`
+Create a Stripe Customer Portal Session for billing configuration and managing plans. Returns the redirect URL.
+*Requires Bearer Token (Instructor)*
+
+**Response (201 Created):**
+```json
+{
+  "url": "https://billing.stripe.com/p/session/..."
+}
+```
+
+---
+
+### `POST /instructor/subscription/choose-plan`
+Choose a plan directly. For paid plans, it redirects to Stripe Checkout. For the FREE plan, it subscribes the user directly.
+*Requires Bearer Token (Instructor)*
+
+**Request Body (JSON):**
+```json
+{
+  "planType": "FREE", // "FREE", "PRO", or "PLUS"
+  "successUrl": "https://example.com/success", // Optional
+  "cancelUrl": "https://example.com/cancel" // Optional
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "plan": "Free",
+  "status": "active",
+  "coursesCount": 0,
+  "totalStudents": 0,
+  "totalStorageBytes": 0,
+  "maxCourses": 1,
+  "maxStudentsPerCourse": 10,
+  "maxStorageBytes": 104857600
+}
+```
+
+---
+
+### `POST /instructor/subscription/refresh-subscription`
+Forces a recalculation of the instructor's resource usage limits and fetches the latest status.
+*Requires Bearer Token (Instructor)*
+
+---
+
+### `POST /instructor/subscription/cancel`
+Cancel the instructor's current subscription.
+*Requires Bearer Token (Instructor)*
+
+**Response (201 Created):**
+```json
+{
+  "message": "Subscription cancelled successfully"
+}
+```
+
+---
+
+### `GET /admin/subscriptions`
+Get list of all active subscriptions in the system.
+*Requires Bearer Token (Admin)*
+
+---
+
+### `GET /admin/subscriptions/plans`
+Get list of all active plans.
+*Requires Bearer Token (Admin)*
+
+---
+
+### `PATCH /admin/subscriptions/:id/status`
+Manually update the status of a subscription.
+*Requires Bearer Token (Admin)*
+
+**Request Body (JSON):**
+```json
+{
+  "status": "active" // "active", "trialing", "past_due", "canceled", "unpaid"
+}
+```
+
+---
+
+### `POST /stripe/webhook`
+Public endpoint to receive Stripe webhook events (e.g. signature verification, checkout session, invoices, cancellations).
+
+**Headers Required:**
+- `stripe-signature`: Stripe event signature string

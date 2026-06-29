@@ -3,6 +3,14 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as fs from 'fs';
 import { join } from 'path';
+import { DataSource } from 'typeorm';
+
+// Mock DataSource.prototype.initialize to prevent database connection errors during CI/swagger generation
+DataSource.prototype.initialize = async function () {
+  (this as any).isInitialized = true;
+  this.driver.database = 'mock-db';
+  return this;
+};
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: false });

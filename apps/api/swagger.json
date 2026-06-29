@@ -197,6 +197,104 @@
         ]
       }
     },
+    "/auth/google": {
+      "get": {
+        "operationId": "AuthController_googleAuth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "operationId": "AuthController_googleAuthRedirect",
+        "parameters": [
+          {
+            "name": "state",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/facebook": {
+      "get": {
+        "operationId": "AuthController_facebookAuth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/facebook/callback": {
+      "get": {
+        "operationId": "AuthController_facebookAuthRedirect",
+        "parameters": [
+          {
+            "name": "state",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/complete-registration": {
+      "post": {
+        "operationId": "AuthController_completeRegistration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRegistrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/admin/users": {
       "post": {
         "operationId": "AdminUsersController_create",
@@ -416,6 +514,198 @@
         },
         "tags": [
           "LearnerInstructors"
+        ]
+      }
+    },
+    "/instructor/subscription": {
+      "get": {
+        "operationId": "InstructorSubscriptionsController_getMySubscription",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InstructorSubscriptions"
+        ]
+      }
+    },
+    "/instructor/subscription/plans": {
+      "get": {
+        "operationId": "InstructorSubscriptionsController_getPlans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InstructorSubscriptions"
+        ]
+      }
+    },
+    "/instructor/subscription/checkout": {
+      "post": {
+        "operationId": "InstructorSubscriptionsController_createCheckout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InstructorSubscriptions"
+        ]
+      }
+    },
+    "/instructor/subscription/portal": {
+      "post": {
+        "operationId": "InstructorSubscriptionsController_createPortal",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InstructorSubscriptions"
+        ]
+      }
+    },
+    "/instructor/subscription/choose-plan": {
+      "post": {
+        "operationId": "InstructorSubscriptionsController_choosePlan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InstructorSubscriptions"
+        ]
+      }
+    },
+    "/instructor/subscription/refresh-subscription": {
+      "post": {
+        "operationId": "InstructorSubscriptionsController_refreshSubscription",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InstructorSubscriptions"
+        ]
+      }
+    },
+    "/instructor/subscription/cancel": {
+      "post": {
+        "operationId": "InstructorSubscriptionsController_cancel",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "InstructorSubscriptions"
+        ]
+      }
+    },
+    "/admin/subscriptions": {
+      "get": {
+        "operationId": "AdminSubscriptionsController_getAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminSubscriptions"
+        ]
+      }
+    },
+    "/admin/subscriptions/plans": {
+      "get": {
+        "operationId": "AdminSubscriptionsController_getPlans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminSubscriptions"
+        ]
+      }
+    },
+    "/admin/subscriptions/{id}/status": {
+      "patch": {
+        "operationId": "AdminSubscriptionsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AdminSubscriptions"
+        ]
+      }
+    },
+    "/stripe/webhook": {
+      "post": {
+        "operationId": "StripeWebhookController_handleWebhook",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "StripeWebhook"
         ]
       }
     },
@@ -1214,6 +1504,10 @@
         "type": "object",
         "properties": {}
       },
+      "CompleteRegistrationDto": {
+        "type": "object",
+        "properties": {}
+      },
       "CreateUserDto": {
         "type": "object",
         "properties": {}
@@ -1227,6 +1521,10 @@
         "properties": {}
       },
       "UpdatePreferencesDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateCheckoutSessionDto": {
         "type": "object",
         "properties": {}
       },
