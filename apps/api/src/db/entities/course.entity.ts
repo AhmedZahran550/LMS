@@ -10,6 +10,7 @@ import { CourseVisibility } from "@lms/shared-types";
 import { User } from "../../db/entities/user.entity";
 import { CourseContent } from "./course-content.entity";
 import { Enrollment } from "./enrollment.entity";
+import { CourseAssignment } from "./course-assignment.entity";
 import { BaseEntity } from "./base.entity";
 
 @Entity()
@@ -46,4 +47,7 @@ export class Course extends BaseEntity {
 
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
   enrollments!: Enrollment[];
+
+  @OneToMany(() => CourseAssignment, (assignment) => assignment.course)
+  assignments!: CourseAssignment[];
 }

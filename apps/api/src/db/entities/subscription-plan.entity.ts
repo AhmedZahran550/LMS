@@ -24,7 +24,7 @@ export class SubscriptionPlan extends BaseEntity {
   maxCourses!: number;
 
   @Column({ default: 0 })
-  maxStudentsPerCourse!: number;
+  maxTotalStudents!: number;
 
   @Column({ type: 'bigint', default: 0 })
   maxStorageBytes!: number;

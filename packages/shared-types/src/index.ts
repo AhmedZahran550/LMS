@@ -6,3 +6,4 @@ export * from './video.types';
 export * from './enrollment.types';
 export * from './notification.types';
 export * from './subscription.types';
+export * from './instructor-student.types';

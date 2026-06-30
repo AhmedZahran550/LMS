@@ -54,3 +54,15 @@ export enum PaymentStatus {
   FAILED = 'failed',
   REFUNDED = 'refunded',
 }
+
+export enum InstructorStudentStatus {
+  INVITED = 'invited',
+  REQUESTED = 'requested',
+  ACTIVE = 'active',
+  REMOVED = 'removed',
+}
+
+export enum InvitedBy {
+  INSTRUCTOR = 'instructor',
+  STUDENT = 'student',
+}

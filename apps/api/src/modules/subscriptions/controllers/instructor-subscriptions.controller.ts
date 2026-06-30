@@ -116,7 +116,7 @@ export class InstructorSubscriptionsController {
         totalStudents: 0,
         totalStorageBytes: 0,
         maxCourses: plan?.maxCourses || 0,
-        maxStudentsPerCourse: plan?.maxStudentsPerCourse || 0,
+        maxTotalStudents: plan?.maxTotalStudents || 0,
         maxStorageBytes: plan?.maxStorageBytes || 0,
       };
     }
@@ -151,7 +151,7 @@ export class InstructorSubscriptionsController {
         totalStudents: 0,
         totalStorageBytes: 0,
         maxCourses: 0,
-        maxStudentsPerCourse: 0,
+        maxTotalStudents: 0,
         maxStorageBytes: 0,
       };
     }
@@ -162,7 +162,7 @@ export class InstructorSubscriptionsController {
       totalStudents: usage.totalStudents,
       totalStorageBytes: usage.totalStorageBytes,
       maxCourses: usage.plan?.maxCourses || 0,
-      maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
+      maxTotalStudents: usage.plan?.maxTotalStudents || 0,
       maxStorageBytes: usage.plan?.maxStorageBytes || 0,
     };
   }

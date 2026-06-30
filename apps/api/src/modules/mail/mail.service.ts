@@ -98,4 +98,13 @@ export class MailService {
       context: { plan, date, appName: getAppName(locale) },
     });
   }
+
+  async sendStudentInvitation(to: string, instructorName: string, acceptUrl: string, locale: string = 'en') {
+    await this.mailProvider.sendMail({
+      to,
+      subject: `You've been invited by ${instructorName}`,
+      template: `student-invitation-${locale}`,
+      context: { instructorName, acceptUrl, appName: getAppName(locale) },
+    });
+  }
 }

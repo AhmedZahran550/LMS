@@ -10,9 +10,11 @@ import { SubscriptionService } from './subscription.service';
 import { Course } from '../../../db/entities/course.entity';
 import { CourseContent } from '../../../db/entities/course-content.entity';
 import { Enrollment } from '../../../db/entities/enrollment.entity';
+import { InstructorStudent } from '../../../db/entities/instructor-student.entity';
 import {
   SubscriptionStatus,
   EnrollmentStatus,
+  InstructorStudentStatus,
 } from '@lms/shared-types';
 import { ErrorCodes } from '../../../core/utils/error-codes';
 
@@ -28,6 +30,8 @@ export class SubscriptionGuardService {
     private readonly contentRepository: Repository<CourseContent>,
     @InjectRepository(Enrollment)
     private readonly enrollmentRepository: Repository<Enrollment>,
+    @InjectRepository(InstructorStudent)
+    private readonly instructorStudentRepository: Repository<InstructorStudent>,
   ) {}
 
   private async getSubscriptionOrThrow(instructorId: string) {
@@ -120,7 +124,7 @@ export class SubscriptionGuardService {
     }
   }
 
-  async checkStudentAcceptance(instructorId: string, courseId?: string): Promise<void> {
+  async checkStudentAcceptance(instructorId: string, _courseId?: string): Promise<void> {
     const subscription = await this.getSubscriptionOrThrow(instructorId);
 
     if (subscription.status === SubscriptionStatus.EXPIRED) {
@@ -141,40 +145,16 @@ export class SubscriptionGuardService {
     }
 
     const plan = subscription.plan;
-    if (plan.maxStudentsPerCourse > 0) {
-      if (courseId) {
-        const count = await this.enrollmentRepository.count({
-          where: { courseId, status: EnrollmentStatus.APPROVED },
+    if (plan.maxTotalStudents > 0) {
+      const studentCount = await this.instructorStudentRepository.count({
+        where: { instructorId, status: InstructorStudentStatus.ACTIVE },
+      });
+
+      if (studentCount >= plan.maxTotalStudents) {
+        throw new ForbiddenException({
+          message: `You have reached the maximum of ${plan.maxTotalStudents} students on your ${plan.name} plan. Upgrade to accept more.`,
+          code: ErrorCodes.STUDENT_LIMIT_REACHED,
         });
-        if (count >= plan.maxStudentsPerCourse) {
-          throw new ForbiddenException({
-            message: `This course has reached the maximum of ${plan.maxStudentsPerCourse} students on your ${plan.name} plan. Upgrade to accept more.`,
-            code: ErrorCodes.STUDENT_LIMIT_REACHED,
-          });
-        }
-      } else {
-        const studentsResult = await this.enrollmentRepository
-          .createQueryBuilder('e')
-          .select('c.id', 'courseId')
-          .addSelect('COUNT(DISTINCT e.learnerId)', 'studentCount')
-          .innerJoin('course', 'c', 'e.courseId = c.id')
-          .where('c.instructorId = :instructorId', { instructorId })
-          .andWhere('e.status = :status', {
-            status: EnrollmentStatus.APPROVED,
-          })
-          .groupBy('c.id')
-          .getRawMany();
-
-        const overLimit = studentsResult.filter(
-          (row: any) => parseInt(row.studentCount, 10) >= plan.maxStudentsPerCourse,
-        );
-
-        if (overLimit.length > 0) {
-          throw new ForbiddenException({
-            message: `One or more courses have reached the maximum of ${plan.maxStudentsPerCourse} students on your ${plan.name} plan. Upgrade to accept more.`,
-            code: ErrorCodes.STUDENT_LIMIT_REACHED,
-          });
-        }
       }
     }
   }

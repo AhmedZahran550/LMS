@@ -231,7 +231,7 @@ export class AuthService {
             totalStudents: usage.totalStudents,
             totalStorageBytes: usage.totalStorageBytes,
             maxCourses: usage.plan?.maxCourses || 0,
-            maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
+            maxTotalStudents: usage.plan?.maxTotalStudents || 0,
             maxStorageBytes: usage.plan?.maxStorageBytes || 0,
           };
         }

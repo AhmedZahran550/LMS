@@ -7,7 +7,7 @@ export interface SubscriptionPlanDto {
   price: number;
   currency: string;
   maxCourses: number;
-  maxStudentsPerCourse: number;
+  maxTotalStudents: number;
   maxStorageBytes: number;
   trialDays: number;
   stripePriceId: string | null;

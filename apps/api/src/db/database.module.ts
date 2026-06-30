@@ -9,6 +9,10 @@ import { CourseContent } from "./entities/course-content.entity";
 import { SubscriptionPlan } from "./entities/subscription-plan.entity";
 import { InstructorSubscription } from "./entities/instructor-subscription.entity";
 import { Payment } from "./entities/payment.entity";
+import { InstructorStudent } from "./entities/instructor-student.entity";
+import { CourseAssignment } from "./entities/course-assignment.entity";
+import { StorageAddon } from "./entities/storage-addon.entity";
+import { SystemConfig } from "./entities/system-config.entity";
 import { AppDataSource } from "./datasource";
 
 @Global()
@@ -25,6 +29,10 @@ import { AppDataSource } from "./datasource";
       SubscriptionPlan,
       InstructorSubscription,
       Payment,
+      InstructorStudent,
+      CourseAssignment,
+      StorageAddon,
+      SystemConfig,
     ]),
   ],
   exports: [TypeOrmModule],
