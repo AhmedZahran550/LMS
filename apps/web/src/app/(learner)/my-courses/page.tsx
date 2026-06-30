@@ -125,7 +125,7 @@ export default function MyCoursesPage() {
                   <PlayCircle className="h-5 w-5 text-[var(--sv-primary)]" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[var(--sv-on-surface)]">{t('Enrolled in LMS Platform')}</p>
+                  <p className="text-sm font-bold text-[var(--sv-on-surface)]">{t('Enrolled')}</p>
                   <p className="text-xs text-[var(--sv-on-surface-variant)]">{t('Just now')}</p>
                 </div>
               </div>

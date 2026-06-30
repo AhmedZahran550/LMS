@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { MailProvider } from './providers/mail-provider.interface';
 
+function getAppName(locale: string): string {
+  return locale === 'ar' ? 'منارة' : 'manara';
+}
+
 @Injectable()
 export class MailService {
   constructor(private mailProvider: MailProvider) {}
@@ -10,7 +14,7 @@ export class MailService {
       to,
       subject: `New content in ${courseName}`,
       template: `new-content-${locale}`,
-      context: { courseName, contentTitle },
+      context: { courseName, contentTitle, appName: getAppName(locale) },
     });
   }
 
@@ -19,7 +23,7 @@ export class MailService {
       to,
       subject: `Enrollment Request: ${courseName}`,
       template: `enrollment-request-${locale}`,
-      context: { learnerName, courseName },
+      context: { learnerName, courseName, appName: getAppName(locale) },
     });
   }
 
@@ -28,7 +32,7 @@ export class MailService {
       to,
       subject: `Enrollment Approved: ${courseName}`,
       template: `enrollment-approved-${locale}`,
-      context: { courseName },
+      context: { courseName, appName: getAppName(locale) },
     });
   }
 
@@ -37,7 +41,7 @@ export class MailService {
       to,
       subject: `Enrollment Update: ${courseName}`,
       template: `enrollment-rejected-${locale}`,
-      context: { courseName },
+      context: { courseName, appName: getAppName(locale) },
     });
   }
 
@@ -46,7 +50,7 @@ export class MailService {
       to,
       subject: `Invitation to join ${courseName}`,
       template: `course-invitation-${locale}`,
-      context: { instructorName, courseName },
+      context: { instructorName, courseName, appName: getAppName(locale) },
     });
   }
 
@@ -55,7 +59,7 @@ export class MailService {
       to,
       subject: 'Verify your email address',
       template: `email-verification-${locale}`,
-      context: { otp },
+      context: { otp, appName: getAppName(locale) },
     });
   }
 
@@ -64,7 +68,7 @@ export class MailService {
       to,
       subject: 'Reset your password',
       template: `reset-password-${locale}`,
-      context: { resetUrl },
+      context: { resetUrl, appName: getAppName(locale) },
     });
   }
 
@@ -73,7 +77,7 @@ export class MailService {
       to,
       subject: `Payment Confirmed — ${plan} Plan`,
       template: `payment-confirmation-${locale}`,
-      context: { plan, amount, currency, date },
+      context: { plan, amount, currency, date, appName: getAppName(locale) },
     });
   }
 
@@ -82,7 +86,7 @@ export class MailService {
       to,
       subject: `Subscription Renewed — ${plan}`,
       template: `subscription-renewed-${locale}`,
-      context: { plan, date },
+      context: { plan, date, appName: getAppName(locale) },
     });
   }
 
@@ -91,7 +95,7 @@ export class MailService {
       to,
       subject: 'Subscription Expiring Soon',
       template: `subscription-expiring-${locale}`,
-      context: { plan, date },
+      context: { plan, date, appName: getAppName(locale) },
     });
   }
 }

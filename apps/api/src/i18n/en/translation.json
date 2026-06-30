@@ -1,4 +1,7 @@
 {
+  "app": {
+    "name": "manara"
+  },
   "auth": {
     "register_success": "Registration successful. Please check your email to verify your account.",
     "invalid_credentials": "Invalid credentials",

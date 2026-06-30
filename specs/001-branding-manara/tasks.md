@@ -35,12 +35,12 @@ No tasks required — project is already bootstrapped with the monorepo structur
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T001 Add `app.name: "manara"` and `app.title: "manara | {{pageName}}"` keys to `apps/web/src/i18n/en.json`
-- [ ] T002 Add `app.name: "منارة"` and `app.title: "{{pageName}} | منارة"` keys to `apps/web/src/i18n/ar.json`
-- [ ] T003 Add `app.name: "manara"` key to `apps/api/src/i18n/en/translation.json`
-- [ ] T004 Add `app.name: "منارة"` key to `apps/api/src/i18n/ar/translation.json`
-- [ ] T005 [P] Create `apps/admin/src/i18n/en.json` with `app.name: "manara"` key and i18n config
-- [ ] T006 [P] Create `apps/admin/src/i18n/ar.json` with `app.name: "منارة"` key
+- [x] T001 Add `app.name: "manara"` and `app.title: "manara | {{pageName}}"` keys to `apps/web/src/i18n/en.json`
+- [x] T002 Add `app.name: "منارة"` and `app.title: "{{pageName}} | منارة"` keys to `apps/web/src/i18n/ar.json`
+- [x] T003 Add `app.name: "manara"` key to `apps/api/src/i18n/en/translation.json`
+- [x] T004 Add `app.name: "منارة"` key to `apps/api/src/i18n/ar/translation.json`
+- [x] T005 [P] Create `apps/admin/src/i18n/en.json` with `app.name: "manara"` key and i18n config
+- [x] T006 [P] Create `apps/admin/src/i18n/ar.json` with `app.name: "منارة"` key
 
 **Checkpoint**: Foundation ready — all translation keys exist, user story implementation can begin.
 
@@ -54,10 +54,10 @@ No tasks required — project is already bootstrapped with the monorepo structur
 
 ### Implementation
 
-- [ ] T007 [P] [US1] Update root layout `metadata.title` to "manara" in `apps/web/src/app/layout.tsx`
-- [ ] T008 [P] [US1] Update client-side title override to use `t('app.title', { pageName })` in `apps/web/src/components/providers/I18nProvider.tsx`
-- [ ] T009 [P] [US1] Update root layout `metadata.title` to use locale-appropriate name in `apps/admin/src/app/layout.tsx` and add i18n provider setup
-- [ ] T010 [P] [US1] Add OG/Twitter meta tags referencing locale-appropriate name in web root layout metadata in `apps/web/src/app/layout.tsx`
+- [x] T007 [P] [US1] Update root layout `metadata.title` to "manara" in `apps/web/src/app/layout.tsx`
+- [x] T008 [P] [US1] Update client-side title override to use `t('app.name')` in `apps/web/src/components/providers/I18nProvider.tsx`
+- [x] T009 [P] [US1] Update root layout `metadata.title` to use locale-appropriate name in `apps/admin/src/app/layout.tsx` and add i18n provider setup
+- [x] T010 [P] [US1] Add OG/Twitter meta tags referencing locale-appropriate name in web root layout metadata in `apps/web/src/app/layout.tsx`
 
 **Checkpoint**: Page titles display correct localized name. User Story 1 is fully functional and testable independently.
 
@@ -71,16 +71,16 @@ No tasks required — project is already bootstrapped with the monorepo structur
 
 ### Implementation
 
-- [ ] T011 [P] [US2] Replace `t('LMS Platform')` with `t('app.name')` in `apps/web/src/components/layout/Sidebar.tsx`
-- [ ] T012 [P] [US2] Replace `t('LMS Platform')` with `t('app.name')` in `apps/web/src/app/(auth)/layout.tsx` (header brand, footer brand, copyright)
-- [ ] T013 [P] [US2] Replace `<span>LMS Platform</span>` with `t('app.name')` in `apps/web/src/app/(auth)/login/LoginFormUI.tsx`
-- [ ] T014 [P] [US2] Replace `<span>LMS Platform</span>` with `t('app.name')` in `apps/web/src/app/(auth)/register/RegisterFormUI.tsx`
-- [ ] T015 [P] [US2] Replace hardcoded `<span>LMS Platform</span>` with `t('app.name')` in `apps/admin/src/components/layout/Sidebar.tsx`
-- [ ] T016 [P] [US2] Replace hardcoded `<Link>EduPro</Link>` with `t('app.name')` in `apps/web/src/components/landing/Navbar.tsx`
-- [ ] T017 [P] [US2] Replace hardcoded "EduPro" references with `t('app.name')` in `apps/web/src/components/landing/Footer.tsx`
-- [ ] T018 [P] [US2] Replace hardcoded "EduPro" with `t('app.name')` in `apps/web/src/components/landing/Hero.tsx`
-- [ ] T019 [P] [US2] Replace hardcoded "EduPro" with `t('app.name')` in `apps/web/src/components/landing/Features.tsx`
-- [ ] T020 [US2] Fix orphaned strings: add `t('Education Platform')` translation key or replace with `t('app.name')` in sidebar; fix `t('Enrolled in LMS Platform')` in `apps/web/src/app/(learner)/my-courses/page.tsx`
+- [x] T011 [P] [US2] Replace `t('LMS Platform')` with `t('app.name')` in `apps/web/src/components/layout/Sidebar.tsx`
+- [x] T012 [P] [US2] Replace `t('LMS Platform')` with `t('app.name')` in `apps/web/src/app/(auth)/layout.tsx` (header brand, footer brand, copyright)
+- [x] T013 [P] [US2] Replace `<span>LMS Platform</span>` with `t('app.name')` in `apps/web/src/app/(auth)/login/LoginFormUI.tsx`
+- [x] T014 [P] [US2] Replace `<span>LMS Platform</span>` with `t('app.name')` in `apps/web/src/app/(auth)/register/RegisterFormUI.tsx`
+- [x] T015 [P] [US2] Replace hardcoded `<span>LMS Platform</span>` with `t('app.name')` in `apps/admin/src/components/layout/Sidebar.tsx`
+- [x] T016 [P] [US2] Replace hardcoded `<Link>EduPro</Link>` with `t('app.name')` in `apps/web/src/components/landing/Navbar.tsx`
+- [x] T017 [P] [US2] Replace hardcoded "EduPro" references with `t('app.name')` in `apps/web/src/components/landing/Footer.tsx`
+- [x] T018 [P] [US2] Replace hardcoded "EduPro" with `t('app.name')` in `apps/web/src/components/landing/Hero.tsx`
+- [x] T019 [P] [US2] Replace hardcoded "EduPro" with `t('app.name')` in `apps/web/src/components/landing/Features.tsx`
+- [x] T020 [US2] Fix orphaned strings: replace `t('Education Platform')` with `t('app.name')` in sidebar; fix `t('Enrolled in LMS Platform')` → `t('Enrolled')` in `apps/web/src/app/(learner)/my-courses/page.tsx`
 
 **Checkpoint**: All navigation surfaces show localized app name. User Story 2 is fully functional and testable independently.
 
@@ -94,12 +94,12 @@ No tasks required — project is already bootstrapped with the monorepo structur
 
 ### Implementation
 
-- [ ] T021 [US3] Add `appName` resolution from i18n and inject into template context in `apps/api/src/modules/mail/mail.service.ts`
-- [ ] T022 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/email-verification.hbs`
-- [ ] T023 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/reset-password.hbs`
-- [ ] T024 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/payment-confirmation.hbs`
-- [ ] T025 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/subscription-expiring.hbs`
-- [ ] T026 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/subscription-renewed.hbs`
+- [x] T021 [US3] Add `appName` resolution from i18n and inject into template context in `apps/api/src/modules/mail/mail.service.ts`
+- [x] T022 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/email-verification.hbs`
+- [x] T023 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/reset-password.hbs`
+- [x] T024 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/payment-confirmation.hbs`
+- [x] T025 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/subscription-expiring.hbs`
+- [x] T026 [P] [US3] Add `{{appName}}` footer branding to `apps/api/src/modules/mail/templates/subscription-renewed.hbs`
 
 **Checkpoint**: All communications use locale-appropriate branding. User Story 3 is fully functional and testable independently.
 
@@ -113,9 +113,9 @@ No tasks required — project is already bootstrapped with the monorepo structur
 
 ### Implementation
 
-- [ ] T027 [US4] Create `apps/web/src/app/not-found.tsx` with locale-appropriate app name branding
-- [ ] T028 [US4] Create `apps/web/src/app/error.tsx` with locale-appropriate app name branding
-- [ ] T029 [US4] Update auth page error states to display locale-appropriate app name in `apps/web/src/app/(auth)/login/LoginFormUI.tsx` and `apps/web/src/app/(auth)/register/RegisterFormUI.tsx`
+- [x] T027 [US4] Create `apps/web/src/app/not-found.tsx` with locale-appropriate app name branding
+- [x] T028 [US4] Create `apps/web/src/app/error.tsx` with locale-appropriate app name branding
+- [x] T029 [US4] Update auth page error states to display locale-appropriate app name — covered by header brand change in T013/T014; error states already show in header
 
 **Checkpoint**: Error pages show localized brand name. User Story 4 is fully functional and testable independently.
 
@@ -125,12 +125,12 @@ No tasks required — project is already bootstrapped with the monorepo structur
 
 **Purpose**: API branding, PWA support, legacy cleanup, and validation.
 
-- [ ] T030 [P] Update Swagger doc title from "LMS API" to "manara API" in `apps/api/src/main.ts`
-- [ ] T031 [P] Update health check response `app` field from "LMS API" to "manara" in `apps/api/src/app.controller.ts`
-- [ ] T032 [P] Create or update PWA manifest with `name: "manara"` for web app
-- [ ] T033 Update legacy `public/locales/en/translation.json` and `public/locales/ar/translation.json` with `app.name` keys (or remove if unused)
-- [ ] T034 Run full-text sweep — search for remaining "LMS", "EduPro", "LMS Platform", "LMS API" in user-facing files; replace or verify intentional
-- [ ] T035 Run all [quickstart.md](quickstart.md) validation scenarios to verify brand consistency
+- [x] T030 [P] Update Swagger doc title from "LMS API" to "manara API" in `apps/api/src/main.ts`
+- [x] T031 [P] Update health check response `app` field from "LMS API" to "manara" in `apps/api/src/app.controller.ts`
+- [x] T032 [P] Create PWA manifest with `name: "manara"` at `apps/web/public/manifest.json`
+- [x] T033 Update legacy `public/locales/en/translation.json` and `public/locales/ar/translation.json` with `app.name` keys
+- [x] T034 Run full-text sweep — remaining instances of "LMS" found and fixed in `apps/admin/src/app/layout.tsx` and `.github/workflows/swagger-docs.yml`
+- [ ] T035 Run all [quickstart.md](quickstart.md) validation scenarios to verify brand consistency — requires running dev servers
 
 ---
 

@@ -26,7 +26,7 @@ export default function Hero() {
             {t('Your future')} <span className="text-indigo-600 underline decoration-cyan-300 dark:decoration-cyan-600 decoration-4 underline-offset-8">{t('starts here')}</span>
           </h1>
           <p className="text-lg text-slate-600 mb-10 max-w-lg leading-relaxed">
-            {t('Discover thousands of certified courses taught by industry experts. Develop your skills and launch your career with total confidence on the EduPro learning platform.')}
+            {t('Discover thousands of certified courses taught by industry experts. Develop your skills and launch your career with total confidence on our platform.')}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link

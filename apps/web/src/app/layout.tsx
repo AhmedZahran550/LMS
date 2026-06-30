@@ -10,8 +10,19 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-plus-jakarta-sans" });
 
 export const metadata: Metadata = {
-  title: "LMS Platform",
+  title: "manara",
   description: "Learn and grow with our comprehensive learning management system",
+  openGraph: {
+    title: "manara",
+    siteName: "manara",
+    description: "Learn and grow with our comprehensive learning management system",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "manara",
+    description: "Learn and grow with our comprehensive learning management system",
+  },
 };
 
 import { cookies } from "next/headers";

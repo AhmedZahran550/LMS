@@ -137,7 +137,7 @@ export default function Features() {
             <div className="relative z-10">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">{t('Ready to start your learning journey?')}</h2>
               <p className="text-xl md:text-2xl opacity-90 mb-12 max-w-2xl mx-auto leading-relaxed">
-                {t('Join thousands of professionals who have transformed their careers through EduPro. Invest in yourself today and see the difference tomorrow.')}
+                {t('Join thousands of professionals who have transformed their careers through our platform. Invest in yourself today and see the difference tomorrow.')}
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-6">
                 <Link href="/register" className="bg-white text-indigo-600 px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl hover:bg-slate-50 transition-all active:scale-95 inline-block">

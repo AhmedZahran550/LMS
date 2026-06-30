@@ -27,8 +27,8 @@ async function bootstrap() {
   };
 
   const config = new DocumentBuilder()
-    .setTitle("LMS API")
-    .setDescription("The LMS API description")
+    .setTitle("manara API")
+    .setDescription("The manara API description")
     .setVersion("1.0")
     .addBearerAuth()
     .build();

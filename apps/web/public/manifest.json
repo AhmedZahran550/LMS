@@ -1,0 +1,11 @@
+{
+  "name": "manara",
+  "short_name": "manara",
+  "description": "Learn and grow with our comprehensive learning management system",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "lang": "en",
+  "dir": "ltr"
+}

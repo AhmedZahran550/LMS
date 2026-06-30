@@ -12,7 +12,7 @@ export default function Footer() {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 px-6 max-w-[1200px] mx-auto">
         <div className="col-span-2">
           <Link href="/" className="text-3xl font-black text-indigo-600 mb-6 block">
-            EduPro
+            {t('app.name')}
           </Link>
           <p className="text-slate-600 mb-6 leading-relaxed max-w-sm">
             {t('The leading platform in e-learning, focused on providing high-quality educational content that meets the demands of the global job market.')}
@@ -21,7 +21,7 @@ export default function Footer() {
         <div>
           <h4 className="font-bold mb-4 text-slate-900">{t('Platform')}</h4>
           <ul className="space-y-2">
-            <li><Link href="/about" className="text-slate-600 hover:text-indigo-600 transition-all text-sm">{t('About EduPro')}</Link></li>
+            <li><Link href="/about" className="text-slate-600 hover:text-indigo-600 transition-all text-sm">{t('About Us')}</Link></li>
             <li><Link href="/instructors" className="text-slate-600 hover:text-indigo-600 transition-all text-sm">{t('Instructors')}</Link></li>
             <li><Link href="/courses" className="text-slate-600 hover:text-indigo-600 transition-all text-sm">{t('Courses')}</Link></li>
             <li><Link href="/pricing" className="text-slate-600 hover:text-indigo-600 transition-all text-sm">{t('Pricing')}</Link></li>
@@ -56,7 +56,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-[1200px] mx-auto px-6 mt-12 pt-8 border-t border-slate-200 text-center text-slate-500 text-sm">
-        {t('copyright', { year: new Date().getFullYear() })} EduPro Learning. All rights reserved.
+        {t('copyright', { year: new Date().getFullYear(), appName: t('app.name') })}
       </div>
     </footer>
   );

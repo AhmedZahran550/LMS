@@ -39,8 +39,8 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col h-full w-64 bg-[var(--sv-surface-container-low)] shadow-sm border-e border-[var(--sv-outline-variant)] py-6 px-4 z-30">
       <div className="mb-8 px-2">
-        <h1 className="text-2xl font-bold text-[var(--sv-primary)]">{t('LMS Platform')}</h1>
-        <p className="text-xs text-[var(--sv-on-surface-variant)]">{t('Education Platform')}</p>
+        <h1 className="text-2xl font-bold text-[var(--sv-primary)]">{t('app.name')}</h1>
+        <p className="text-xs text-[var(--sv-on-surface-variant)]">{t('app.name')}</p>
       </div>
       
       <nav className="flex-1 space-y-2">

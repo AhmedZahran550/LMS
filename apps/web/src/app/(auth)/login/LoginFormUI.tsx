@@ -69,7 +69,7 @@ export function LoginFormUI({
           {/* Brand */}
           <div className="flex items-center gap-2 mb-8">
             <GraduationCap className="w-7 h-7" />
-            <span className="text-lg font-bold">{t('LMS Platform')}</span>
+            <span className="text-lg font-bold">{t('app.name')}</span>
           </div>
 
           {/* Welcome */}

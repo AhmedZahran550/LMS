@@ -24,7 +24,7 @@ export default function Navbar() {
       <nav className="flex justify-between items-center px-6 py-4 max-w-[1200px] mx-auto">
         <div className="flex items-center gap-8">
           <Link href="/" className="text-2xl font-bold text-indigo-600">
-            EduPro
+            {t('app.name')}
           </Link>
           <div className="hidden md:flex gap-6">
             <Link href="/" className="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1 text-base">
