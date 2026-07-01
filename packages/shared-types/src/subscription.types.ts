@@ -10,6 +10,7 @@ export interface SubscriptionPlanDto {
   pricePerStudent: number;
   baseStorageBytes: number;
   trialDays: number;
+  durationMonths: number;
   stripePriceId: string | null;
   isActive: boolean;
 }

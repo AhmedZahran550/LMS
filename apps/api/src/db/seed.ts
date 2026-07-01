@@ -12,6 +12,7 @@ const SUBSCRIPTION_PLANS = [
     pricePerStudent: 0,
     baseStorageBytes: 2147483648, // 2 GB
     durationDays: 30,
+    durationMonths: 1,
     stripePriceId: null,
     isActive: true,
   },
@@ -24,6 +25,7 @@ const SUBSCRIPTION_PLANS = [
     pricePerStudent: 120,
     baseStorageBytes: 10737418240, // 10 GB
     durationDays: 180,
+    durationMonths: 6,
     stripePriceId: process.env.STRIPE_PRICE_PRO || null,
     isActive: true,
   },
@@ -36,6 +38,7 @@ const SUBSCRIPTION_PLANS = [
     pricePerStudent: 100,
     baseStorageBytes: 10737418240, // 10 GB
     durationDays: 180,
+    durationMonths: 6,
     stripePriceId: process.env.STRIPE_PRICE_PLUS || null,
     isActive: true,
   },
@@ -48,6 +51,7 @@ const SUBSCRIPTION_PLANS = [
     pricePerStudent: 70,
     baseStorageBytes: 10737418240, // 10 GB
     durationDays: 180,
+    durationMonths: 6,
     stripePriceId: null,
     isActive: true,
   },
@@ -94,8 +98,8 @@ async function seed() {
       console.log(`Plan "${plan.name}" already exists.`);
     } else {
       await AppDataSource.query(
-        `INSERT INTO subscription_plan (name, description, price, currency, "maxTotalStudents", "pricePerStudent", "baseStorageBytes", "durationDays", "stripePriceId", "isActive")
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        `INSERT INTO subscription_plan (name, description, price, currency, "maxTotalStudents", "pricePerStudent", "baseStorageBytes", "durationDays", "durationMonths", "stripePriceId", "isActive")
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
         [
           plan.name,
           plan.description,
@@ -105,6 +109,7 @@ async function seed() {
           plan.pricePerStudent,
           String(plan.baseStorageBytes),
           plan.durationDays,
+          plan.durationMonths,
           plan.stripePriceId,
           plan.isActive,
         ],

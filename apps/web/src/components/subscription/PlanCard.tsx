@@ -16,6 +16,7 @@ interface PlanCardProps {
   price: number;
   currency: string;
   description: string;
+  durationMonths?: number;
   features: PlanFeature[];
   isCurrentPlan: boolean;
   isPopular?: boolean;
@@ -30,6 +31,7 @@ export function PlanCard({
   price,
   currency,
   description,
+  durationMonths = 6,
   features,
   isCurrentPlan,
   isPopular,
@@ -70,11 +72,11 @@ export function PlanCard({
         <span className="text-3xl font-black text-[var(--sv-on-surface)]">
           {price === 0
             ? t("Free")
-            : `${currency === "usd" ? "$" : currency}${price.toFixed(2)}`}
+            : `${currency === "usd" ? "$" : currency.toUpperCase()} ${(price / durationMonths).toFixed(2)}`}
         </span>
         {price > 0 && (
           <span className="text-sm text-[var(--sv-on-surface-variant)] ml-1">
-            {t("/6 months")}
+            {t("/month for {{months}} months", { months: durationMonths })}
           </span>
         )}
       </div>

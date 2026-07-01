@@ -41,6 +41,9 @@ export class SubscriptionPlan extends BaseEntity {
   @Column({ default: 180 })
   durationDays!: number;
 
+  @Column({ default: 6 })
+  durationMonths!: number;
+
   @BeforeInsert()
   @BeforeUpdate()
   computePrice() {

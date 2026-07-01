@@ -279,6 +279,7 @@ export default function InstructorSubscriptionPage() {
                 price={p.price}
                 currency={p.currency}
                 description={p.description}
+                durationMonths={p.durationMonths}
                 features={features}
                 isCurrentPlan={isCurrentPlan}
                 isPopular={p.name === SubscriptionPlanType.PRO}
