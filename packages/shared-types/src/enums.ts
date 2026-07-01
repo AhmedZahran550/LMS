@@ -41,6 +41,11 @@ export enum SubscriptionPlanType {
   ENTERPRISE = 'enterprise',
 }
 
+export enum ClientType {
+  WEB = 'web',
+  MOBILE = 'mobile',
+}
+
 export enum SubscriptionStatus {
   TRIALING = 'trialing',
   ACTIVE = 'active',

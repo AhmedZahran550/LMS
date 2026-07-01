@@ -44,7 +44,11 @@ function redirectByRole(user: UserProfile, router: ReturnType<typeof useRouter>)
   }
 }
 
-export function SocialLoginWithPopup() {
+interface SocialLoginWithPopupProps {
+  role?: UserRole;
+}
+
+export function SocialLoginWithPopup({ role }: SocialLoginWithPopupProps = {}) {
   const { t } = useTranslation();
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -127,7 +131,14 @@ export function SocialLoginWithPopup() {
   }, [handleOAuthMessage]);
 
   const openProvider = (provider: 'google' | 'facebook') => {
-    const url = `${API_URL}/auth/${provider}`;
+    if (role === UserRole.LEARNER) {
+      setOauthError(t('Students must use the mobile app to log in.'));
+      return;
+    }
+    let url = `${API_URL}/auth/${provider}?client=web`;
+    if (role) {
+      url += `&role=${role}`;
+    }
     const popup = window.open(url, 'oauth-popup', 'width=600,height=700,popup=1');
     if (!popup || popup.closed) {
       window.location.href = url;

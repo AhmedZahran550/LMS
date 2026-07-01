@@ -13,6 +13,7 @@ import { InstructorStudent } from "./entities/instructor-student.entity";
 import { CourseAssignment } from "./entities/course-assignment.entity";
 import { StorageAddon } from "./entities/storage-addon.entity";
 import { SystemConfig } from "./entities/system-config.entity";
+import { DeviceToken } from "./entities/device-token.entity";
 import { AppDataSource } from "./datasource";
 
 @Global()
@@ -33,6 +34,7 @@ import { AppDataSource } from "./datasource";
       CourseAssignment,
       StorageAddon,
       SystemConfig,
+      DeviceToken,
     ]),
   ],
   exports: [TypeOrmModule],

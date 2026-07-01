@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { SocialLoginWithPopup } from '@/components/auth/SocialLoginWithPopup';
+import { UserRole } from '@lms/shared-types';
 
 interface LoginFormUIProps {
   register: UseFormRegister<any>;
@@ -20,6 +21,7 @@ interface LoginFormUIProps {
   resendSuccess: string | null;
   resendError: string | null;
   resetSuccess?: string | null;
+  selectedRole: UserRole;
 }
 
 function GoogleIcon({ className = 'w-5 h-5' }: { className?: string }) {
@@ -52,6 +54,7 @@ export function LoginFormUI({
   resendSuccess,
   resendError,
   resetSuccess,
+  selectedRole,
 }: LoginFormUIProps) {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
@@ -169,6 +172,60 @@ export function LoginFormUI({
             </div>
           )}
 
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-slate-700 block">
+              {t('I am a')}
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label
+                htmlFor="role-student"
+                className={`relative flex items-center justify-center p-3 border rounded-xl cursor-pointer transition-all duration-200 ${
+                  errors.role
+                    ? 'border-red-300 bg-red-50'
+                    : 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
+                } group`}
+              >
+                <input
+                  type="radio"
+                  id="role-student"
+                  value={UserRole.LEARNER}
+                  {...register('role')}
+                  className="peer sr-only"
+                />
+                <div className="flex items-center gap-2 text-slate-600 peer-checked:text-indigo-600 font-medium">
+                  <BookOpen className="w-5 h-5" />
+                  <span>{t('Student')}</span>
+                </div>
+                <div className="absolute inset-0 border-2 border-transparent peer-checked:border-indigo-600 rounded-xl transition-all pointer-events-none"></div>
+              </label>
+
+              <label
+                htmlFor="role-instructor"
+                className={`relative flex items-center justify-center p-3 border rounded-xl cursor-pointer transition-all duration-200 ${
+                  errors.role
+                    ? 'border-red-300 bg-red-50'
+                    : 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50'
+                } group`}
+              >
+                <input
+                  type="radio"
+                  id="role-instructor"
+                  value={UserRole.INSTRUCTOR}
+                  {...register('role')}
+                  className="peer sr-only"
+                />
+                <div className="flex items-center gap-2 text-slate-600 peer-checked:text-indigo-600 font-medium">
+                  <GraduationCap className="w-5 h-5" />
+                  <span>{t('Instructor')}</span>
+                </div>
+                <div className="absolute inset-0 border-2 border-transparent peer-checked:border-indigo-600 rounded-xl transition-all pointer-events-none"></div>
+              </label>
+            </div>
+            {errors.role && (
+              <p className="text-xs text-red-500 mt-1">{errors.role.message?.toString()}</p>
+            )}
+          </div>
+
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-slate-700 block" htmlFor="email">
               {t('Email address')}
@@ -242,7 +299,7 @@ export function LoginFormUI({
             <div className="flex-grow border-t border-slate-200"></div>
           </div>
 
-          <SocialLoginWithPopup />
+          <SocialLoginWithPopup role={selectedRole} />
 
           <p className="text-sm text-center text-slate-500 pt-1">
             {t("Don't have an account?")}{' '}

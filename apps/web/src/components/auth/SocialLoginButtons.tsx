@@ -37,14 +37,14 @@ export function SocialLoginButtons({ role }: SocialLoginButtonsProps) {
   return (
     <div className="flex flex-col gap-3">
       <a
-        href={`${GOOGLE_AUTH_URL}?role=${role}`}
+        href={`${GOOGLE_AUTH_URL}?role=${role}&client=web`}
         className="flex items-center justify-center gap-3 w-full h-11 px-4 rounded-lg border border-[var(--sv-border)] bg-[var(--sv-bg-card)] text-[var(--sv-text-primary)] text-sm font-medium hover:bg-[var(--sv-surface-container-high)] transition-colors shadow-sm"
       >
         <GoogleIcon />
         {t('Continue with Google')}
       </a>
       <a
-        href={`${FACEBOOK_AUTH_URL}?role=${role}`}
+        href={`${FACEBOOK_AUTH_URL}?role=${role}&client=web`}
         className="flex items-center justify-center gap-3 w-full h-11 px-4 rounded-lg bg-[#1877F2] text-white text-sm font-medium hover:brightness-110 transition-all shadow-sm"
       >
         <FacebookIcon />

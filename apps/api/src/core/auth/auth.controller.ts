@@ -89,7 +89,7 @@ export class AuthController {
   @Get('google')
   @AuthSwagger.googleAuth()
   async googleAuth(@Query() query: OAuthInitDto, @Res() res: Response) {
-    const state = this.oauthStateStore.save(query.role);
+    const state = this.oauthStateStore.save(query.role, query.client);
     const config = this.configService.get('oauth.google') as {
       clientId: string;
       clientSecret: string;
@@ -108,11 +108,14 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   @AuthSwagger.googleAuthRedirect()
   async googleAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
-    const role = this.oauthStateStore.consume(state) ?? undefined;
+    const consumed = this.oauthStateStore.consume(state);
+    const role = consumed?.role;
+    const client = consumed?.client;
     const result = await this.socialAuthService.validateOrCreateUser(
       AuthProvider.GOOGLE,
       req.user,
       role,
+      client,
     );
     const origin = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
     return res.type('text/html').send(this.buildSuccessHtml(result, origin));
@@ -121,7 +124,7 @@ export class AuthController {
   @Get('facebook')
   @AuthSwagger.facebookAuth()
   async facebookAuth(@Query() query: OAuthInitDto, @Res() res: Response) {
-    const state = this.oauthStateStore.save(query.role);
+    const state = this.oauthStateStore.save(query.role, query.client);
     const config = this.configService.get('oauth.facebook') as {
       appId: string;
       appSecret: string;
@@ -140,11 +143,14 @@ export class AuthController {
   @UseGuards(AuthGuard('facebook'))
   @AuthSwagger.facebookAuthRedirect()
   async facebookAuthRedirect(@Req() req: any, @Res() res: Response, @Query('state') state: string) {
-    const role = this.oauthStateStore.consume(state) ?? undefined;
+    const consumed = this.oauthStateStore.consume(state);
+    const role = consumed?.role;
+    const client = consumed?.client;
     const result = await this.socialAuthService.validateOrCreateUser(
       AuthProvider.FACEBOOK,
       req.user,
       role,
+      client,
     );
     const origin = this.configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
     return res.type('text/html').send(this.buildSuccessHtml(result, origin));

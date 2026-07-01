@@ -14,6 +14,9 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     if (!user && !pathname.includes('/login') && !pathname.includes('/register')) {
       router.push('/login');
     }
+    if (user && user.role === 'learner') {
+      router.replace('/login?error=students_use_mobile');
+    }
     if (
       user &&
       user.role === 'instructor' &&

@@ -2,7 +2,8 @@ import { api } from './api';
 
 export const authApis = {
   login: async (data: any) => {
-    const response = await api.post('/auth/login', data);
+    const payload = { ...data, client: 'web' };
+    const response = await api.post('/auth/login', payload);
     return response.data;
   },
   register: async (data: any) => {

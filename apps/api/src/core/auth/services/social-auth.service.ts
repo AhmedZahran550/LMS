@@ -33,6 +33,7 @@ export class SocialAuthService {
     provider: AuthProvider,
     profile: SocialProfile,
     role?: string,
+    client?: string,
   ) {
     let user = await this.usersRepository.findOne({
       where: { provider, providerId: profile.id },
@@ -40,6 +41,9 @@ export class SocialAuthService {
     if (user) {
       if (!user.isActive) {
         throw new UnauthorizedException('Account is inactive');
+      }
+      if (client === 'web' && user.role === UserRole.LEARNER) {
+        throw new UnauthorizedException('error.students_use_mobile');
       }
       const tokens = await this.generateTokens(user);
       return { ...tokens, needsRole: false };
@@ -49,6 +53,9 @@ export class SocialAuthService {
     if (user) {
       if (!user.isActive) {
         throw new UnauthorizedException('Account is inactive');
+      }
+      if (client === 'web' && user.role === UserRole.LEARNER) {
+        throw new UnauthorizedException('error.students_use_mobile');
       }
       user.provider = provider;
       user.providerId = profile.id;
@@ -66,6 +73,9 @@ export class SocialAuthService {
       const validRoles = Object.values(UserRole) as string[];
       if (!validRoles.includes(role)) {
         throw new BadRequestException('Invalid role');
+      }
+      if (client === 'web' && role === UserRole.LEARNER) {
+        throw new UnauthorizedException('error.students_use_mobile');
       }
       const user = await this.createSocialUser(provider, profile, role as UserRole);
       const tokens = await this.generateTokens(user);

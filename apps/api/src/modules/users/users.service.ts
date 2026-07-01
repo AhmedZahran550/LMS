@@ -20,6 +20,9 @@ export const USER_PAGINATION_CONFIG: PaginateConfig<User> = {
   },
 };
 
+import { DeviceToken } from '../../db/entities/device-token.entity';
+import { DeviceInfo } from '../../core/auth/dto/login.dto';
+
 @Injectable()
 export class UsersService extends DBService<
   User,
@@ -29,8 +32,24 @@ export class UsersService extends DBService<
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(DeviceToken)
+    private readonly deviceTokenRepository: Repository<DeviceToken>,
   ) {
     super(usersRepository, USER_PAGINATION_CONFIG);
+  }
+
+  async upsertDeviceToken(userId: string, token: string, info?: DeviceInfo) {
+    let deviceToken = await this.deviceTokenRepository.findOne({
+      where: { user: { id: userId }, deviceToken: token },
+    });
+    if (!deviceToken) {
+      deviceToken = this.deviceTokenRepository.create({
+        user: { id: userId } as User,
+        deviceToken: token,
+      });
+    }
+    deviceToken.deviceInfo = info;
+    return this.deviceTokenRepository.save(deviceToken);
   }
 
   async findByEmail(email: string): Promise<User | null> {

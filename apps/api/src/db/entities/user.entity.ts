@@ -1,4 +1,5 @@
-import { Entity, Column, Unique } from 'typeorm';
+import { Entity, Column, Unique, OneToMany } from 'typeorm';
+import { DeviceToken } from './device-token.entity';
 import { UserRole, AuthProvider } from '@lms/shared-types';
 import { Exclude } from 'class-transformer';
 import { BaseEntity } from './base.entity';
@@ -68,4 +69,7 @@ export class User extends BaseEntity {
 
   @Column({ default: false })
   hasUsedFreePlan!: boolean;
+
+  @OneToMany(() => DeviceToken, (deviceToken) => deviceToken.user)
+  deviceTokens!: DeviceToken[];
 }

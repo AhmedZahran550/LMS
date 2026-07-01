@@ -83,7 +83,22 @@ export class AuthService {
       throw new UnauthorizedException('Account is inactive');
     }
 
-    return this.generateTokens(user);
+    if (loginDto.client === 'web' && user.role === 'learner') {
+      throw new UnauthorizedException('error.students_use_mobile');
+    }
+
+    const tokens = await this.generateTokens(user);
+
+    // Save device token if provided
+    if (loginDto.deviceToken) {
+      await this.usersService.upsertDeviceToken(
+        user.id,
+        loginDto.deviceToken,
+        loginDto.deviceInfo
+      );
+    }
+
+    return tokens;
   }
 
   async refresh(refreshTokenDto: RefreshTokenDto) {

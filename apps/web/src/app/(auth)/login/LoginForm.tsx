@@ -17,6 +17,7 @@ function getLoginSchema(t: (key: string) => string) {
   return z.object({
     email: z.string().min(1, t('Email is required')).email(t('Invalid email address')),
     password: z.string().min(1, t('Password is required')),
+    role: z.nativeEnum(UserRole),
   });
 }
 
@@ -28,7 +29,13 @@ export function LoginForm() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const loginMutation = useLoginMutation();
   const sendOtpMutation = useSendOtpMutation();
-  const [serverError, setServerError] = useState<{ message: string; code?: string } | null>(null);
+  const [serverError, setServerError] = useState<{ message: string; code?: string } | null>(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam === 'students_use_mobile') {
+      return { message: t('Students must use the mobile app to log in.') };
+    }
+    return null;
+  });
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
 
@@ -38,15 +45,27 @@ export function LoginForm() {
     register,
     handleSubmit,
     getValues,
+    watch,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      role: UserRole.INSTRUCTOR,
+    },
   });
+
+  const selectedRole = watch('role');
 
   const onSubmit = async (data: LoginFormData) => {
     setServerError(null);
     setResendSuccess(null);
     setResendError(null);
+    
+    if (data.role === UserRole.LEARNER) {
+      setServerError({ message: t('Students must use the mobile app to log in.') });
+      return;
+    }
+
     try {
       const response = await loginMutation.mutateAsync(data);
       const { user, accessToken, refreshToken } = response;
@@ -99,7 +118,9 @@ export function LoginForm() {
         }
       } else {
         setServerError({
-          message: data?.message || t('Login failed. Please check your credentials.'),
+          message: data?.message === 'error.students_use_mobile' 
+            ? t('Students must use the mobile app to log in.') 
+            : data?.message || t('Login failed. Please check your credentials.'),
           code: data?.errorCode,
         });
       }
@@ -135,6 +156,7 @@ export function LoginForm() {
       resendSuccess={resendSuccess}
       resendError={resendError}
       resetSuccess={resetSuccess}
+      selectedRole={selectedRole}
     />
   );
 }
