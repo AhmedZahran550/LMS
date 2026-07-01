@@ -148,7 +148,9 @@ export default function InstructorSubscriptionPage() {
                   <p className="text-sm text-[var(--sv-on-surface-variant)] mt-1 flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     {t("Expires on {{date}}", {
-                      date: new Date(sub.subscriptionEndDate).toLocaleDateString(),
+                      date: new Date(
+                        sub.subscriptionEndDate,
+                      ).toLocaleDateString(),
                     })}
                   </p>
                 )}
@@ -208,7 +210,10 @@ export default function InstructorSubscriptionPage() {
             {sub.storageAddons && sub.storageAddons.length > 0 ? (
               <div className="space-y-3">
                 {sub.storageAddons.map((addon: any) => (
-                  <div key={addon.id} className="flex justify-between items-center p-3 rounded-lg border border-[var(--sv-outline-variant)]">
+                  <div
+                    key={addon.id}
+                    className="flex justify-between items-center p-3 rounded-lg border border-[var(--sv-outline-variant)]"
+                  >
                     <div>
                       <p className="font-medium text-[var(--sv-on-surface)]">
                         + {formatBytes(parseInt(addon.additionalBytes, 10))}
@@ -219,7 +224,10 @@ export default function InstructorSubscriptionPage() {
                         })}
                       </p>
                     </div>
-                    <Badge variant="outline" className="text-[var(--sv-primary)] border-[var(--sv-primary)]/30">
+                    <Badge
+                      variant="outline"
+                      className="text-[var(--sv-primary)] border-[var(--sv-primary)]/30"
+                    >
                       {t("Active")}
                     </Badge>
                   </div>
@@ -239,66 +247,73 @@ export default function InstructorSubscriptionPage() {
           {t("Available Plans")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans?.filter((p: any) => !(p.name === SubscriptionPlanType.FREE && sub?.hasUsedFreePlan)).map((p: any) => {
-            const isCurrentPlan = sub?.plan === p.name;
-            const features = [
-              {
-                label: `${p.maxTotalStudents} ${t("students")} - ${p.currency?.toUpperCase() || "EGP"} ${p.pricePerStudent}/${t("student")}`,
-                included: true,
-              },
-              { label: t("Unlimited courses"), included: true },
-              {
-                label:
-                  p.baseStorageBytes === 0
-                    ? t("No storage")
-                    : t("Up to {{size}} storage", {
-                        size: formatBytes(p.baseStorageBytes),
-                      }),
-                included: true,
-              },
-              {
-                label: t("Purchase additional storage"),
-                included: p.name !== SubscriptionPlanType.FREE,
-              },
-              {
-                label: t("Priority support"),
-                included: p.name !== SubscriptionPlanType.FREE,
-              },
-              {
-                label: t("Custom branding"),
-                included:
-                  p.name === SubscriptionPlanType.PLUS ||
-                  p.name === SubscriptionPlanType.ENTERPRISE,
-              },
-            ];
+          {plans
+            ?.filter(
+              (p: any) =>
+                !(p.name === SubscriptionPlanType.FREE && sub?.hasUsedFreePlan),
+            )
+            .map((p: any) => {
+              const isCurrentPlan = sub?.plan === p.name;
+              const features = [
+                {
+                  label: `${p.maxTotalStudents} ${t("students")} - ${"EGP"} ${p.pricePerStudent}/${t("student")}`,
+                  included: true,
+                },
+                { label: t("Unlimited courses"), included: true },
+                {
+                  label:
+                    p.baseStorageBytes === 0
+                      ? t("No storage")
+                      : t("Up to {{size}} storage", {
+                          size: formatBytes(p.baseStorageBytes),
+                        }),
+                  included: true,
+                },
+                {
+                  label: t("Purchase additional storage"),
+                  included: p.name !== SubscriptionPlanType.FREE,
+                },
+                {
+                  label: t("Priority support"),
+                  included: p.name !== SubscriptionPlanType.FREE,
+                },
+                {
+                  label: t("Custom branding"),
+                  included:
+                    p.name === SubscriptionPlanType.PLUS ||
+                    p.name === SubscriptionPlanType.ENTERPRISE,
+                },
+              ];
 
-            return (
-              <PlanCard
-                key={p.id}
-                name={p.name}
-                price={p.price}
-                currency={p.currency}
-                description={p.description}
-                durationMonths={p.durationMonths}
-                features={features}
-                isCurrentPlan={isCurrentPlan}
-                isPopular={p.name === SubscriptionPlanType.PRO}
-                onSelect={
-                  isCurrentPlan ? undefined : () => handleUpgrade(p.name)
-                }
-                buttonLabel={
-                  p.price === 0 ? t("Downgrade to Free") : t("Upgrade")
-                }
-                isLoading={upgradingPlan === p.name}
-              />
-            );
-          })}
+              return (
+                <PlanCard
+                  key={p.id}
+                  name={p.name}
+                  price={p.price}
+                  currency={p.currency}
+                  description={p.description}
+                  durationMonths={p.durationMonths}
+                  features={features}
+                  isCurrentPlan={isCurrentPlan}
+                  isPopular={p.name === SubscriptionPlanType.PRO}
+                  onSelect={
+                    isCurrentPlan ? undefined : () => handleUpgrade(p.name)
+                  }
+                  buttonLabel={
+                    p.price === 0 ? t("Downgrade to Free") : t("Upgrade")
+                  }
+                  isLoading={upgradingPlan === p.name}
+                />
+              );
+            })}
         </div>
       </div>
-      <BuyStorageDialog 
-        open={buyStorageOpen} 
-        onOpenChange={setBuyStorageOpen} 
-        isPaidPlan={sub?.plan !== SubscriptionPlanType.FREE && sub?.plan !== null} 
+      <BuyStorageDialog
+        open={buyStorageOpen}
+        onOpenChange={setBuyStorageOpen}
+        isPaidPlan={
+          sub?.plan !== SubscriptionPlanType.FREE && sub?.plan !== null
+        }
       />
     </div>
   );
