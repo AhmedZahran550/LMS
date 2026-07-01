@@ -77,8 +77,6 @@ export default function InstructorCoursesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-courses'] });
-      const current = useAuthStore.getState().user?.subscription?.coursesCount || 0;
-      updateSubscription({ coursesCount: current + 1 });
       setIsCreating(false);
       reset();
     },

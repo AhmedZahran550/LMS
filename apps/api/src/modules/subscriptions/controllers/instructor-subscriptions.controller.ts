@@ -112,12 +112,12 @@ export class InstructorSubscriptionsController {
       return {
         plan: plan?.name || null,
         status: subscription.status,
-        coursesCount: 0,
         totalStudents: 0,
         totalStorageBytes: 0,
-        maxCourses: plan?.maxCourses || 0,
         maxTotalStudents: plan?.maxTotalStudents || 0,
-        maxStorageBytes: plan?.maxStorageBytes || 0,
+        pricePerStudent: plan?.pricePerStudent || 0,
+        baseStorageBytes: parseInt(plan?.baseStorageBytes || '0', 10),
+        totalAddonStorageBytes: 0,
       };
     }
 
@@ -147,23 +147,23 @@ export class InstructorSubscriptionsController {
       return {
         plan: null,
         status: null,
-        coursesCount: 0,
         totalStudents: 0,
         totalStorageBytes: 0,
-        maxCourses: 0,
         maxTotalStudents: 0,
-        maxStorageBytes: 0,
+        pricePerStudent: 0,
+        baseStorageBytes: 0,
+        totalAddonStorageBytes: 0,
       };
     }
     return {
       plan: usage.plan?.name || null,
       status: usage.subscription?.status || null,
-      coursesCount: usage.coursesCount,
       totalStudents: usage.totalStudents,
       totalStorageBytes: usage.totalStorageBytes,
-      maxCourses: usage.plan?.maxCourses || 0,
       maxTotalStudents: usage.plan?.maxTotalStudents || 0,
-      maxStorageBytes: usage.plan?.maxStorageBytes || 0,
+      pricePerStudent: usage.plan?.pricePerStudent || 0,
+      baseStorageBytes: usage.baseStorageBytes,
+      totalAddonStorageBytes: usage.totalAddonStorageBytes,
     };
   }
 

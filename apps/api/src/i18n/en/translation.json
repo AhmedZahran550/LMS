@@ -61,7 +61,7 @@
     "SUBSCRIPTION_NOT_FOUND": "No subscription found. Please choose a plan.",
     "SUBSCRIPTION_EXPIRED": "Your subscription has expired. Please renew.",
     "SUBSCRIPTION_INACTIVE": "Your subscription is inactive. Please renew.",
-    "COURSE_LIMIT_REACHED": "Course limit reached. Upgrade your plan.",
+    "COURSE_LIMIT_REACHED": "Courses are unlimited on your plan.",
     "STORAGE_LIMIT_REACHED": "Storage limit reached. Upgrade your plan.",
     "STUDENT_LIMIT_REACHED": "Student limit reached. Upgrade your plan.",
     "ACTIVE_SUBSCRIPTION_EXISTS": "You already have an active subscription."

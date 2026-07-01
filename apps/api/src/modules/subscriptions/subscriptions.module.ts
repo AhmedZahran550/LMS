@@ -5,9 +5,9 @@ import stripeConfig from '../../config/stripe.config';
 import { SubscriptionPlan } from '../../db/entities/subscription-plan.entity';
 import { InstructorSubscription } from '../../db/entities/instructor-subscription.entity';
 import { Payment } from '../../db/entities/payment.entity';
-import { Course } from '../../db/entities/course.entity';
 import { CourseContent } from '../../db/entities/course-content.entity';
-import { Enrollment } from '../../db/entities/enrollment.entity';
+import { StorageAddon } from '../../db/entities/storage-addon.entity';
+import { InstructorStudent } from '../../db/entities/instructor-student.entity';
 import { UsersModule } from '../users/users.module';
 import { MailModule } from '../mail/mail.module';
 import { SubscriptionService } from './services/subscription.service';
@@ -24,9 +24,8 @@ import { StripeWebhookController } from './controllers/stripe-webhook.controller
       SubscriptionPlan,
       InstructorSubscription,
       Payment,
-      Course,
       CourseContent,
-      Enrollment,
+      StorageAddon,
     ]),
     ConfigModule.forFeature(stripeConfig),
     UsersModule,

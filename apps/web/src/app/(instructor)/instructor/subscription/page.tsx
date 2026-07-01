@@ -21,6 +21,10 @@ function formatBytes(bytes: number): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
+function formatPrice(pricePerStudent: number): string {
+  return `$${(pricePerStudent / 100).toFixed(2)}`;
+}
+
 export default function InstructorSubscriptionPage() {
   const { t } = useTranslation();
   const { user, updateSubscription } = useAuthStore();
@@ -35,12 +39,12 @@ export default function InstructorSubscriptionPage() {
         updateSubscription({
           plan: usage.plan?.name || null,
           status: usage.subscription?.status || null,
-          coursesCount: usage.coursesCount,
           totalStudents: usage.totalStudents,
           totalStorageBytes: usage.totalStorageBytes,
-          maxCourses: usage.plan?.maxCourses || 0,
-          maxStudentsPerCourse: usage.plan?.maxStudentsPerCourse || 0,
-          maxStorageBytes: usage.plan?.maxStorageBytes || 0,
+          maxTotalStudents: usage.plan?.maxTotalStudents || 0,
+          pricePerStudent: usage.plan?.pricePerStudent || 0,
+          baseStorageBytes: usage.baseStorageBytes,
+          totalAddonStorageBytes: usage.totalAddonStorageBytes,
         });
       }).catch(() => {});
     }
@@ -139,19 +143,14 @@ export default function InstructorSubscriptionPage() {
 
             <div className="space-y-4">
               <UsageBar
-                label={t('Courses')}
-                current={sub.coursesCount}
-                max={sub.maxCourses}
-              />
-              <UsageBar
-                label={t('Students per Course')}
+                label={t('Students')}
                 current={sub.totalStudents}
-                max={sub.maxStudentsPerCourse}
+                max={sub.maxTotalStudents}
               />
               <UsageBar
                 label={t('Storage')}
                 current={parseFloat((sub.totalStorageBytes / (1024 * 1024 * 1024)).toFixed(1))}
-                max={sub.maxStorageBytes === 0 ? 0 : parseFloat((sub.maxStorageBytes / (1024 * 1024 * 1024)).toFixed(1))}
+                max={parseFloat((((sub.baseStorageBytes || 0) + (sub.totalAddonStorageBytes || 0)) / (1024 * 1024 * 1024)).toFixed(1))}
                 unit="GB"
               />
             </div>
@@ -165,12 +164,12 @@ export default function InstructorSubscriptionPage() {
           {plans?.map((p: any) => {
             const isCurrentPlan = sub?.plan === p.name;
             const features = [
-              { label: p.maxCourses === 0 ? t('Unlimited courses') : t('Up to {{count}} courses', { count: p.maxCourses }), included: true },
-              { label: p.maxStudentsPerCourse === 0 ? t('Unlimited students per course') : t('Up to {{count}} students per course', { count: p.maxStudentsPerCourse }), included: true },
-              { label: p.maxStorageBytes === 0 ? t('Unlimited storage') : t('Up to {{size}} storage', { size: formatBytes(p.maxStorageBytes) }), included: true },
-              { label: p.trialDays > 0 ? t('{{days}}-day free trial', { days: p.trialDays }) : t('No free trial'), included: true },
+              { label: `${p.maxTotalStudents} ${t('students')} - ${formatPrice(p.pricePerStudent)}/${t('student')}`, included: true },
+              { label: t('Unlimited courses'), included: true },
+              { label: p.baseStorageBytes === 0 ? t('No storage') : t('Up to {{size}} storage', { size: formatBytes(p.baseStorageBytes) }), included: true },
+              { label: t('Purchase additional storage'), included: p.name !== SubscriptionPlanType.FREE },
               { label: t('Priority support'), included: p.name !== SubscriptionPlanType.FREE },
-              { label: t('Custom branding'), included: p.name === SubscriptionPlanType.PLUS },
+              { label: t('Custom branding'), included: p.name === SubscriptionPlanType.PLUS || p.name === SubscriptionPlanType.ENTERPRISE },
             ];
 
             return (

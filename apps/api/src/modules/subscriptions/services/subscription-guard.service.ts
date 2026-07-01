@@ -7,13 +7,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriptionService } from './subscription.service';
-import { Course } from '../../../db/entities/course.entity';
 import { CourseContent } from '../../../db/entities/course-content.entity';
-import { Enrollment } from '../../../db/entities/enrollment.entity';
 import { InstructorStudent } from '../../../db/entities/instructor-student.entity';
+import { StorageAddon } from '../../../db/entities/storage-addon.entity';
 import {
   SubscriptionStatus,
-  EnrollmentStatus,
   InstructorStudentStatus,
 } from '@lms/shared-types';
 import { ErrorCodes } from '../../../core/utils/error-codes';
@@ -24,14 +22,12 @@ export class SubscriptionGuardService {
 
   constructor(
     private readonly subscriptionService: SubscriptionService,
-    @InjectRepository(Course)
-    private readonly courseRepository: Repository<Course>,
     @InjectRepository(CourseContent)
     private readonly contentRepository: Repository<CourseContent>,
-    @InjectRepository(Enrollment)
-    private readonly enrollmentRepository: Repository<Enrollment>,
     @InjectRepository(InstructorStudent)
     private readonly instructorStudentRepository: Repository<InstructorStudent>,
+    @InjectRepository(StorageAddon)
+    private readonly storageAddonRepository: Repository<StorageAddon>,
   ) {}
 
   private async getSubscriptionOrThrow(instructorId: string) {
@@ -67,19 +63,6 @@ export class SubscriptionGuardService {
         code: ErrorCodes.SUBSCRIPTION_INACTIVE,
       });
     }
-
-    const plan = subscription.plan;
-    if (plan.maxCourses > 0) {
-      const courseCount = await this.courseRepository.count({
-        where: { instructorId },
-      });
-      if (courseCount >= plan.maxCourses) {
-        throw new ForbiddenException({
-          message: `You have reached the maximum of ${plan.maxCourses} courses on your ${plan.name} plan. Upgrade to create more.`,
-          code: ErrorCodes.COURSE_LIMIT_REACHED,
-        });
-      }
-    }
   }
 
   async checkContentUpload(
@@ -106,7 +89,11 @@ export class SubscriptionGuardService {
     }
 
     const plan = subscription.plan;
-    if (plan.maxStorageBytes > 0) {
+    const baseStorage = BigInt(plan.baseStorageBytes || '0');
+    const addonStorage = await this.getActiveAddonStorage(subscription.id);
+    const effectiveStorage = baseStorage + addonStorage;
+
+    if (effectiveStorage > 0) {
       const storageResult = await this.contentRepository
         .createQueryBuilder('content')
         .select('COALESCE(SUM(content.size), 0)', 'total')
@@ -114,10 +101,10 @@ export class SubscriptionGuardService {
         .where('c.instructorId = :instructorId', { instructorId })
         .getRawOne();
 
-      const currentStorage = parseInt(storageResult?.total || '0', 10);
-      if (currentStorage + fileSize > plan.maxStorageBytes) {
+      const currentStorage = BigInt(storageResult?.total || '0');
+      if (currentStorage + BigInt(fileSize) > effectiveStorage) {
         throw new ForbiddenException({
-          message: `You have reached the storage limit of ${this.formatBytes(plan.maxStorageBytes)} on your ${plan.name} plan. Upgrade to upload more.`,
+          message: `You have reached the storage limit of ${this.formatBytes(Number(effectiveStorage))} on your ${plan.name} plan. Upgrade to upload more.`,
           code: ErrorCodes.STORAGE_LIMIT_REACHED,
         });
       }
@@ -157,6 +144,24 @@ export class SubscriptionGuardService {
         });
       }
     }
+  }
+
+  private async getActiveAddonStorage(subscriptionId: string): Promise<bigint> {
+    const addons = await this.storageAddonRepository.find({
+      where: {
+        instructorSubscriptionId: subscriptionId,
+        isActive: true,
+      },
+    });
+
+    const now = new Date();
+    let total = BigInt(0);
+    for (const addon of addons) {
+      if (!addon.endDate || addon.endDate > now) {
+        total += BigInt(addon.additionalBytes);
+      }
+    }
+    return total;
   }
 
   private formatBytes(bytes: number): string {

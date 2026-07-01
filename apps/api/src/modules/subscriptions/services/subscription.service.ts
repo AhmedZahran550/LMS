@@ -5,22 +5,19 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan, MoreThan } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ConfigType } from '@nestjs/config';
 import { Inject } from '@nestjs/common';
 import stripeConfig from '../../../config/stripe.config';
 import { SubscriptionPlan } from '../../../db/entities/subscription-plan.entity';
 import { InstructorSubscription } from '../../../db/entities/instructor-subscription.entity';
 import { Payment } from '../../../db/entities/payment.entity';
-import { User } from '../../../db/entities/user.entity';
-import { Course } from '../../../db/entities/course.entity';
 import { CourseContent } from '../../../db/entities/course-content.entity';
-import { Enrollment } from '../../../db/entities/enrollment.entity';
+import { StorageAddon } from '../../../db/entities/storage-addon.entity';
 import {
   SubscriptionPlanType,
   SubscriptionStatus,
   PaymentStatus,
-  EnrollmentStatus,
 } from '@lms/shared-types';
 
 @Injectable()
@@ -34,12 +31,10 @@ export class SubscriptionService {
     private readonly subscriptionRepository: Repository<InstructorSubscription>,
     @InjectRepository(Payment)
     private readonly paymentRepository: Repository<Payment>,
-    @InjectRepository(Course)
-    private readonly courseRepository: Repository<Course>,
     @InjectRepository(CourseContent)
     private readonly contentRepository: Repository<CourseContent>,
-    @InjectRepository(Enrollment)
-    private readonly enrollmentRepository: Repository<Enrollment>,
+    @InjectRepository(StorageAddon)
+    private readonly storageAddonRepository: Repository<StorageAddon>,
     @Inject(stripeConfig.KEY)
     private readonly stripeConf: ConfigType<typeof stripeConfig>,
   ) {}
@@ -171,31 +166,36 @@ export class SubscriptionService {
       return null;
     }
 
-    const [coursesCount, studentsResult, storageResult] = await Promise.all([
-      this.courseRepository.count({ where: { instructorId } }),
-      this.enrollmentRepository
-        .createQueryBuilder('e')
-        .select('COUNT(DISTINCT e.learnerId)', 'total')
-        .innerJoin('course', 'c', 'e.courseId = c.id')
-        .where('c.instructorId = :instructorId', { instructorId })
-        .andWhere('e.status = :status', {
-          status: EnrollmentStatus.APPROVED,
-        })
-        .getRawOne(),
+    const [storageResult, addonResult] = await Promise.all([
       this.contentRepository
         .createQueryBuilder('content')
         .select('COALESCE(SUM(content.size), 0)', 'total')
         .innerJoin('course', 'c', 'content.courseId = c.id')
         .where('c.instructorId = :instructorId', { instructorId })
         .getRawOne(),
+      this.storageAddonRepository
+        .createQueryBuilder('addon')
+        .select('COALESCE(SUM(addon.additionalBytes), 0)', 'total')
+        .where('addon.instructorSubscriptionId = :subId', {
+          subId: subscription.id,
+        })
+        .andWhere('addon.isActive = :isActive', { isActive: true })
+        .andWhere('(addon.endDate IS NULL OR addon.endDate > :now)', {
+          now: new Date(),
+        })
+        .getRawOne(),
     ]);
 
     return {
       plan: subscription.plan,
       subscription,
-      coursesCount,
-      totalStudents: parseInt(studentsResult?.total || '0', 10),
+      totalStudents: 0,
       totalStorageBytes: parseInt(storageResult?.total || '0', 10),
+      baseStorageBytes: parseInt(
+        subscription.plan?.baseStorageBytes || '0',
+        10,
+      ),
+      totalAddonStorageBytes: parseInt(addonResult?.total || '0', 10),
     };
   }
 
@@ -216,7 +216,7 @@ export class SubscriptionService {
       endDate = trialEndDate;
     } else {
       status = SubscriptionStatus.ACTIVE;
-      endDate = new Date(now.getTime() + 30 * 86400000);
+      endDate = new Date(now.getTime() + 180 * 86400000);
       trialEndDate = null;
     }
 
@@ -253,7 +253,7 @@ export class SubscriptionService {
       await this.subscriptionRepository.save(current);
     }
 
-    const endDate = new Date(now.getTime() + 30 * 86400000);
+    const endDate = new Date(now.getTime() + 180 * 86400000);
 
     const subscription = this.subscriptionRepository.create({
       instructorId,
@@ -314,7 +314,7 @@ export class SubscriptionService {
     if (!subscription) return;
 
     const now = new Date();
-    const endDate = new Date(now.getTime() + 30 * 86400000);
+    const endDate = new Date(now.getTime() + 180 * 86400000);
 
     subscription.status = SubscriptionStatus.ACTIVE;
     subscription.endDate = endDate;

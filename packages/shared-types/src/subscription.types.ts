@@ -6,9 +6,9 @@ export interface SubscriptionPlanDto {
   description: string;
   price: number;
   currency: string;
-  maxCourses: number;
   maxTotalStudents: number;
-  maxStorageBytes: number;
+  pricePerStudent: number;
+  baseStorageBytes: number;
   trialDays: number;
   stripePriceId: string | null;
   isActive: boolean;
@@ -43,7 +43,8 @@ export interface PaymentDto {
 export interface SubscriptionUsageDto {
   plan: SubscriptionPlanDto;
   subscription: InstructorSubscriptionDto;
-  coursesCount: number;
   totalStudents: number;
   totalStorageBytes: number;
+  baseStorageBytes: number;
+  totalAddonStorageBytes: number;
 }

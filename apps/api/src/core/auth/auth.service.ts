@@ -227,12 +227,12 @@ export class AuthService {
           subscription = {
             plan: usage.plan?.name || null,
             status: usage.subscription?.status || null,
-            coursesCount: usage.coursesCount,
             totalStudents: usage.totalStudents,
             totalStorageBytes: usage.totalStorageBytes,
-            maxCourses: usage.plan?.maxCourses || 0,
             maxTotalStudents: usage.plan?.maxTotalStudents || 0,
-            maxStorageBytes: usage.plan?.maxStorageBytes || 0,
+            pricePerStudent: usage.plan?.pricePerStudent || 0,
+            baseStorageBytes: usage.baseStorageBytes,
+            totalAddonStorageBytes: usage.totalAddonStorageBytes,
           };
         }
       } catch {

@@ -38,6 +38,7 @@ export enum SubscriptionPlanType {
   FREE = 'free',
   PRO = 'pro',
   PLUS = 'plus',
+  ENTERPRISE = 'enterprise',
 }
 
 export enum SubscriptionStatus {

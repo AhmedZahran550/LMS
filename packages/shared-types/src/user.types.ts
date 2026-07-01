@@ -8,12 +8,12 @@ export interface UserPreferences {
 export interface SubscriptionInfo {
   plan: string | null;
   status: string | null;
-  coursesCount: number;
   totalStudents: number;
   totalStorageBytes: number;
-  maxCourses: number;
-  maxStudentsPerCourse: number;
-  maxStorageBytes: number;
+  maxTotalStudents: number;
+  pricePerStudent: number;
+  baseStorageBytes: number;
+  totalAddonStorageBytes: number;
 }
 
 export interface UserProfile {

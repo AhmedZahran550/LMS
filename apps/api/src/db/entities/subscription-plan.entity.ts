@@ -1,4 +1,4 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { SubscriptionPlanType } from '@lms/shared-types';
 import { BaseEntity } from './base.entity';
 
@@ -21,13 +21,13 @@ export class SubscriptionPlan extends BaseEntity {
   currency!: string;
 
   @Column({ default: 0 })
-  maxCourses!: number;
-
-  @Column({ default: 0 })
   maxTotalStudents!: number;
 
+  @Column({ default: 0 })
+  pricePerStudent!: number;
+
   @Column({ type: 'bigint', default: 0 })
-  maxStorageBytes!: number;
+  baseStorageBytes!: string;
 
   @Column({ default: 0 })
   trialDays!: number;
@@ -37,4 +37,10 @@ export class SubscriptionPlan extends BaseEntity {
 
   @Column({ default: true })
   isActive!: boolean;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  computePrice() {
+    this.price = this.maxTotalStudents * this.pricePerStudent;
+  }
 }
