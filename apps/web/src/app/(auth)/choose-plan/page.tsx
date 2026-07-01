@@ -21,9 +21,6 @@ function formatBytes(bytes: number): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
-function formatPrice(pricePerStudent: number): string {
-  return `$${(pricePerStudent / 100).toFixed(2)}`;
-}
 
 export default function ChoosePlanPage() {
   const { t } = useTranslation();
@@ -122,7 +119,7 @@ export default function ChoosePlanPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {plans?.map((p: any) => {
               const features = [
-                { label: `${p.maxTotalStudents} ${t('students')} - ${formatPrice(p.pricePerStudent)}/${t('student')}`, included: true },
+                { label: `${p.maxTotalStudents} ${t('students')} - ${p.pricePerStudent} ${p.currency?.toUpperCase() || 'EGP'}/${t('student')}`, included: true },
                 { label: t('Unlimited courses'), included: true },
                 { label: p.baseStorageBytes === 0 ? t('No storage') : t('Up to {{size}} storage', { size: formatBytes(p.baseStorageBytes) }), included: true },
                 { label: p.trialDays > 0 ? t('{{days}}-day free trial', { days: p.trialDays }) : t('No free trial'), included: true },
