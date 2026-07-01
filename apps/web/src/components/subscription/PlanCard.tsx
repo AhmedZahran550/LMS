@@ -72,7 +72,7 @@ export function PlanCard({
         <span className="text-3xl font-black text-[var(--sv-on-surface)]">
           {price === 0
             ? t("Free")
-            : ` ${(price / durationMonths).toFixed(2)} ${currency === "usd" ? "$" : currency.toUpperCase()}`}
+            : ` ${(price / durationMonths).toFixed(2)} ${currency.toUpperCase()}`}
         </span>
         {price > 0 && (
           <span className="text-sm text-[var(--sv-on-surface-variant)] ml-1">
