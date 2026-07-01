@@ -79,6 +79,14 @@ export function PlanCard({
             {t("/month for {{months}} months", { months: durationMonths })}
           </span>
         )}
+        {price > 0 && (
+          <p className="text-sm text-[var(--sv-on-surface-variant)] mt-1">
+            {t("Total: {{currency}} {{total}}", {
+              currency: currency === "usd" ? "$" : currency.toUpperCase(),
+              total: price.toFixed(2),
+            })}
+          </p>
+        )}
       </div>
 
       <ul className="space-y-3 mb-8 flex-1">
