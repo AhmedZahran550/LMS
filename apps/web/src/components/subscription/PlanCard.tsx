@@ -72,7 +72,7 @@ export function PlanCard({
         <span className="text-3xl font-black text-[var(--sv-on-surface)]">
           {price === 0
             ? t("Free")
-            : `${currency === "usd" ? "$" : currency.toUpperCase()} ${(price / durationMonths).toFixed(2)}`}
+            : ` ${(price / durationMonths).toFixed(2)} ${currency === "usd" ? "$" : currency.toUpperCase()}`}
         </span>
         {price > 0 && (
           <span className="text-sm text-[var(--sv-on-surface-variant)] ml-1">
@@ -81,7 +81,7 @@ export function PlanCard({
         )}
         {price > 0 && (
           <p className="text-sm text-[var(--sv-on-surface-variant)] mt-1">
-            {t("Total: {{currency}} {{total}}", {
+            {t("Total: {{total}} {{currency}}", {
               currency: currency === "usd" ? "$" : currency.toUpperCase(),
               total: price.toFixed(2),
             })}

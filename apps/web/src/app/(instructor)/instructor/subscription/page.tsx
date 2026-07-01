@@ -256,7 +256,7 @@ export default function InstructorSubscriptionPage() {
               const isCurrentPlan = sub?.plan === p.name;
               const features = [
                 {
-                  label: `${p.maxTotalStudents} ${t("students")} - ${"EGP"} ${p.pricePerStudent}/${t("student")}`,
+                  label: `${p.maxTotalStudents} ${t("students")} - ${p.pricePerStudent} ${p.currency.toUpperCase() || "EGP"}/${t("student")}`,
                   included: true,
                 },
                 { label: t("Unlimited courses"), included: true },
