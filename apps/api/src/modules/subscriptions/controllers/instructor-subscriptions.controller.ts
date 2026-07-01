@@ -177,7 +177,7 @@ export class InstructorSubscriptionsController {
         baseStorageBytes: 0,
         totalAddonStorageBytes: 0,
         totalCourses: 0,
-        hasUsedFreePlan: usage?.hasUsedFreePlan || false,
+        hasUsedFreePlan: false,
         storageAddons: [],
         subscriptionEndDate: null,
       };
