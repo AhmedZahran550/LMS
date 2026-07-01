@@ -1,28 +1,24 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { subscriptionApis } from '@/lib/subscriptionApis';
-import { PlanCard } from '@/components/subscription/PlanCard';
-import { UsageBar } from '@/components/subscription/UsageBar';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { CreditCard, AlertCircle, Calendar } from 'lucide-react';
-import { SubscriptionPlanType, SubscriptionStatus } from '@lms/shared-types';
-import { useAuthStore } from '@/store/useAuthStore';
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { subscriptionApis } from "@/lib/subscriptionApis";
+import { PlanCard } from "@/components/subscription/PlanCard";
+import { UsageBar } from "@/components/subscription/UsageBar";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { CreditCard, AlertCircle, Calendar } from "lucide-react";
+import { SubscriptionPlanType, SubscriptionStatus } from "@lms/shared-types";
+import { useAuthStore } from "@/store/useAuthStore";
 
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-}
-
-function formatPrice(pricePerStudent: number): string {
-  return `$${(pricePerStudent / 100).toFixed(2)}`;
 }
 
 export default function InstructorSubscriptionPage() {
@@ -34,24 +30,27 @@ export default function InstructorSubscriptionPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('success') === 'true') {
-      subscriptionApis.getMySubscription().then(usage => {
-        updateSubscription({
-          plan: usage.plan?.name || null,
-          status: usage.subscription?.status || null,
-          totalStudents: usage.totalStudents,
-          totalStorageBytes: usage.totalStorageBytes,
-          maxTotalStudents: usage.plan?.maxTotalStudents || 0,
-          pricePerStudent: usage.plan?.pricePerStudent || 0,
-          baseStorageBytes: usage.baseStorageBytes,
-          totalAddonStorageBytes: usage.totalAddonStorageBytes,
-        });
-      }).catch(() => {});
+    if (params.get("success") === "true") {
+      subscriptionApis
+        .getMySubscription()
+        .then((usage) => {
+          updateSubscription({
+            plan: usage.plan?.name || null,
+            status: usage.subscription?.status || null,
+            totalStudents: usage.totalStudents,
+            totalStorageBytes: usage.totalStorageBytes,
+            maxTotalStudents: usage.plan?.maxTotalStudents || 0,
+            pricePerStudent: usage.plan?.pricePerStudent || 0,
+            baseStorageBytes: usage.baseStorageBytes,
+            totalAddonStorageBytes: usage.totalAddonStorageBytes,
+          });
+        })
+        .catch(() => {});
     }
   }, [updateSubscription]);
 
   const { data: plans } = useQuery({
-    queryKey: ['subscription-plans'],
+    queryKey: ["subscription-plans"],
     queryFn: () => subscriptionApis.getPlans(),
   });
 
@@ -84,15 +83,15 @@ export default function InstructorSubscriptionPage() {
 
   const getStatusBadge = (status: string | null | undefined) => {
     const variants: Record<string, string> = {
-      [SubscriptionStatus.TRIALING]: 'secondary',
-      [SubscriptionStatus.ACTIVE]: 'default',
-      [SubscriptionStatus.PAST_DUE]: 'destructive',
-      [SubscriptionStatus.CANCELLED]: 'outline',
-      [SubscriptionStatus.EXPIRED]: 'destructive',
+      [SubscriptionStatus.TRIALING]: "secondary",
+      [SubscriptionStatus.ACTIVE]: "default",
+      [SubscriptionStatus.PAST_DUE]: "destructive",
+      [SubscriptionStatus.CANCELLED]: "outline",
+      [SubscriptionStatus.EXPIRED]: "destructive",
     };
-    const s = status || 'inactive';
+    const s = status || "inactive";
     return (
-      <Badge variant={(variants[s] || 'outline') as any}>
+      <Badge variant={(variants[s] || "outline") as any}>
         {t(s.charAt(0).toUpperCase() + s.slice(1))}
       </Badge>
     );
@@ -104,14 +103,22 @@ export default function InstructorSubscriptionPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--sv-on-surface)]">{t('Subscription')}</h1>
-        <p className="text-[var(--sv-on-surface-variant)] mt-1">{t('Manage your plan and billing')}</p>
+        <h1 className="text-2xl font-bold text-[var(--sv-on-surface)]">
+          {t("Subscription")}
+        </h1>
+        <p className="text-[var(--sv-on-surface-variant)] mt-1">
+          {t("Manage your plan and billing")}
+        </p>
       </div>
 
       {isExpired && (
         <div className="flex items-center gap-3 p-4 rounded-lg bg-[var(--sv-error)]/10 border border-[var(--sv-error)]/20 text-[var(--sv-error)]">
           <AlertCircle className="h-5 w-5 flex-shrink-0" />
-          <p className="text-sm font-medium">{t('Your subscription has expired. Upgrade to continue creating courses and accepting students.')}</p>
+          <p className="text-sm font-medium">
+            {t(
+              "Your subscription has expired. Upgrade to continue creating courses and accepting students.",
+            )}
+          </p>
         </div>
       )}
 
@@ -119,7 +126,7 @@ export default function InstructorSubscriptionPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>{t('Current Plan')}</CardTitle>
+              <CardTitle>{t("Current Plan")}</CardTitle>
               <div className="flex items-center gap-3">
                 {getStatusBadge(sub.status)}
               </div>
@@ -128,7 +135,9 @@ export default function InstructorSubscriptionPage() {
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold text-[var(--sv-on-surface)] capitalize">{t('{{plan}} Plan', { plan: sub.plan || 'Free' })}</h3>
+                <h3 className="text-xl font-bold text-[var(--sv-on-surface)] capitalize">
+                  {t("{{plan}} Plan", { plan: sub.plan || "Free" })}
+                </h3>
               </div>
               <Button
                 variant="outline"
@@ -137,20 +146,28 @@ export default function InstructorSubscriptionPage() {
                 isLoading={portalMutation.isPending}
               >
                 <CreditCard className="h-4 w-4 mr-2" />
-                {t('Manage Billing')}
+                {t("Manage Billing")}
               </Button>
             </div>
 
             <div className="space-y-4">
               <UsageBar
-                label={t('Students')}
+                label={t("Students")}
                 current={sub.totalStudents}
                 max={sub.maxTotalStudents}
               />
               <UsageBar
-                label={t('Storage')}
-                current={parseFloat((sub.totalStorageBytes / (1024 * 1024 * 1024)).toFixed(1))}
-                max={parseFloat((((sub.baseStorageBytes || 0) + (sub.totalAddonStorageBytes || 0)) / (1024 * 1024 * 1024)).toFixed(1))}
+                label={t("Storage")}
+                current={parseFloat(
+                  (sub.totalStorageBytes / (1024 * 1024 * 1024)).toFixed(1),
+                )}
+                max={parseFloat(
+                  (
+                    ((sub.baseStorageBytes || 0) +
+                      (sub.totalAddonStorageBytes || 0)) /
+                    (1024 * 1024 * 1024)
+                  ).toFixed(1),
+                )}
                 unit="GB"
               />
             </div>
@@ -159,17 +176,41 @@ export default function InstructorSubscriptionPage() {
       )}
 
       <div>
-        <h2 className="text-xl font-bold text-[var(--sv-on-surface)] mb-4">{t('Available Plans')}</h2>
+        <h2 className="text-xl font-bold text-[var(--sv-on-surface)] mb-4">
+          {t("Available Plans")}
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans?.map((p: any) => {
             const isCurrentPlan = sub?.plan === p.name;
             const features = [
-              { label: `${p.maxTotalStudents} ${t('students')} - ${formatPrice(p.pricePerStudent)}/${t('student')}`, included: true },
-              { label: t('Unlimited courses'), included: true },
-              { label: p.baseStorageBytes === 0 ? t('No storage') : t('Up to {{size}} storage', { size: formatBytes(p.baseStorageBytes) }), included: true },
-              { label: t('Purchase additional storage'), included: p.name !== SubscriptionPlanType.FREE },
-              { label: t('Priority support'), included: p.name !== SubscriptionPlanType.FREE },
-              { label: t('Custom branding'), included: p.name === SubscriptionPlanType.PLUS || p.name === SubscriptionPlanType.ENTERPRISE },
+              {
+                label: `${p.maxTotalStudents} ${t("students")} - ${p.pricePerStudent}/${t("student")}`,
+                included: true,
+              },
+              { label: t("Unlimited courses"), included: true },
+              {
+                label:
+                  p.baseStorageBytes === 0
+                    ? t("No storage")
+                    : t("Up to {{size}} storage", {
+                        size: formatBytes(p.baseStorageBytes),
+                      }),
+                included: true,
+              },
+              {
+                label: t("Purchase additional storage"),
+                included: p.name !== SubscriptionPlanType.FREE,
+              },
+              {
+                label: t("Priority support"),
+                included: p.name !== SubscriptionPlanType.FREE,
+              },
+              {
+                label: t("Custom branding"),
+                included:
+                  p.name === SubscriptionPlanType.PLUS ||
+                  p.name === SubscriptionPlanType.ENTERPRISE,
+              },
             ];
 
             return (
@@ -182,8 +223,12 @@ export default function InstructorSubscriptionPage() {
                 features={features}
                 isCurrentPlan={isCurrentPlan}
                 isPopular={p.name === SubscriptionPlanType.PRO}
-                onSelect={isCurrentPlan ? undefined : () => handleUpgrade(p.name)}
-                buttonLabel={p.price === 0 ? t('Downgrade to Free') : t('Upgrade')}
+                onSelect={
+                  isCurrentPlan ? undefined : () => handleUpgrade(p.name)
+                }
+                buttonLabel={
+                  p.price === 0 ? t("Downgrade to Free") : t("Upgrade")
+                }
                 isLoading={upgradingPlan === p.name}
               />
             );

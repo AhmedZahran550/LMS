@@ -2,6 +2,7 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class UpdatePlanPricing1783000000000 implements MigrationInterface {
     name = 'UpdatePlanPricing1783000000000'
+    transaction = false;
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TYPE "public"."subscription_plan_name_enum" ADD VALUE 'enterprise'`);
