@@ -4,11 +4,13 @@ import { CourseAssignment } from '../../db/entities/course-assignment.entity';
 import { CourseAssignmentsService } from './services/course-assignments.service';
 import { CourseAssignmentsController } from './controllers/course-assignments.controller';
 import { CoursesModule } from '../courses/courses.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([CourseAssignment]),
     CoursesModule,
+    MailModule,
   ],
   controllers: [CourseAssignmentsController],
   providers: [CourseAssignmentsService],

@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InstructorStudent } from '../../db/entities/instructor-student.entity';
 import { CourseAssignment } from '../../db/entities/course-assignment.entity';
+import { Course } from '../../db/entities/course.entity';
 import { User } from '../../db/entities/user.entity';
 import { InstructorStudentsService } from './services/instructor-students.service';
 import { InstructorStudentsController } from './controllers/instructor-students.controller';
@@ -16,7 +17,7 @@ import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([InstructorStudent, CourseAssignment, User]),
+    TypeOrmModule.forFeature([InstructorStudent, CourseAssignment, Course, User]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({

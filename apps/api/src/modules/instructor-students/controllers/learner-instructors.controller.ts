@@ -43,4 +43,13 @@ export class StudentInstructorsController {
     const instructors = await this.service.getMyInstructors(studentId);
     return { success: true, data: instructors };
   }
+
+  @Get('my-instructors/:instructorId/courses')
+  async getInstructorCourses(
+    @CurrentUser('id') studentId: string,
+    @Param('instructorId') instructorId: string,
+  ) {
+    const courses = await this.service.getInstructorCourses(studentId, instructorId);
+    return { success: true, data: courses };
+  }
 }

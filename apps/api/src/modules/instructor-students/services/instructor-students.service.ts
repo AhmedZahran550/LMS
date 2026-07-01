@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { I18nService } from 'nestjs-i18n';
 import { InstructorStudent } from '../../../db/entities/instructor-student.entity';
 import { User } from '../../../db/entities/user.entity';
+import { Course } from '../../../db/entities/course.entity';
 import { MailService } from '../../mail/mail.service';
 import { InstructorStudentStatus, InvitedBy, UserRole } from '@lms/shared-types';
 import { InviteStudentDto } from '../dto/invite-student.dto';
@@ -17,6 +18,8 @@ export class InstructorStudentsService {
     private readonly instructorStudentRepo: Repository<InstructorStudent>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @InjectRepository(Course)
+    private readonly courseRepo: Repository<Course>,
     private readonly jwtService: JwtService,
     private readonly i18n: I18nService,
     private readonly mailService: MailService,
@@ -51,7 +54,7 @@ export class InstructorStudentsService {
 
     const saved = await this.instructorStudentRepo.save(link);
 
-    const acceptUrl = `${process.env.APP_URL}/learner/invitations/accept?token=${token}`;
+    const acceptUrl = `${process.env.APP_URL}/invitations/accept?token=${token}`;
     await this.mailService.sendStudentInvitation(
       dto.email,
       instructor ? `${instructor.firstName} ${instructor.lastName}` : 'An instructor',
@@ -191,9 +194,48 @@ export class InstructorStudentsService {
     }));
   }
 
+  async getInstructorCourses(studentId: string, instructorId: string) {
+    const link = await this.instructorStudentRepo.findOne({
+      where: { studentId, instructorId, status: InstructorStudentStatus.ACTIVE },
+    });
+    if (!link) throw new NotFoundException();
+
+    const courses = await this.courseRepo.find({
+      where: { instructorId },
+      order: { createdAt: 'DESC' },
+    });
+
+    return courses.map((c) => ({
+      id: c.id,
+      title: c.title,
+      description: c.description,
+      thumbnailUrl: c.thumbnailUrl,
+      visibility: c.visibility,
+    }));
+  }
+
   async getStudentCount(instructorId: string): Promise<number> {
     return this.instructorStudentRepo.count({
       where: { instructorId, status: InstructorStudentStatus.ACTIVE },
     });
+  }
+
+  async getInvitationInfo(token: string) {
+    let payload: { instructorId: string; email: string };
+    try {
+      payload = this.jwtService.verify(token);
+    } catch {
+      throw new ForbiddenException(this.i18n.t('errors.INVALID_INVITATION_TOKEN'));
+    }
+
+    const instructor = await this.userRepo.findOne({ where: { id: payload.instructorId } });
+    if (!instructor) throw new NotFoundException();
+
+    return {
+      instructorName: `${instructor.firstName} ${instructor.lastName}`,
+      instructorEmail: instructor.email,
+      instructorProfileImageUrl: instructor.profileImageUrl,
+      studentEmail: payload.email,
+    };
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, Redirect } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { InstructorStudentsService } from '../services/instructor-students.service';
@@ -14,5 +14,11 @@ export class LearnerInvitationsController {
   async accept(@CurrentUser('id') userId: string, @Query('token') token: string) {
     const link = await this.service.acceptInvitation(token, userId);
     return { success: true, data: { id: link.id, status: link.status } };
+  }
+
+  @Get('info')
+  async getInfo(@Query('token') token: string) {
+    const info = await this.service.getInvitationInfo(token);
+    return { success: true, data: info };
   }
 }

@@ -107,4 +107,18 @@ export class MailService {
       context: { instructorName, acceptUrl, appName: getAppName(locale) },
     });
   }
+
+  async sendCourseAssignment(to: string, studentName: string, instructorName: string, courseNames: string[], locale: string = 'en') {
+    await this.mailProvider.sendMail({
+      to,
+      subject: `You've been assigned to courses by ${instructorName}`,
+      template: `course-assignment-${locale}`,
+      context: {
+        studentName,
+        instructorName,
+        courseNames: courseNames.join(', '),
+        appName: getAppName(locale),
+      },
+    });
+  }
 }
