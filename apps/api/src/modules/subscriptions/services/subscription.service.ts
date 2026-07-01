@@ -13,7 +13,9 @@ import { SubscriptionPlan } from '../../../db/entities/subscription-plan.entity'
 import { InstructorSubscription } from '../../../db/entities/instructor-subscription.entity';
 import { Payment } from '../../../db/entities/payment.entity';
 import { CourseContent } from '../../../db/entities/course-content.entity';
+import { Course } from '../../../db/entities/course.entity';
 import { StorageAddon } from '../../../db/entities/storage-addon.entity';
+import { User } from '../../../db/entities/user.entity';
 import {
   SubscriptionPlanType,
   SubscriptionStatus,
@@ -35,6 +37,8 @@ export class SubscriptionService {
     private readonly contentRepository: Repository<CourseContent>,
     @InjectRepository(StorageAddon)
     private readonly storageAddonRepository: Repository<StorageAddon>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @Inject(stripeConfig.KEY)
     private readonly stripeConf: ConfigType<typeof stripeConfig>,
   ) {}
@@ -88,9 +92,15 @@ export class SubscriptionService {
       return existing;
     }
 
+    const user = await this.userRepository.findOne({ where: { id: instructorId } });
+    if (!user) throw new NotFoundException('User not found');
+    if (user.hasUsedFreePlan) {
+      throw new BadRequestException('Free plan can only be used once.');
+    }
+
     const freePlan = await this.getFreePlan();
     const now = new Date();
-    const trialEnd = new Date(now.getTime() + freePlan.trialDays * 86400000);
+    const trialEnd = new Date(now.getTime() + freePlan.durationDays * 86400000);
 
     const subscription = this.subscriptionRepository.create({
       instructorId,
@@ -103,6 +113,10 @@ export class SubscriptionService {
     });
 
     const saved = await this.subscriptionRepository.save(subscription);
+    
+    user.hasUsedFreePlan = true;
+    await this.userRepository.save(user);
+
     saved.plan = freePlan;
     return saved;
   }
@@ -161,9 +175,13 @@ export class SubscriptionService {
   }
 
   async getUsage(instructorId: string) {
+    const user = await this.userRepository.findOne({ where: { id: instructorId } });
     const subscription = await this.getActiveSubscription(instructorId);
+    
     if (!subscription) {
-      return null;
+      return {
+        hasUsedFreePlan: user?.hasUsedFreePlan || false,
+      };
     }
 
     const [storageResult, addonResult] = await Promise.all([
@@ -186,17 +204,58 @@ export class SubscriptionService {
         .getRawOne(),
     ]);
 
+    const activeAddons = await this.getStorageAddons(instructorId);
+    const totalCourses = await this.contentRepository.manager.count(Course, { where: { instructorId } });
+
     return {
       plan: subscription.plan,
       subscription,
+      subscriptionEndDate: subscription.endDate,
       totalStudents: 0,
+      totalCourses,
       totalStorageBytes: parseInt(storageResult?.total || '0', 10),
       baseStorageBytes: parseInt(
         subscription.plan?.baseStorageBytes || '0',
         10,
       ),
       totalAddonStorageBytes: parseInt(addonResult?.total || '0', 10),
+      storageAddons: activeAddons,
+      hasUsedFreePlan: user?.hasUsedFreePlan || false,
     };
+  }
+
+  async getStorageAddons(instructorId: string) {
+    const subscription = await this.getActiveSubscription(instructorId);
+    if (!subscription) return [];
+    
+    return this.storageAddonRepository.find({
+      where: {
+        instructorSubscriptionId: subscription.id,
+        isActive: true,
+      },
+      order: { endDate: 'ASC' },
+    });
+  }
+
+  async createStorageAddon(instructorId: string): Promise<StorageAddon> {
+    const subscription = await this.getActiveSubscription(instructorId);
+    if (!subscription) {
+      throw new BadRequestException('No active subscription found');
+    }
+    
+    const now = new Date();
+    // 6 months duration = 180 days
+    const endDate = new Date(now.getTime() + 180 * 86400000);
+
+    const addon = this.storageAddonRepository.create({
+      instructorSubscriptionId: subscription.id,
+      additionalBytes: '10737418240', // 10 GB
+      startDate: now,
+      endDate,
+      isActive: true,
+    });
+    
+    return this.storageAddonRepository.save(addon);
   }
 
   async createSubscription(
@@ -211,12 +270,16 @@ export class SubscriptionService {
     let trialEndDate: Date | null;
 
     if (planType === SubscriptionPlanType.FREE) {
+      const user = await this.userRepository.findOne({ where: { id: instructorId } });
+      if (user?.hasUsedFreePlan) {
+        throw new BadRequestException('Free plan can only be used once.');
+      }
       status = SubscriptionStatus.TRIALING;
-      trialEndDate = new Date(now.getTime() + plan.trialDays * 86400000);
+      trialEndDate = new Date(now.getTime() + plan.durationDays * 86400000);
       endDate = trialEndDate;
     } else {
       status = SubscriptionStatus.ACTIVE;
-      endDate = new Date(now.getTime() + 180 * 86400000);
+      endDate = new Date(now.getTime() + plan.durationDays * 86400000);
       trialEndDate = null;
     }
 
@@ -231,6 +294,15 @@ export class SubscriptionService {
     });
 
     const saved = await this.subscriptionRepository.save(subscription);
+    
+    if (planType === SubscriptionPlanType.FREE) {
+      const user = await this.userRepository.findOne({ where: { id: instructorId } });
+      if (user) {
+        user.hasUsedFreePlan = true;
+        await this.userRepository.save(user);
+      }
+    }
+
     saved.plan = plan;
     return saved;
   }
@@ -253,7 +325,7 @@ export class SubscriptionService {
       await this.subscriptionRepository.save(current);
     }
 
-    const endDate = new Date(now.getTime() + 180 * 86400000);
+    const endDate = new Date(now.getTime() + plan.durationDays * 86400000);
 
     const subscription = this.subscriptionRepository.create({
       instructorId,
@@ -314,6 +386,7 @@ export class SubscriptionService {
     if (!subscription) return;
 
     const now = new Date();
+    // Default to 180 days if plan not easily loaded, or load plan:
     const endDate = new Date(now.getTime() + 180 * 86400000);
 
     subscription.status = SubscriptionStatus.ACTIVE;

@@ -5,4 +5,5 @@ export default registerAs("stripe", () => ({
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "placeholder",
   pricePro: process.env.STRIPE_PRICE_PRO || "placeholder",
   pricePlus: process.env.STRIPE_PRICE_PLUS || "placeholder",
+  priceStorageAddon: process.env.STRIPE_PRICE_STORAGE_ADDON || "placeholder",
 }));

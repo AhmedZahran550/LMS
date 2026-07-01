@@ -139,6 +139,29 @@ export class InstructorSubscriptionsController {
     return { url: session.url };
   }
 
+  @Post('storage')
+  @SubscriptionsSwagger.buyStorage()
+  async buyStorage(@CurrentUser() user: any, @Req() req: Request) {
+    const frontendUrl = process.env.FRONTEND_URL || process.env.WEB_URL || 'http://localhost:3000';
+    const successUrl = `${frontendUrl}/instructor/subscription?success=true`;
+    const cancelUrl = `${frontendUrl}/instructor/subscription?cancelled=true`;
+
+    const session = await this.stripeService.createStorageCheckoutSession(
+      user.id,
+      user.email,
+      successUrl,
+      cancelUrl,
+    );
+
+    return { url: session.url };
+  }
+
+  @Get('storage')
+  @SubscriptionsSwagger.getStorageAddons()
+  async getStorageAddons(@CurrentUser() user: any) {
+    return this.subscriptionService.getStorageAddons(user.id);
+  }
+
   @Post('refresh-subscription')
   @SubscriptionsSwagger.refreshSubscription()
   async refreshSubscription(@CurrentUser() user: any) {
@@ -153,6 +176,10 @@ export class InstructorSubscriptionsController {
         pricePerStudent: 0,
         baseStorageBytes: 0,
         totalAddonStorageBytes: 0,
+        totalCourses: 0,
+        hasUsedFreePlan: usage?.hasUsedFreePlan || false,
+        storageAddons: [],
+        subscriptionEndDate: null,
       };
     }
     return {
@@ -164,6 +191,10 @@ export class InstructorSubscriptionsController {
       pricePerStudent: usage.plan?.pricePerStudent || 0,
       baseStorageBytes: usage.baseStorageBytes,
       totalAddonStorageBytes: usage.totalAddonStorageBytes,
+      totalCourses: usage.totalCourses,
+      hasUsedFreePlan: usage.hasUsedFreePlan,
+      storageAddons: usage.storageAddons || [],
+      subscriptionEndDate: usage.subscriptionEndDate || null,
     };
   }
 

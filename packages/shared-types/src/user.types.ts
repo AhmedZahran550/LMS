@@ -14,6 +14,10 @@ export interface SubscriptionInfo {
   pricePerStudent: number;
   baseStorageBytes: number;
   totalAddonStorageBytes: number;
+  totalCourses: number;
+  hasUsedFreePlan: boolean;
+  storageAddons: any[];
+  subscriptionEndDate: string | Date | null;
 }
 
 export interface UserProfile {

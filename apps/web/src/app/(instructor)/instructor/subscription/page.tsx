@@ -6,6 +6,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { subscriptionApis } from "@/lib/subscriptionApis";
 import { PlanCard } from "@/components/subscription/PlanCard";
 import { UsageBar } from "@/components/subscription/UsageBar";
+import { BuyStorageDialog } from "@/components/subscription/BuyStorageDialog";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -25,6 +26,7 @@ export default function InstructorSubscriptionPage() {
   const { t } = useTranslation();
   const { user, updateSubscription } = useAuthStore();
   const [upgradingPlan, setUpgradingPlan] = useState<string | null>(null);
+  const [buyStorageOpen, setBuyStorageOpen] = useState(false);
 
   const sub = user?.subscription;
 
@@ -43,6 +45,10 @@ export default function InstructorSubscriptionPage() {
             pricePerStudent: usage.plan?.pricePerStudent || 0,
             baseStorageBytes: usage.baseStorageBytes,
             totalAddonStorageBytes: usage.totalAddonStorageBytes,
+            totalCourses: usage.totalCourses,
+            hasUsedFreePlan: usage.hasUsedFreePlan,
+            storageAddons: usage.storageAddons,
+            subscriptionEndDate: usage.subscriptionEndDate,
           });
         })
         .catch(() => {});
@@ -138,6 +144,14 @@ export default function InstructorSubscriptionPage() {
                 <h3 className="text-xl font-bold text-[var(--sv-on-surface)] capitalize">
                   {t("{{plan}} Plan", { plan: sub.plan || "Free" })}
                 </h3>
+                {sub.subscriptionEndDate && (
+                  <p className="text-sm text-[var(--sv-on-surface-variant)] mt-1 flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {t("Expires on {{date}}", {
+                      date: new Date(sub.subscriptionEndDate).toLocaleDateString(),
+                    })}
+                  </p>
+                )}
               </div>
               <Button
                 variant="outline"
@@ -175,12 +189,57 @@ export default function InstructorSubscriptionPage() {
         </Card>
       )}
 
+      {sub && sub.plan !== SubscriptionPlanType.FREE && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>{t("Storage Add-ons")}</CardTitle>
+                <p className="text-sm text-[var(--sv-on-surface-variant)] mt-1">
+                  {t("Expand your storage capacity")}
+                </p>
+              </div>
+              <Button onClick={() => setBuyStorageOpen(true)}>
+                {t("Buy Storage")}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {sub.storageAddons && sub.storageAddons.length > 0 ? (
+              <div className="space-y-3">
+                {sub.storageAddons.map((addon: any) => (
+                  <div key={addon.id} className="flex justify-between items-center p-3 rounded-lg border border-[var(--sv-outline-variant)]">
+                    <div>
+                      <p className="font-medium text-[var(--sv-on-surface)]">
+                        + {formatBytes(parseInt(addon.additionalBytes, 10))}
+                      </p>
+                      <p className="text-sm text-[var(--sv-on-surface-variant)]">
+                        {t("Expires on {{date}}", {
+                          date: new Date(addon.endDate).toLocaleDateString(),
+                        })}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="text-[var(--sv-primary)] border-[var(--sv-primary)]/30">
+                      {t("Active")}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-[var(--sv-on-surface-variant)]">
+                {t("No active storage add-ons.")}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <div>
         <h2 className="text-xl font-bold text-[var(--sv-on-surface)] mb-4">
           {t("Available Plans")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans?.map((p: any) => {
+          {plans?.filter((p: any) => !(p.name === SubscriptionPlanType.FREE && sub?.hasUsedFreePlan)).map((p: any) => {
             const isCurrentPlan = sub?.plan === p.name;
             const features = [
               {
@@ -235,6 +294,11 @@ export default function InstructorSubscriptionPage() {
           })}
         </div>
       </div>
+      <BuyStorageDialog 
+        open={buyStorageOpen} 
+        onOpenChange={setBuyStorageOpen} 
+        isPaidPlan={sub?.plan !== SubscriptionPlanType.FREE && sub?.plan !== null} 
+      />
     </div>
   );
 }

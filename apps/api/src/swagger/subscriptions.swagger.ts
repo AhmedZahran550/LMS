@@ -46,6 +46,20 @@ export const SubscriptionsSwagger = {
       ApiResponse({ status: 201, description: "Checkout URL returned" }),
     ),
 
+  buyStorage: () =>
+    applyDecorators(
+      ApiOperation({ summary: "Buy storage add-on (Instructor)", description: "Creates a Stripe checkout session for a 10 GB storage add-on." }),
+      ApiBearerAuth(),
+      ApiResponse({ status: 201, description: "Checkout URL returned" }),
+    ),
+
+  getStorageAddons: () =>
+    applyDecorators(
+      ApiOperation({ summary: "Get storage add-ons (Instructor)", description: "Returns the instructor's active storage add-ons." }),
+      ApiBearerAuth(),
+      ApiResponse({ status: 200, description: "Storage add-ons list" }),
+    ),
+
   createPortal: () =>
     applyDecorators(
       ApiOperation({ summary: "Create Stripe portal (Instructor)", description: "Creates a Stripe customer portal session for managing subscription." }),

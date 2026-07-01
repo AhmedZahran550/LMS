@@ -84,6 +84,27 @@ export class StripeService {
     return session;
   }
 
+  async createStorageCheckoutSession(
+    instructorId: string,
+    email: string,
+    successUrl: string,
+    cancelUrl: string,
+  ): Promise<Stripe.Checkout.Session> {
+    const customerId = await this.getOrCreateCustomer(email, instructorId);
+
+    const session = await this.stripe.checkout.sessions.create({
+      customer: customerId,
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [{ price: this.stripeConf.priceStorageAddon, quantity: 1 }],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: { instructorId, isStorageAddon: 'true' },
+    });
+
+    return session;
+  }
+
   async createPortalSession(
     customerId: string,
     returnUrl: string,
@@ -114,9 +135,17 @@ export class StripeService {
 
   async handleCheckoutCompleted(session: Stripe.Checkout.Session): Promise<void> {
     const instructorId = session.metadata?.instructorId;
-    const subscriptionId = session.subscription as string;
+    const isStorageAddon = session.metadata?.isStorageAddon === 'true';
 
-    if (!instructorId || !subscriptionId) return;
+    if (!instructorId) return;
+
+    if (isStorageAddon) {
+      await this.subscriptionService.createStorageAddon(instructorId);
+      return;
+    }
+
+    const subscriptionId = session.subscription as string;
+    if (!subscriptionId) return;
 
     const lineItems = await this.stripe.checkout.sessions.listLineItems(
       session.id,

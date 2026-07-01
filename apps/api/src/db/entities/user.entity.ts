@@ -65,4 +65,7 @@ export class User extends BaseEntity {
 
   @Column('jsonb', { default: { lang: 'ar', mode: 'light' } })
   preferences!: { lang: 'ar' | 'en'; mode: 'light' | 'dark' };
+
+  @Column({ default: false })
+  hasUsedFreePlan!: boolean;
 }

@@ -7,11 +7,11 @@ const SUBSCRIPTION_PLANS = [
     name: SubscriptionPlanType.FREE,
     description: 'Free plan with 2GB storage and up to 5 students.',
     price: 0,
-    currency: 'usd',
+    currency: 'egp',
     maxTotalStudents: 5,
     pricePerStudent: 0,
     baseStorageBytes: 2147483648, // 2 GB
-    trialDays: 90,
+    durationDays: 30,
     stripePriceId: null,
     isActive: true,
   },
@@ -19,11 +19,11 @@ const SUBSCRIPTION_PLANS = [
     name: SubscriptionPlanType.PRO,
     description: 'Pro plan with 10GB storage and up to 100 students.',
     price: 12000,
-    currency: 'usd',
+    currency: 'egp',
     maxTotalStudents: 100,
     pricePerStudent: 120,
     baseStorageBytes: 10737418240, // 10 GB
-    trialDays: 0,
+    durationDays: 180,
     stripePriceId: process.env.STRIPE_PRICE_PRO || null,
     isActive: true,
   },
@@ -31,11 +31,11 @@ const SUBSCRIPTION_PLANS = [
     name: SubscriptionPlanType.PLUS,
     description: 'Plus plan with 10GB storage and up to 200 students.',
     price: 20000,
-    currency: 'usd',
+    currency: 'egp',
     maxTotalStudents: 200,
     pricePerStudent: 100,
     baseStorageBytes: 10737418240, // 10 GB
-    trialDays: 0,
+    durationDays: 180,
     stripePriceId: process.env.STRIPE_PRICE_PLUS || null,
     isActive: true,
   },
@@ -43,11 +43,11 @@ const SUBSCRIPTION_PLANS = [
     name: SubscriptionPlanType.ENTERPRISE,
     description: 'Enterprise plan with 10GB storage and up to 500 students.',
     price: 35000,
-    currency: 'usd',
+    currency: 'egp',
     maxTotalStudents: 500,
     pricePerStudent: 70,
     baseStorageBytes: 10737418240, // 10 GB
-    trialDays: 0,
+    durationDays: 180,
     stripePriceId: null,
     isActive: true,
   },
@@ -94,7 +94,7 @@ async function seed() {
       console.log(`Plan "${plan.name}" already exists.`);
     } else {
       await AppDataSource.query(
-        `INSERT INTO subscription_plan (name, description, price, currency, "maxTotalStudents", "pricePerStudent", "baseStorageBytes", "trialDays", "stripePriceId", "isActive")
+        `INSERT INTO subscription_plan (name, description, price, currency, "maxTotalStudents", "pricePerStudent", "baseStorageBytes", "durationDays", "stripePriceId", "isActive")
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           plan.name,
@@ -104,7 +104,7 @@ async function seed() {
           plan.maxTotalStudents,
           plan.pricePerStudent,
           String(plan.baseStorageBytes),
-          plan.trialDays,
+          plan.durationDays,
           plan.stripePriceId,
           plan.isActive,
         ],

@@ -32,7 +32,15 @@ export const subscriptionApis = {
   },
 
   refreshSubscription: async () => {
-    const response = await roleApi.post("/subscription/refresh-subscription");
+    const response = await roleApi.post('/subscription/refresh-subscription');
+    return response.data;
+  },
+  buyStorageAddon: async () => {
+    const response = await roleApi.post('/subscription/storage');
+    return response.data;
+  },
+  getStorageAddons: async () => {
+    const response = await roleApi.get('/subscription/storage');
     return response.data;
   },
 };
