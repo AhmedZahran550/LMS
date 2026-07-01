@@ -160,7 +160,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @AuthSwagger.completeRegistration()
   async completeRegistration(@Body() dto: CompleteRegistrationDto) {
-    return this.socialAuthService.completeRegistration(dto.tempToken, dto.role);
+    return this.socialAuthService.completeRegistration(dto.tempToken, dto.role, dto.client);
   }
 
   private buildSuccessHtml(payload: Record<string, unknown>, origin: string): string {

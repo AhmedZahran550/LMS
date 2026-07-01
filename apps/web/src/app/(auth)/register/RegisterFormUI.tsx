@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Mail, BookOpen, Brain, ArrowLeft, ArrowRight, GraduationCap, Users, Globe, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, BookOpen, ArrowLeft, ArrowRight, GraduationCap, Users, Globe, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
@@ -60,7 +60,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
           <div className="mb-6">
             <h2 className="text-2xl font-bold leading-tight mb-2">{t('Create an account')}</h2>
             <p className="text-[#c3c0ff] text-sm leading-relaxed">
-              {t('Join our platform as a Learner or Instructor.')}
+              {t('Join our platform as an Instructor.')}
             </p>
           </div>
 
@@ -93,7 +93,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
 
           <div className="mt-8 pt-6 border-t border-white/20 text-center">
             <p className="text-xs text-[#c3c0ff]">
-              {t('Join over')} <span className="font-bold text-white">10,000+</span> {t('active learners')}
+              {t('Join over')} <span className="font-bold text-white">10,000+</span> {t('active instructors')}
             </p>
           </div>
         </div>
@@ -170,47 +170,6 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[var(--sv-text-primary)] block">{t('I want to join as:')}</label>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <input
-                  id="role-student"
-                  type="radio"
-                  value={UserRole.LEARNER}
-                  {...register('role')}
-                  className="peer hidden"
-                />
-                <label
-                  htmlFor="role-student"
-                  className="flex flex-col items-center justify-center p-4 border border-[var(--sv-border)] rounded-xl cursor-pointer transition-all text-[var(--sv-text-muted)] peer-checked:bg-indigo-50 peer-checked:border-indigo-600 peer-checked:text-indigo-600 hover:bg-[var(--sv-surface-container-high)]"
-                >
-                  <BookOpen className="w-6 h-6 mb-2" />
-                  <span className="text-sm font-semibold">{t('Student')}</span>
-                </label>
-              </div>
-              <div className="flex-1">
-                <input
-                  id="role-instructor"
-                  type="radio"
-                  value={UserRole.INSTRUCTOR}
-                  {...register('role')}
-                  className="peer hidden"
-                />
-                <label
-                  htmlFor="role-instructor"
-                  className="flex flex-col items-center justify-center p-4 border border-[var(--sv-border)] rounded-xl cursor-pointer transition-all text-[var(--sv-text-muted)] peer-checked:bg-indigo-50 peer-checked:border-indigo-600 peer-checked:text-indigo-600 hover:bg-[var(--sv-surface-container-high)]"
-                >
-                  <Brain className="w-6 h-6 mb-2" />
-                  <span className="text-sm font-semibold">{t('Instructor')}</span>
-                </label>
-              </div>
-            </div>
-            {errors.role && (
-              <p className="text-xs text-red-500 mt-1">{errors.role.message?.toString()}</p>
-            )}
-          </div>
-
           <div className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[var(--sv-text-primary)] block" htmlFor="password">{t('Password')}</label>
@@ -273,7 +232,7 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
             <div className="flex-grow border-t border-[var(--sv-border)]"></div>
           </div>
 
-          <SocialLoginWithPopup />
+          <SocialLoginWithPopup role={UserRole.INSTRUCTOR} />
 
           <p className="text-sm text-center text-[var(--sv-text-secondary)] pt-1">
             {t('Already have an account?')}{' '}

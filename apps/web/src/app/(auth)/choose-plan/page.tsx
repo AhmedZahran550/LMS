@@ -94,7 +94,7 @@ export default function ChoosePlanPage() {
 
   return (
     <div className="flex justify-center px-4">
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-6xl">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-[var(--sv-text-primary)]">
             {t('Choose Your Plan')}
@@ -116,7 +116,7 @@ export default function ChoosePlanPage() {
             <Loader2 className="h-8 w-8 animate-spin text-[var(--sv-primary)]" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans?.map((p: any) => {
               const features = [
                 { label: `${p.maxTotalStudents} ${t('students')} - ${p.pricePerStudent} ${p.currency?.toUpperCase() || 'EGP'}/${t('student')}`, included: true },

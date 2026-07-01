@@ -17,7 +17,6 @@ function getLoginSchema(t: (key: string) => string) {
   return z.object({
     email: z.string().min(1, t('Email is required')).email(t('Invalid email address')),
     password: z.string().min(1, t('Password is required')),
-    role: z.nativeEnum(UserRole),
   });
 }
 
@@ -45,26 +44,15 @@ export function LoginForm() {
     register,
     handleSubmit,
     getValues,
-    watch,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      role: UserRole.INSTRUCTOR,
-    },
   });
-
-  const selectedRole = watch('role');
 
   const onSubmit = async (data: LoginFormData) => {
     setServerError(null);
     setResendSuccess(null);
     setResendError(null);
-    
-    if (data.role === UserRole.LEARNER) {
-      setServerError({ message: t('Students must use the mobile app to log in.') });
-      return;
-    }
 
     try {
       const response = await loginMutation.mutateAsync(data);
@@ -156,7 +144,6 @@ export function LoginForm() {
       resendSuccess={resendSuccess}
       resendError={resendError}
       resetSuccess={resetSuccess}
-      selectedRole={selectedRole}
     />
   );
 }

@@ -6,7 +6,7 @@ import { Repository } from "typeorm";
 import * as crypto from "crypto";
 import * as argon2 from "argon2";
 import { User } from "../../../db/entities/user.entity";
-import { AuthProvider, UserRole } from "@lms/shared-types";
+import { AuthProvider, ClientType, UserRole } from "@lms/shared-types";
 import { UsersService } from "../../../modules/users/users.service";
 import { SubscriptionService } from "../../../modules/subscriptions/services/subscription.service";
 
@@ -68,46 +68,21 @@ export class SocialAuthService {
       return { ...tokens, needsRole: false };
     }
 
-    // New user — some flows provide a role upfront, others defer to /choose-role
-    if (role) {
-      const validRoles = Object.values(UserRole) as string[];
-      if (!validRoles.includes(role)) {
-        throw new BadRequestException('Invalid role');
-      }
-      if (client === 'web' && role === UserRole.LEARNER) {
-        throw new UnauthorizedException('error.students_use_mobile');
-      }
-      const user = await this.createSocialUser(provider, profile, role as UserRole);
-      const tokens = await this.generateTokens(user);
-      return { ...tokens, needsRole: false };
+    // New user — determine role based on provided role, client type, or default
+    const effectiveRole = role ?? (client === ClientType.MOBILE ? UserRole.LEARNER : UserRole.INSTRUCTOR);
+    const validRoles = Object.values(UserRole) as string[];
+    if (!validRoles.includes(effectiveRole)) {
+      throw new BadRequestException('Invalid role');
     }
-
-    // No role given → issue a temp token for /choose-role
-    const tempToken = this.jwtService.sign(
-      {
-        temp: true,
-        email: profile.email,
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        provider,
-        providerId: profile.id,
-        picture: profile.picture,
-      },
-      { expiresIn: '5m' },
-    );
-
-    return {
-      tempToken,
-      needsRole: true,
-      user: {
-        email: profile.email,
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-      },
-    };
+    if (client === 'web' && effectiveRole === UserRole.LEARNER) {
+      throw new UnauthorizedException('error.students_use_mobile');
+    }
+    const newUser = await this.createSocialUser(provider, profile, effectiveRole as UserRole);
+    const tokens = await this.generateTokens(newUser);
+    return { ...tokens, needsRole: false };
   }
 
-  async completeRegistration(tempToken: string, role: UserRole) {
+  async completeRegistration(tempToken: string, role?: UserRole, client?: string) {
     let payload: any;
     try {
       payload = this.jwtService.verify(tempToken);
@@ -118,6 +93,8 @@ export class SocialAuthService {
       throw new BadRequestException('Invalid token type');
     }
 
+    const effectiveRole = role ?? (client === ClientType.MOBILE ? UserRole.LEARNER : UserRole.INSTRUCTOR);
+
     const user = await this.createSocialUser(
       payload.provider,
       {
@@ -127,7 +104,7 @@ export class SocialAuthService {
         lastName: payload.lastName,
         picture: payload.picture,
       },
-      role,
+      effectiveRole,
     );
 
     const tokens = await this.generateTokens(user);

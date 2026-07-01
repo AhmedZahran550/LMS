@@ -246,7 +246,7 @@ export default function InstructorSubscriptionPage() {
         <h2 className="text-xl font-bold text-[var(--sv-on-surface)] mb-4">
           {t("Available Plans")}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {plans
             ?.filter(
               (p: any) =>

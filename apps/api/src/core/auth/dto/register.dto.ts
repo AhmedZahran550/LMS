@@ -1,5 +1,5 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength, Matches, MaxLength } from 'class-validator';
-import { UserRole } from '@lms/shared-types';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength, Matches, MaxLength } from 'class-validator';
+import { UserRole, ClientType } from '@lms/shared-types';
 
 export class RegisterDto {
   @IsEmail()
@@ -23,7 +23,11 @@ export class RegisterDto {
   @IsNotEmpty()
   lastName!: string;
 
+  @IsOptional()
   @IsEnum(UserRole)
-  @IsNotEmpty()
-  role!: UserRole;
+  role?: UserRole;
+
+  @IsOptional()
+  @IsEnum(ClientType)
+  client?: ClientType;
 }

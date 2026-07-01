@@ -7,7 +7,8 @@ export const authApis = {
     return response.data;
   },
   register: async (data: any) => {
-    const response = await api.post('/auth/register', data);
+    const payload = { ...data, client: 'web' };
+    const response = await api.post('/auth/register', payload);
     return response.data;
   },
   verifyOtp: async (email: string, otp: string) => {

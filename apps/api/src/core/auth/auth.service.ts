@@ -6,6 +6,7 @@ import * as argon2 from 'argon2';
 import { UsersService } from '../../modules/users/users.service';
 import { MailService } from '../../modules/mail/mail.service';
 import { SubscriptionService } from '../../modules/subscriptions/services/subscription.service';
+import { ClientType, UserRole } from '@lms/shared-types';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -40,9 +41,14 @@ export class AuthService {
 
     const hashedPassword = await argon2.hash(registerDto.password);
 
+    const role = registerDto.role ?? (registerDto.client === ClientType.MOBILE ? UserRole.LEARNER : UserRole.INSTRUCTOR);
+
     const user = await this.usersService.create({
-      ...registerDto,
+      email: registerDto.email,
       password: hashedPassword,
+      firstName: registerDto.firstName,
+      lastName: registerDto.lastName,
+      role,
     });
 
     const otp = this.generateOtp();

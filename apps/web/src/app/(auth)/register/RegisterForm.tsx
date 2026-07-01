@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { RegisterFormUI } from './RegisterFormUI';
 import { useRegisterMutation } from '@/hooks/useAuthMutations';
-import { UserRole } from '@lms/shared-types';
 
 function getRegisterSchema(t: (key: string) => string) {
   return z.object({
@@ -24,7 +23,6 @@ function getRegisterSchema(t: (key: string) => string) {
         t('Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character')
       ),
     confirmPassword: z.string().min(1, t('Please confirm your password')),
-    role: z.nativeEnum(UserRole),
   }).refine((data) => data.password === data.confirmPassword, {
     message: t("Passwords don't match"),
     path: ['confirmPassword'],
@@ -47,9 +45,6 @@ export function RegisterForm() {
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      role: UserRole.LEARNER,
-    },
   });
 
   const onSubmit = async (data: RegisterFormData) => {
