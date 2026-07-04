@@ -51,7 +51,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           onClick={onClose}
         />
       )}
-      <aside className={`fixed md:relative top-0 ltr:left-0 rtl:right-0 h-full w-64 bg-[var(--sv-surface-container-low)] shadow-sm border-e border-[var(--sv-outline-variant)] py-6 px-4 z-50 transform transition-transform duration-300 flex flex-col md:translate-x-0 ${isOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full'}`}>
+      <aside className={`fixed md:relative top-0 ltr:left-0 rtl:right-0 h-full w-64 bg-[var(--sv-surface-container-low)] shadow-sm border-e border-[var(--sv-outline-variant)] py-6 px-4 z-50 transform transition-transform duration-300 flex flex-col md:!translate-x-0 ${isOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full'}`}>
         <div className="mb-8 px-2 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-[var(--sv-primary)]">{t('app.name')}</h1>
