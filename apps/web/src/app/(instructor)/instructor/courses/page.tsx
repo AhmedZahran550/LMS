@@ -115,12 +115,12 @@ export default function InstructorCoursesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--sv-text-primary)]">{t('Manage Courses')}</h1>
           <p className="text-[var(--sv-text-secondary)] mt-1">{t('Create and manage your educational content.')}</p>
         </div>
-        <Button onClick={() => setIsCreating(!isCreating)}>
+        <Button className="w-full sm:w-auto" onClick={() => setIsCreating(!isCreating)}>
           {isCreating ? t('Cancel') : t('Create New Course')}
         </Button>
       </div>

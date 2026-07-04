@@ -23,7 +23,7 @@ function formatBytes(bytes: number): string {
 }
 
 export default function InstructorSubscriptionPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, updateSubscription } = useAuthStore();
   const [upgradingPlan, setUpgradingPlan] = useState<string | null>(null);
   const [buyStorageOpen, setBuyStorageOpen] = useState(false);
@@ -131,7 +131,7 @@ export default function InstructorSubscriptionPage() {
       {sub && (
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle>{t("Current Plan")}</CardTitle>
               <div className="flex items-center gap-3">
                 {getStatusBadge(sub.status)}
@@ -139,7 +139,7 @@ export default function InstructorSubscriptionPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold text-[var(--sv-on-surface)] capitalize">
                   {t("{{plan}} Plan", { plan: sub.plan || "Free" })}
@@ -150,7 +150,7 @@ export default function InstructorSubscriptionPage() {
                     {t("Expires on {{date}}", {
                       date: new Date(
                         sub.subscriptionEndDate,
-                      ).toLocaleDateString(),
+                      ).toLocaleDateString(i18n.language),
                     })}
                   </p>
                 )}
@@ -161,7 +161,7 @@ export default function InstructorSubscriptionPage() {
                 onClick={() => portalMutation.mutate()}
                 isLoading={portalMutation.isPending}
               >
-                <CreditCard className="h-4 w-4 mr-2" />
+                <CreditCard className="h-4 w-4 me-2" />
                 {t("Manage Billing")}
               </Button>
             </div>
@@ -220,7 +220,7 @@ export default function InstructorSubscriptionPage() {
                       </p>
                       <p className="text-sm text-[var(--sv-on-surface-variant)]">
                         {t("Expires on {{date}}", {
-                          date: new Date(addon.endDate).toLocaleDateString(),
+                          date: new Date(addon.endDate).toLocaleDateString(i18n.language),
                         })}
                       </p>
                     </div>
@@ -246,7 +246,7 @@ export default function InstructorSubscriptionPage() {
         <h2 className="text-xl font-bold text-[var(--sv-on-surface)] mb-4">
           {t("Available Plans")}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {plans
             ?.filter(
               (p: any) =>

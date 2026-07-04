@@ -24,7 +24,7 @@ const statusOptions = [
 ];
 
 export default function StudentListPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { updateSubscription } = useAuthStore();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -63,19 +63,19 @@ export default function StudentListPage() {
   const statusBadge = (status: string) => {
     switch (status) {
       case InstructorStudentStatus.ACTIVE:
-        return <Badge variant="default" className="bg-success-500">Active</Badge>;
+        return <Badge variant="default" className="bg-success-500">{t('Active')}</Badge>;
       case InstructorStudentStatus.INVITED:
-        return <Badge variant="secondary">Invited</Badge>;
+        return <Badge variant="secondary">{t('Invited')}</Badge>;
       case InstructorStudentStatus.REQUESTED:
-        return <Badge variant="outline">Requested</Badge>;
+        return <Badge variant="outline">{t('Requested')}</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline">{t(status)}</Badge>;
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-on-surface">{t('Students')}</h1>
           <p className="text-sm text-on-surface-variant">{t('Manage your students and invitations.')}</p>
@@ -104,7 +104,7 @@ export default function StudentListPage() {
             <CardContent>
               <div className="space-y-2">
                 <Input
-                  placeholder="student@example.com"
+                  placeholder={t('student@example.com')}
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                 />
@@ -148,10 +148,10 @@ export default function StudentListPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>{t('Student')}</TableHead>
-                      <TableHead>{t('Email')}</TableHead>
+                      <TableHead className="hidden sm:table-cell">{t('Email')}</TableHead>
                       <TableHead>{t('Status')}</TableHead>
-                      <TableHead>{t('Invited')}</TableHead>
-                      <TableHead className="text-right">{t('Actions')}</TableHead>
+                      <TableHead className="hidden sm:table-cell">{t('Invited')}</TableHead>
+                      <TableHead className="text-end">{t('Actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -182,16 +182,16 @@ export default function StudentListPage() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="text-on-surface-variant">
+                          <TableCell className="text-on-surface-variant hidden sm:table-cell">
                             {s.student?.email || '—'}
                           </TableCell>
                           <TableCell>{statusBadge(s.status)}</TableCell>
-                          <TableCell className="text-on-surface-variant text-sm">
+                          <TableCell className="text-on-surface-variant text-sm hidden sm:table-cell">
                             {s.invitationSentAt
-                              ? new Date(s.invitationSentAt).toLocaleDateString()
+                              ? new Date(s.invitationSentAt).toLocaleDateString(i18n.language)
                               : '—'}
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-end">
                             <div className="flex items-center justify-end gap-1">
                               {s.status === InstructorStudentStatus.ACTIVE && (
                                 <Link href={`/instructor/students/${s.student?.id}/assign`}>

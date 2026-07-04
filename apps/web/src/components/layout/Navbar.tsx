@@ -12,11 +12,15 @@ import Link from 'next/link';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 
-export function Navbar() {
+interface NavbarProps {
+  onMenuClick?: () => void;
+}
+
+export function Navbar({ onMenuClick }: NavbarProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { user, logout } = useAuthStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -89,7 +93,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-20 bg-[var(--sv-surface)]/80 backdrop-blur-md border-b border-[var(--sv-outline-variant)]/30 px-6 py-3 flex justify-between items-center w-full">
       <div className="flex items-center gap-6 flex-1">
-        <button className="md:hidden p-2 rounded-full hover:bg-[var(--sv-surface-container-high)] text-[var(--sv-on-surface-variant)] transition-colors">
+        <button onClick={onMenuClick} className="md:hidden p-2 rounded-full hover:bg-[var(--sv-surface-container-high)] text-[var(--sv-on-surface-variant)] transition-colors">
           <Menu className="h-6 w-6" />
         </button>
         <div className="relative w-full max-w-md hidden md:block">
@@ -118,7 +122,7 @@ export function Navbar() {
           </button>
 
           {showNotifications && (
-            <div className="absolute ltr:right-0 rtl:left-0 mt-2 w-80 rounded-xl border border-[var(--sv-outline-variant)]/30 bg-[var(--sv-surface)]/95 backdrop-blur-xl p-2 shadow-lg ring-1 ring-black/5 z-50">
+            <div className="absolute ltr:-right-16 sm:ltr:right-0 rtl:-left-16 sm:rtl:left-0 mt-2 w-[280px] sm:w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-[var(--sv-outline-variant)]/30 bg-[var(--sv-surface)]/95 backdrop-blur-xl p-2 shadow-lg ring-1 ring-black/5 z-50">
               <div className="flex items-center justify-between border-b border-[var(--sv-outline-variant)]/30 px-4 py-2">
                 <span className="text-sm font-bold text-[var(--sv-on-surface)]">{t('Notifications')}</span>
                 {unreadCount > 0 && (
@@ -155,7 +159,7 @@ export function Navbar() {
                       </div>
                       <span className="text-xs leading-normal">{notification.message}</span>
                       <span className="text-[10px] text-[var(--sv-on-surface-variant)]">
-                        {new Date(notification.createdAt).toLocaleDateString()}
+                        {new Date(notification.createdAt).toLocaleDateString(i18n.language)}
                       </span>
                     </div>
                   ))

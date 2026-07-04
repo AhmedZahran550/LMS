@@ -9,7 +9,12 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole, SubscriptionStatus } from '@lms/shared-types';
 import { Avatar } from '@/components/ui/Avatar';
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
   const { user, logout } = useAuthStore();
@@ -38,11 +43,24 @@ export function Sidebar() {
   const profileHref = user.role === UserRole.INSTRUCTOR ? '/instructor/profile' : '/profile';
 
   return (
-    <aside className="hidden md:flex flex-col h-full w-64 bg-[var(--sv-surface-container-low)] shadow-sm border-e border-[var(--sv-outline-variant)] py-6 px-4 z-30">
-      <div className="mb-8 px-2">
-        <h1 className="text-2xl font-bold text-[var(--sv-primary)]">{t('app.name')}</h1>
-        <p className="text-xs text-[var(--sv-on-surface-variant)]">{t('app.name')}</p>
-      </div>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity"
+          onClick={onClose}
+        />
+      )}
+      <aside className={`fixed md:relative top-0 ltr:left-0 rtl:right-0 h-full w-64 bg-[var(--sv-surface-container-low)] shadow-sm border-e border-[var(--sv-outline-variant)] py-6 px-4 z-50 transform transition-transform duration-300 flex flex-col md:translate-x-0 ${isOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full'}`}>
+        <div className="mb-8 px-2 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--sv-primary)]">{t('app.name')}</h1>
+            <p className="text-xs text-[var(--sv-on-surface-variant)]">{t('app.name')}</p>
+          </div>
+          <button className="md:hidden text-[var(--sv-on-surface-variant)]" onClick={onClose}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
       
       <nav className="flex-1 space-y-2">
         {links.map((link) => {
@@ -117,5 +135,6 @@ export function Sidebar() {
         </button>
       </div>
     </aside>
+    </>
   );
 }

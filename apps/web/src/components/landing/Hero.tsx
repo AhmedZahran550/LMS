@@ -73,7 +73,7 @@ export default function Hero() {
         >
           <ThreeJsBackground />
           
-          <div className="absolute -top-10 -end-10 bg-slate-50/70 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-slate-200 animate-bounce duration-[3000ms]">
+          <div className="hidden md:block absolute -top-10 -end-10 bg-slate-50/70 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-slate-200 animate-bounce duration-[3000ms]">
             <div className="flex items-center gap-3">
               <div className="bg-cyan-300 dark:bg-cyan-800 p-2 rounded-lg">
                 <svg className="w-6 h-6 text-cyan-900 dark:text-cyan-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">

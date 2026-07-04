@@ -14,7 +14,7 @@ import { InstructorStudentStatus } from '@lms/shared-types';
 import Link from 'next/link';
 
 export default function InvitationsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
 
@@ -60,9 +60,9 @@ export default function InvitationsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('Email')}</TableHead>
-                  <TableHead>{t('Sent')}</TableHead>
+                  <TableHead className="hidden sm:table-cell">{t('Sent')}</TableHead>
                   <TableHead>{t('Status')}</TableHead>
-                  <TableHead className="text-right">{t('Actions')}</TableHead>
+                  <TableHead className="text-end">{t('Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -87,15 +87,15 @@ export default function InvitationsPage() {
                           <span>{inv.student?.email || '—'}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-on-surface-variant text-sm">
+                      <TableCell className="text-on-surface-variant text-sm hidden sm:table-cell">
                         {inv.invitationSentAt
-                          ? new Date(inv.invitationSentAt).toLocaleDateString()
+                          ? new Date(inv.invitationSentAt).toLocaleDateString(i18n.language)
                           : '—'}
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{t('Pending')}</Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Button
                           size="sm"
                           variant="ghost"

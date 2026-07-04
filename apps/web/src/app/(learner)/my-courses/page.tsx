@@ -23,10 +23,10 @@ export default function MyCoursesPage() {
   return (
     <>
       {/* Welcome Section */}
-      <section className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <section className="mb-6 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="text-4xl font-bold text-[var(--sv-on-surface)]">{t('My Learning')}</h2>
-          <p className="text-lg text-[var(--sv-on-surface-variant)] mt-1">{t('Courses you are enrolled in or requested to join.')}</p>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[var(--sv-on-surface)]">{t('My Learning')}</h2>
+          <p className="text-base sm:text-lg text-[var(--sv-on-surface-variant)] mt-1">{t('Courses you are enrolled in or requested to join.')}</p>
         </div>
         <div className="flex gap-2">
           <Link href="/courses">

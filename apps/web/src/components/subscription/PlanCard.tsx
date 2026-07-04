@@ -54,7 +54,7 @@ export function PlanCard({
       )}
     >
       {isPopular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[var(--sv-accent-500)] text-white text-xs font-bold">
+        <div className="absolute -top-3 start-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2 px-4 py-1 rounded-full bg-[var(--sv-accent-500)] text-white text-xs font-bold">
           {t("Popular")}
         </div>
       )}
@@ -75,7 +75,7 @@ export function PlanCard({
             : ` ${(price / durationMonths).toFixed(2)} ${currency.toUpperCase()}`}
         </span>
         {price > 0 && (
-          <span className="text-sm text-[var(--sv-on-surface-variant)] ml-1">
+          <span className="text-sm text-[var(--sv-on-surface-variant)] ms-1">
             {t("/month for {{months}} months", { months: durationMonths })}
           </span>
         )}

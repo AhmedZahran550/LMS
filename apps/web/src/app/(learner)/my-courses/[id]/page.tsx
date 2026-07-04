@@ -79,7 +79,7 @@ export default function CourseDetailPage() {
           <ChevronLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{course.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{course.title}</h1>
           <p className="text-slate-500 mt-1">{t('Instructor: {{name}}', { name: `${course.instructor?.firstName} ${course.instructor?.lastName}` })}</p>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function CourseDetailPage() {
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-200">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <h2 className="text-xl font-semibold text-slate-900">{t('Course Content')}</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900">{t('Course Content')}</h2>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-64">
                 <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">

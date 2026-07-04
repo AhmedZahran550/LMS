@@ -80,7 +80,7 @@ export default function InstructorCourseDetailPage() {
         </div>
       </div>
 
-      <div className="flex space-x-1 border-b border-[var(--sv-border)] mb-6">
+      <div className="flex gap-1 border-b border-[var(--sv-border)] mb-6 overflow-x-auto whitespace-nowrap pb-1 scrollbar-hide">
         <button 
           className={`flex items-center px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'content' ? 'border-[var(--sv-primary)] text-[var(--sv-primary)]' : 'border-transparent text-[var(--sv-text-muted)] hover:text-[var(--sv-text-primary)] hover:border-[var(--sv-border)]'}`}
           onClick={() => setActiveTab('content')}

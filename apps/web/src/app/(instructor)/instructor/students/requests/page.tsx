@@ -70,9 +70,9 @@ export default function RequestsPage() {
               {requests.map((req: any) => (
                 <div
                   key={req.id}
-                  className="flex items-center justify-between p-4 rounded-xl border border-outline-variant bg-surface-container-low"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border border-outline-variant bg-surface-container-low"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
                     <div className="h-10 w-10 rounded-full bg-surface-container-high flex items-center justify-center">
                       <UserPlus className="h-5 w-5 text-on-surface-variant" />
                     </div>
@@ -83,8 +83,8 @@ export default function RequestsPage() {
                       <p className="text-sm text-on-surface-variant">{req.student?.email}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">Requested</Badge>
+                  <div className="flex w-full sm:w-auto items-center justify-end gap-2">
+                    <Badge variant="outline">{t('Requested')}</Badge>
                     <Button
                       size="sm"
                       variant="outline"
