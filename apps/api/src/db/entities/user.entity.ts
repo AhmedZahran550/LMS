@@ -10,6 +10,19 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
 
+  @Column({ type: 'varchar', nullable: true, unique: true })
+  mobileNumber?: string | null;
+
+  @Column({ default: false })
+  isMobileVerified!: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  @Exclude()
+  mobileOtp?: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  mobileOtpExpiresAt?: Date | null;
+
   @Column()
   @Exclude()
   password!: string;

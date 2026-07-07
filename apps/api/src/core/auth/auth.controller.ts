@@ -14,6 +14,8 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
+import { SendMobileOtpDto } from './dto/send-mobile-otp.dto';
+import { VerifyMobileOtpDto } from './dto/verify-mobile-otp.dto';
 import { OAuthInitDto } from './dto/oauth-init.dto';
 import { CompleteRegistrationDto } from './dto/complete-registration.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -55,6 +57,20 @@ export class AuthController {
   @AuthSwagger.sendOtp()
   async sendOtp(@Body() sendOtpDto: SendOtpDto) {
     return this.authService.sendOtp(sendOtpDto);
+  }
+
+  @Post('send-mobile-otp')
+  @HttpCode(HttpStatus.OK)
+  @AuthSwagger.sendMobileOtp()
+  async sendMobileOtp(@Body() sendMobileOtpDto: SendMobileOtpDto) {
+    return this.authService.sendMobileOtp(sendMobileOtpDto);
+  }
+
+  @Post('verify-mobile-otp')
+  @HttpCode(HttpStatus.OK)
+  @AuthSwagger.verifyMobileOtp()
+  async verifyMobileOtp(@Body() verifyMobileOtpDto: VerifyMobileOtpDto) {
+    return this.authService.verifyMobileOtp(verifyMobileOtpDto);
   }
 
   @Post('forgot-password')

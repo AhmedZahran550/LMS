@@ -8,6 +8,11 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(/^\+[1-9]\d{1,14}$/, { message: 'Mobile number must be in valid E.164 format (e.g. +201234567890)' })
+  mobileNumber!: string;
+
+  @IsString()
+  @IsNotEmpty()
   @MinLength(8)
   @MaxLength(50)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/, {

@@ -23,6 +23,7 @@ export interface SubscriptionInfo {
 export interface UserProfile {
   id: string;
   email: string;
+  mobileNumber?: string | null;
   firstName: string;
   lastName: string;
   role: UserRole;

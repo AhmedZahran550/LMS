@@ -14,6 +14,8 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
+import { SendMobileOtpDto } from './dto/send-mobile-otp.dto';
+import { VerifyMobileOtpDto } from './dto/verify-mobile-otp.dto';
 import { User } from '../../db/entities/user.entity';
 
 @Injectable()
@@ -41,10 +43,14 @@ export class AuthService {
 
     const hashedPassword = await argon2.hash(registerDto.password);
 
-    const role = registerDto.role ?? (registerDto.client === ClientType.MOBILE ? UserRole.LEARNER : UserRole.INSTRUCTOR);
+    let role = registerDto.role ?? (registerDto.client === ClientType.MOBILE ? UserRole.LEARNER : UserRole.INSTRUCTOR);
+    if (registerDto.client === ClientType.WEB) {
+      role = UserRole.INSTRUCTOR;
+    }
 
     const user = await this.usersService.create({
       email: registerDto.email,
+      mobileNumber: registerDto.mobileNumber,
       password: hashedPassword,
       firstName: registerDto.firstName,
       lastName: registerDto.lastName,
@@ -184,6 +190,74 @@ export class AuthService {
     return { message: 'OTP sent successfully', email: user.email };
   }
 
+  async sendMobileOtp({ mobileNumber, client }: SendMobileOtpDto) {
+    const user = await this.usersService.findByMobileNumber(mobileNumber);
+    if (!user) {
+      throw new BadRequestException('User with this mobile number does not exist');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Account is inactive');
+    }
+
+    if (client === ClientType.WEB && user.role === UserRole.LEARNER) {
+      throw new UnauthorizedException('error.students_use_mobile');
+    }
+
+    const otp = this.generateOtp();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+
+    user.mobileOtp = otp;
+    user.mobileOtpExpiresAt = expiresAt;
+    await this.usersService.save(user);
+
+    // TODO: Send OTP via SMS
+    console.log(`Sending mobile OTP ${otp} to ${mobileNumber}`);
+
+    return { message: 'Mobile OTP sent successfully', mobileNumber: user.mobileNumber };
+  }
+
+  async verifyMobileOtp({ mobileNumber, otp, client, deviceToken, deviceInfo }: VerifyMobileOtpDto) {
+    const user = await this.usersService.findByMobileNumber(mobileNumber);
+    if (!user) {
+      throw new BadRequestException('Invalid verification request');
+    }
+
+    if (user.mobileOtp !== otp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    if (!user.mobileOtpExpiresAt || user.mobileOtpExpiresAt < new Date()) {
+      throw new BadRequestException('OTP has expired');
+    }
+
+    if (client === ClientType.WEB && user.role === UserRole.LEARNER) {
+      throw new UnauthorizedException('error.students_use_mobile');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Account is inactive');
+    }
+
+    user.isMobileVerified = true;
+    user.mobileOtp = null;
+    user.mobileOtpExpiresAt = null;
+    await this.usersService.save(user);
+
+    const tokens = await this.generateTokens(user);
+
+    if (deviceToken) {
+      await this.usersService.upsertDeviceToken(
+        user.id,
+        deviceToken,
+        deviceInfo
+      );
+    }
+
+    return tokens;
+  }
+
   async forgotPassword({ email }: ForgotPasswordDto) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
@@ -266,6 +340,7 @@ export class AuthService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      mobileNumber: user.mobileNumber,
       role: user.role,
       isActive: user.isActive,
       profileImageUrl: user.profileImageUrl,

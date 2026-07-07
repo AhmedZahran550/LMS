@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Mail, BookOpen, ArrowLeft, ArrowRight, GraduationCap, Users, Globe, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Phone, BookOpen, ArrowLeft, ArrowRight, GraduationCap, Users, Globe, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
@@ -167,6 +167,25 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
             </div>
             {errors.email && (
               <p className="text-xs text-red-500 mt-1">{errors.email.message?.toString()}</p>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-[var(--sv-text-primary)] block" htmlFor="mobileNumber">{t('Mobile Number')}</label>
+            <div className="relative group">
+              <span className="absolute inset-y-0 start-3 my-auto h-5 w-5 flex items-center text-[var(--sv-text-muted)] group-focus-within:text-indigo-600 transition-colors pointer-events-none">
+                <Phone className="w-5 h-5" />
+              </span>
+              <Input
+                id="mobileNumber"
+                type="tel"
+                placeholder="+201234567890"
+                {...register('mobileNumber')}
+                className="ps-10 ltr:text-left rtl:text-right"
+              />
+            </div>
+            {errors.mobileNumber && (
+              <p className="text-xs text-red-500 mt-1">{errors.mobileNumber.message?.toString()}</p>
             )}
           </div>
 

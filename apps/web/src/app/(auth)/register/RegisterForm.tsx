@@ -14,6 +14,7 @@ function getRegisterSchema(t: (key: string) => string) {
     firstName: z.string().min(1, t('First name is required')),
     lastName: z.string().min(1, t('Last name is required')),
     email: z.string().email(t('Invalid email address')),
+    mobileNumber: z.string().min(1, t('Mobile number is required')).regex(/^\+[1-9]\d{1,14}$/, t('Mobile number must be in valid E.164 format (e.g. +201234567890)')),
     password: z
       .string()
       .min(8, t('Password must be at least 8 characters long'))

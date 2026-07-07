@@ -56,6 +56,17 @@ export class UsersService extends DBService<
     return this.usersRepository.findOne({ where: { email } });
   }
 
+  async findByMobileNumber(mobileNumber: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { mobileNumber } });
+  }
+
+  async updateMobileNumber(id: string, mobileNumber: string): Promise<User> {
+    const user = await this.findByIdOrFail(id);
+    user.mobileNumber = mobileNumber;
+    user.isMobileVerified = false;
+    return this.usersRepository.save(user);
+  }
+
   async save(user: User): Promise<User> {
     return this.usersRepository.save(user);
   }

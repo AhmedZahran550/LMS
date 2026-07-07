@@ -8,7 +8,12 @@
     "email_exists": "Email already exists",
     "verify_email": "Please verify your email before logging in",
     "account_inactive": "Account is inactive",
-    "refresh_token_missing": "Refresh token is missing"
+    "refresh_token_missing": "Refresh token is missing",
+    "mobile_otp_sent": "OTP sent to your mobile number",
+    "invalid_mobile_otp": "Invalid or expired OTP",
+    "mobile_not_found": "No account found with this mobile number",
+    "mobile_already_exists": "This mobile number is already registered",
+    "web_instructor_only": "Only instructors can use the web application"
   },
   "notifications": {
     "subjects": {

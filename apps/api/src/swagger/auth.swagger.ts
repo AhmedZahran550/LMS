@@ -7,6 +7,8 @@ import { SendOtpDto } from "../core/auth/dto/send-otp.dto";
 import { ForgotPasswordDto } from "../core/auth/dto/forgot-password.dto";
 import { ResetPasswordDto } from "../core/auth/dto/reset-password.dto";
 import { RefreshTokenDto } from "../core/auth/dto/refresh-token.dto";
+import { SendMobileOtpDto } from "../core/auth/dto/send-mobile-otp.dto";
+import { VerifyMobileOtpDto } from "../core/auth/dto/verify-mobile-otp.dto";
 import { OAuthInitDto } from "../core/auth/dto/oauth-init.dto";
 import { CompleteRegistrationDto } from "../core/auth/dto/complete-registration.dto";
 
@@ -41,6 +43,22 @@ export const AuthSwagger = {
       ApiBody({ type: SendOtpDto }),
       ApiResponse({ status: 200, description: "OTP sent successfully" }),
       ApiResponse({ status: 429, description: "Rate limit exceeded" }),
+    ),
+
+  sendMobileOtp: () =>
+    applyDecorators(
+      ApiOperation({ summary: "Send Mobile OTP", description: "Sends a 6-digit OTP code to the provided mobile number." }),
+      ApiBody({ type: SendMobileOtpDto }),
+      ApiResponse({ status: 200, description: "Mobile OTP sent successfully" }),
+      ApiResponse({ status: 429, description: "Rate limit exceeded" }),
+    ),
+
+  verifyMobileOtp: () =>
+    applyDecorators(
+      ApiOperation({ summary: "Verify mobile OTP and login", description: "Verifies mobile OTP and returns JWT tokens." }),
+      ApiBody({ type: VerifyMobileOtpDto }),
+      ApiResponse({ status: 200, description: "Mobile OTP verified successfully, returns tokens" }),
+      ApiResponse({ status: 400, description: "Invalid or expired OTP" }),
     ),
 
   forgotPassword: () =>

@@ -6,9 +6,14 @@
     "register_success": "تم التسجيل بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.",
     "invalid_credentials": "بيانات الدخول غير صحيحة",
     "email_exists": "البريد الإلكتروني موجود بالفعل",
-    "verify_email": "يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول",
+    "verify_email": "الرجاء تأكيد بريدك الإلكتروني قبل تسجيل الدخول",
     "account_inactive": "الحساب غير نشط",
-    "refresh_token_missing": "رمز التحديث مفقود"
+    "refresh_token_missing": "رمز التحديث مفقود",
+    "mobile_otp_sent": "تم إرسال رمز التحقق إلى رقم هاتفك",
+    "invalid_mobile_otp": "رمز التحقق غير صالح أو منتهي الصلاحية",
+    "mobile_not_found": "لم يتم العثور على حساب بهذا الرقم",
+    "mobile_already_exists": "رقم الهاتف مسجل بالفعل",
+    "web_instructor_only": "يمكن للمعلمين فقط استخدام تطبيق الويب"
   },
   "notifications": {
     "subjects": {
