@@ -42,6 +42,7 @@ export function RegisterForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
@@ -66,6 +67,7 @@ export function RegisterForm() {
   return (
     <RegisterFormUI
       register={register}
+      control={control}
       errors={errors}
       serverError={serverError}
       isLoading={registerMutation.isPending}

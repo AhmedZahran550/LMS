@@ -6,12 +6,14 @@ import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Mail, Phone, BookOpen, ArrowLeft, ArrowRight, GraduationCap, Users, Globe, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { UseFormRegister, FieldErrors, Controller } from 'react-hook-form';
 import { UserRole } from '@lms/shared-types';
 import { SocialLoginWithPopup } from '@/components/auth/SocialLoginWithPopup';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 
 interface RegisterFormUIProps {
   register: UseFormRegister<any>;
+  control: any;
   errors: FieldErrors<any>;
   serverError: { message: string; code?: string } | null;
   isLoading: boolean;
@@ -37,7 +39,7 @@ function FacebookIcon({ className = 'w-5 h-5' }: { className?: string }) {
   );
 }
 
-export function RegisterFormUI({ register, errors, serverError, isLoading, onSubmit }: RegisterFormUIProps) {
+export function RegisterFormUI({ register, control, errors, serverError, isLoading, onSubmit }: RegisterFormUIProps) {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -172,18 +174,19 @@ export function RegisterFormUI({ register, errors, serverError, isLoading, onSub
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[var(--sv-text-primary)] block" htmlFor="mobileNumber">{t('Mobile Number')}</label>
-            <div className="relative group">
-              <span className="absolute inset-y-0 start-3 my-auto h-5 w-5 flex items-center text-[var(--sv-text-muted)] group-focus-within:text-indigo-600 transition-colors pointer-events-none">
-                <Phone className="w-5 h-5" />
-              </span>
-              <Input
-                id="mobileNumber"
-                type="tel"
-                placeholder="+201234567890"
-                {...register('mobileNumber')}
-                className="ps-10 ltr:text-left rtl:text-right"
-              />
-            </div>
+            <Controller
+              name="mobileNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  id="mobileNumber"
+                  placeholder="1234567890"
+                  defaultCountryCode="+20"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
             {errors.mobileNumber && (
               <p className="text-xs text-red-500 mt-1">{errors.mobileNumber.message?.toString()}</p>
             )}
