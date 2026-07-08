@@ -123,7 +123,7 @@ export default function InstructorDashboard() {
               <p className="text-sm font-medium text-[var(--sv-on-surface)]">{t('Subscription')}</p>
               <p className="text-sm text-[var(--sv-on-surface-variant)]">
                 {usage?.subscriptionEndDate 
-                  ? new Date(usage.subscriptionEndDate).toLocaleDateString(i18n.language) 
+                  ? new Date(usage.subscriptionEndDate).toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' }) 
                   : t('N/A')}
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function InstructorDashboard() {
               <div>
                 <p className="text-sm font-medium text-[var(--sv-on-surface)]">{t('Next Add-on Expiry')}</p>
                 <p className="text-sm text-[var(--sv-on-surface-variant)]">
-                  {new Date(nearestAddon.endDate).toLocaleDateString(i18n.language)}
+                  {new Date(nearestAddon.endDate).toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' })}
                   <span className="ms-2 text-xs font-bold text-[var(--sv-primary)]">
                     (+{formatBytes(parseInt(nearestAddon.additionalBytes, 10))})
                   </span>
