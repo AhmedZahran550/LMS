@@ -48,9 +48,17 @@ export const SubscriptionsSwagger = {
 
   buyStorage: () =>
     applyDecorators(
-      ApiOperation({ summary: "Buy storage add-on (Instructor)", description: "Creates a Stripe checkout session for a 10 GB storage add-on." }),
+      ApiOperation({ summary: "Buy storage add-on (Instructor)", description: "Creates a Stripe checkout session for a selected storage add-on plan." }),
       ApiBearerAuth(),
+      ApiBody({ schema: { type: 'object', properties: { planId: { type: 'string', description: 'The ID of the storage plan' } } } }),
       ApiResponse({ status: 201, description: "Checkout URL returned" }),
+    ),
+
+  getStoragePlans: () =>
+    applyDecorators(
+      ApiOperation({ summary: "List storage plans (Instructor)", description: "Returns active storage plans available for purchase." }),
+      ApiBearerAuth(),
+      ApiResponse({ status: 200, description: "Storage plans list" }),
     ),
 
   getStorageAddons: () =>
@@ -58,6 +66,29 @@ export const SubscriptionsSwagger = {
       ApiOperation({ summary: "Get storage add-ons (Instructor)", description: "Returns the instructor's active storage add-ons." }),
       ApiBearerAuth(),
       ApiResponse({ status: 200, description: "Storage add-ons list" }),
+    ),
+
+  adminGetStoragePlans: () =>
+    applyDecorators(
+      ApiOperation({ summary: "List storage plans (Admin)", description: "Returns all storage plans. Admin only." }),
+      ApiBearerAuth(),
+      ApiResponse({ status: 200, description: "Storage plans list" }),
+    ),
+
+  adminCreateStoragePlan: () =>
+    applyDecorators(
+      ApiOperation({ summary: "Create storage plan (Admin)", description: "Creates a new storage plan. Admin only." }),
+      ApiBearerAuth(),
+      ApiBody({ schema: { type: 'object', properties: { gigabytes: { type: 'number' }, pricePerGb: { type: 'number' } } } }),
+      ApiResponse({ status: 201, description: "Storage plan created" }),
+    ),
+
+  adminUpdateStoragePlan: () =>
+    applyDecorators(
+      ApiOperation({ summary: "Update storage plan (Admin)", description: "Updates an existing storage plan. Admin only." }),
+      ApiBearerAuth(),
+      ApiBody({ schema: { type: 'object', properties: { gigabytes: { type: 'number' }, pricePerGb: { type: 'number' }, isActive: { type: 'boolean' } } } }),
+      ApiResponse({ status: 200, description: "Storage plan updated" }),
     ),
 
   createPortal: () =>

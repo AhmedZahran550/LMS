@@ -139,9 +139,24 @@ export class InstructorSubscriptionsController {
     return { url: session.url };
   }
 
+  @Get('storage/plans')
+  @SubscriptionsSwagger.getStoragePlans()
+  async getStoragePlans() {
+    return this.subscriptionService.getStoragePlans();
+  }
+
   @Post('storage')
   @SubscriptionsSwagger.buyStorage()
-  async buyStorage(@CurrentUser() user: any, @Req() req: Request) {
+  async buyStorage(
+    @CurrentUser() user: any,
+    @Body('planId') planId: string,
+  ) {
+    if (!planId) {
+      throw new BadRequestException('planId is required');
+    }
+
+    const plan = await this.subscriptionService.getStoragePlanById(planId);
+
     const frontendUrl = process.env.FRONTEND_URL || process.env.WEB_URL || 'http://localhost:3000';
     const successUrl = `${frontendUrl}/instructor/subscription?success=true`;
     const cancelUrl = `${frontendUrl}/instructor/subscription?cancelled=true`;
@@ -151,6 +166,8 @@ export class InstructorSubscriptionsController {
       user.email,
       successUrl,
       cancelUrl,
+      plan.gigabytes,
+      plan.totalPrice,
     );
 
     return { url: session.url };

@@ -89,6 +89,8 @@ export class StripeService {
     email: string,
     successUrl: string,
     cancelUrl: string,
+    gigabytes: number,
+    totalPrice: number,
   ): Promise<Stripe.Checkout.Session> {
     const customerId = await this.getOrCreateCustomer(email, instructorId);
 
@@ -96,10 +98,22 @@ export class StripeService {
       customer: customerId,
       mode: 'payment',
       payment_method_types: ['card'],
-      line_items: [{ price: this.stripeConf.priceStorageAddon, quantity: 1 }],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `${gigabytes} GB Storage Addon`,
+              description: `Adds ${gigabytes} GB of storage to your workspace for 6 months.`,
+            },
+            unit_amount: Math.round(totalPrice * 100),
+          },
+          quantity: 1,
+        },
+      ],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      metadata: { instructorId, isStorageAddon: 'true' },
+      metadata: { instructorId, isStorageAddon: 'true', gigabytes: gigabytes.toString() },
     });
 
     return session;
@@ -140,7 +154,8 @@ export class StripeService {
     if (!instructorId) return;
 
     if (isStorageAddon) {
-      await this.subscriptionService.createStorageAddon(instructorId);
+      const gigabytes = parseInt(session.metadata?.gigabytes || '10', 10);
+      await this.subscriptionService.createStorageAddon(instructorId, gigabytes);
       return;
     }
 

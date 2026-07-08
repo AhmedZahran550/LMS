@@ -12,6 +12,7 @@ import { Payment } from "./entities/payment.entity";
 import { InstructorStudent } from "./entities/instructor-student.entity";
 import { CourseAssignment } from "./entities/course-assignment.entity";
 import { StorageAddon } from "./entities/storage-addon.entity";
+import { StoragePlan } from "./entities/storage-plan.entity";
 import { SystemConfig } from "./entities/system-config.entity";
 import { DeviceToken } from "./entities/device-token.entity";
 import { AppDataSource } from "./datasource";
@@ -33,6 +34,7 @@ import { AppDataSource } from "./datasource";
       InstructorStudent,
       CourseAssignment,
       StorageAddon,
+      StoragePlan,
       SystemConfig,
       DeviceToken,
     ]),

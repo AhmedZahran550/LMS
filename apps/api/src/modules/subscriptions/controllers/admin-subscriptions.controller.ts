@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Param,
   Body,
@@ -42,5 +43,31 @@ export class AdminSubscriptionsController {
     @Body('status') status: SubscriptionStatus,
   ) {
     return this.subscriptionService.updateSubscriptionStatus(id, status);
+  }
+
+  // --- Storage Plans ---
+
+  @Get('storage-plans')
+  @SubscriptionsSwagger.adminGetStoragePlans()
+  async getStoragePlans() {
+    return this.subscriptionService.getStoragePlans();
+  }
+
+  @Post('storage-plans')
+  @SubscriptionsSwagger.adminCreateStoragePlan()
+  async createStoragePlan(
+    @Body('gigabytes') gigabytes: number,
+    @Body('pricePerGb') pricePerGb: number,
+  ) {
+    return this.subscriptionService.createStoragePlan(gigabytes, pricePerGb);
+  }
+
+  @Patch('storage-plans/:id')
+  @SubscriptionsSwagger.adminUpdateStoragePlan()
+  async updateStoragePlan(
+    @Param('id') id: string,
+    @Body() updates: any,
+  ) {
+    return this.subscriptionService.updateStoragePlan(id, updates);
   }
 }

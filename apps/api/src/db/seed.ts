@@ -57,6 +57,12 @@ const SUBSCRIPTION_PLANS = [
   },
 ];
 
+const STORAGE_PLANS = [
+  { gigabytes: 10, pricePerGb: 15, totalPrice: 150, isActive: true },
+  { gigabytes: 50, pricePerGb: 12, totalPrice: 600, isActive: true },
+  { gigabytes: 100, pricePerGb: 10, totalPrice: 1000, isActive: true },
+];
+
 async function seed() {
   await AppDataSource.initialize();
 
@@ -115,6 +121,32 @@ async function seed() {
         ],
       );
       console.log(`Plan "${plan.name}" created.`);
+    }
+  }
+
+  // Seed storage plans
+  console.log('Seeding storage plans...');
+
+  for (const plan of STORAGE_PLANS) {
+    const existing = await AppDataSource.query(
+      `SELECT id FROM storage_plan WHERE gigabytes = $1`,
+      [plan.gigabytes],
+    );
+
+    if (existing.length > 0) {
+      console.log(`Storage Plan "${plan.gigabytes}GB" already exists.`);
+    } else {
+      await AppDataSource.query(
+        `INSERT INTO storage_plan (gigabytes, "pricePerGb", "totalPrice", "isActive")
+         VALUES ($1, $2, $3, $4)`,
+        [
+          plan.gigabytes,
+          plan.pricePerGb,
+          plan.totalPrice,
+          plan.isActive,
+        ],
+      );
+      console.log(`Storage Plan "${plan.gigabytes}GB" created.`);
     }
   }
 

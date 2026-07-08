@@ -15,6 +15,7 @@ import { Payment } from '../../../db/entities/payment.entity';
 import { CourseContent } from '../../../db/entities/course-content.entity';
 import { Course } from '../../../db/entities/course.entity';
 import { StorageAddon } from '../../../db/entities/storage-addon.entity';
+import { StoragePlan } from '../../../db/entities/storage-plan.entity';
 import { User } from '../../../db/entities/user.entity';
 import {
   SubscriptionPlanType,
@@ -37,6 +38,8 @@ export class SubscriptionService {
     private readonly contentRepository: Repository<CourseContent>,
     @InjectRepository(StorageAddon)
     private readonly storageAddonRepository: Repository<StorageAddon>,
+    @InjectRepository(StoragePlan)
+    private readonly storagePlanRepository: Repository<StoragePlan>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @Inject(stripeConfig.KEY)
@@ -237,7 +240,7 @@ export class SubscriptionService {
     });
   }
 
-  async createStorageAddon(instructorId: string): Promise<StorageAddon> {
+  async createStorageAddon(instructorId: string, gigabytes: number): Promise<StorageAddon> {
     const subscription = await this.getActiveSubscription(instructorId);
     if (!subscription) {
       throw new BadRequestException('No active subscription found');
@@ -247,15 +250,45 @@ export class SubscriptionService {
     // 6 months duration = 180 days
     const endDate = new Date(now.getTime() + 180 * 86400000);
 
+    const additionalBytes = (gigabytes * 1024 * 1024 * 1024).toString();
+
     const addon = this.storageAddonRepository.create({
       instructorSubscriptionId: subscription.id,
-      additionalBytes: '10737418240', // 10 GB
+      additionalBytes,
       startDate: now,
       endDate,
       isActive: true,
     });
     
     return this.storageAddonRepository.save(addon);
+  }
+
+  // --- Storage Plan CRUD ---
+  
+  async getStoragePlans(): Promise<StoragePlan[]> {
+    return this.storagePlanRepository.find({
+      where: { isActive: true },
+      order: { gigabytes: 'ASC' },
+    });
+  }
+
+  async getStoragePlanById(id: string): Promise<StoragePlan> {
+    const plan = await this.storagePlanRepository.findOne({ where: { id } });
+    if (!plan) throw new NotFoundException('Storage plan not found');
+    return plan;
+  }
+
+  async createStoragePlan(gigabytes: number, pricePerGb: number): Promise<StoragePlan> {
+    const plan = this.storagePlanRepository.create({ gigabytes, pricePerGb });
+    return this.storagePlanRepository.save(plan);
+  }
+
+  async updateStoragePlan(id: string, updates: Partial<StoragePlan>): Promise<StoragePlan> {
+    const plan = await this.getStoragePlanById(id);
+    if (updates.gigabytes !== undefined) plan.gigabytes = updates.gigabytes;
+    if (updates.pricePerGb !== undefined) plan.pricePerGb = updates.pricePerGb;
+    if (updates.isActive !== undefined) plan.isActive = updates.isActive;
+    return this.storagePlanRepository.save(plan);
   }
 
   async createSubscription(
