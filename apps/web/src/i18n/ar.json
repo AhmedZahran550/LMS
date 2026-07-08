@@ -1,6 +1,13 @@
 {
   "English": "English",
   "عربى": "عربى",
+  "Students": "الطلاب",
+  "{{current}} / {{max}} allowed": "مسموح بـ {{current}} / {{max}}",
+  "B": "بايت",
+  "KB": "كيلوبايت",
+  "MB": "ميجابايت",
+  "GB": "جيجابايت",
+  "TB": "تيرابايت",
   "Notifications": "الإشعارات",
   "Mark all read": "تحديد الكل كمقروء",
   "No notifications yet.": "لا توجد إشعارات بعد.",

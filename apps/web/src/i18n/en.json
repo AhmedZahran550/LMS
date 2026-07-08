@@ -1,6 +1,13 @@
 {
   "English": "English",
   "عربى": "عربى",
+  "Students": "Students",
+  "{{current}} / {{max}} allowed": "{{current}} / {{max}} allowed",
+  "B": "B",
+  "KB": "KB",
+  "MB": "MB",
+  "GB": "GB",
+  "TB": "TB",
   "Notifications": "Notifications",
   "Mark all read": "Mark all read",
   "No notifications yet.": "No notifications yet.",

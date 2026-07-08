@@ -9,12 +9,12 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { SubscriptionPlanType } from '@lms/shared-types';
 
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
+function formatBytes(bytes: number, t: any): string {
+  if (bytes === 0) return `0 ${t('B')}`;
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${t(sizes[i])}`;
 }
 
 export default function InstructorDashboard() {
@@ -83,7 +83,7 @@ export default function InstructorDashboard() {
           <div className="text-4xl font-black text-[var(--sv-on-surface)]">{usage?.totalStudents || 0}</div>
           <p className="text-sm text-[var(--sv-on-surface-variant)] mt-2">
             {usage?.plan?.maxTotalStudents > 0 
-              ? `${usage.totalStudents} / ${usage.plan.maxTotalStudents} ${t('allowed')}` 
+              ? t('{{current}} / {{max}} allowed', { current: usage.totalStudents, max: usage.plan.maxTotalStudents })
               : t('Unlimited')}
           </p>
         </div>
@@ -96,7 +96,7 @@ export default function InstructorDashboard() {
             </div>
           </div>
           <div className="text-3xl font-black text-[var(--sv-on-surface)]">
-            {formatBytes(Math.max(0, (usage?.baseStorageBytes || 0) + (usage?.totalAddonStorageBytes || 0) - (usage?.totalStorageBytes || 0)))}
+            {formatBytes(Math.max(0, (usage?.baseStorageBytes || 0) + (usage?.totalAddonStorageBytes || 0) - (usage?.totalStorageBytes || 0)), t)}
           </div>
           <div className="mt-3">
             <div className="h-2 w-full rounded-full bg-[var(--sv-surface-container-high)] overflow-hidden">
@@ -133,7 +133,7 @@ export default function InstructorDashboard() {
                 <p className="text-sm text-[var(--sv-on-surface-variant)]">
                   {new Date(nearestAddon.endDate).toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' })}
                   <span className="ms-2 text-xs font-bold text-[var(--sv-primary)]">
-                    (+{formatBytes(parseInt(nearestAddon.additionalBytes, 10))})
+                    (+{formatBytes(parseInt(nearestAddon.additionalBytes, 10), t)})
                   </span>
                 </p>
               </div>
