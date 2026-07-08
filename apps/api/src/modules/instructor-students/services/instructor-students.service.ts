@@ -45,7 +45,8 @@ export class InstructorStudentsService {
 
     const link = this.instructorStudentRepo.create({
       instructorId,
-      studentId: student?.id,
+      studentId: student?.id ?? null,
+      invitedEmail: dto.email,
       status: InstructorStudentStatus.INVITED,
       invitedBy: InvitedBy.INSTRUCTOR,
       invitationToken: token,
@@ -126,10 +127,14 @@ export class InstructorStudentsService {
     }
 
     const link = await this.instructorStudentRepo.findOne({
-      where: { instructorId: payload.instructorId, studentId: userId, status: InstructorStudentStatus.INVITED },
+      where: [
+        { instructorId: payload.instructorId, studentId: userId, status: InstructorStudentStatus.INVITED },
+        { instructorId: payload.instructorId, invitedEmail: payload.email, status: InstructorStudentStatus.INVITED }
+      ],
     });
     if (!link) throw new NotFoundException(this.i18n.t('errors.INVITATION_EXPIRED'));
 
+    link.studentId = userId;
     link.status = InstructorStudentStatus.ACTIVE;
     link.respondedAt = new Date();
     link.invitationToken = null;

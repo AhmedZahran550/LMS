@@ -6,13 +6,16 @@ import { BaseEntity } from './base.entity';
 @Entity()
 @Index(['instructorId', 'status'])
 @Index(['studentId', 'status'])
-@Index(['instructorId', 'studentId'], { unique: true })
+@Index(['instructorId', 'studentId'], { unique: true, where: '"studentId" IS NOT NULL' })
 export class InstructorStudent extends BaseEntity {
   @Column()
   instructorId!: string;
 
-  @Column()
-  studentId!: string;
+  @Column({ nullable: true })
+  studentId?: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  invitedEmail?: string | null;
 
   @Column({
     type: 'enum',
@@ -41,7 +44,7 @@ export class InstructorStudent extends BaseEntity {
   @JoinColumn({ name: 'instructorId' })
   instructor!: User;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'studentId' })
-  student!: User;
+  student?: User | null;
 }
