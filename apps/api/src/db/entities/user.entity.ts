@@ -1,4 +1,4 @@
-import { Entity, Column, Unique, OneToMany } from 'typeorm';
+import { Entity, Column, Unique, OneToMany, Index } from 'typeorm';
 import { DeviceToken } from './device-token.entity';
 import { UserRole, AuthProvider } from '@lms/shared-types';
 import { Exclude } from 'class-transformer';
@@ -6,11 +6,12 @@ import { BaseEntity } from './base.entity';
 
 @Entity()
 @Unique(['provider', 'providerId'])
+@Index(['mobileNumber'], { unique: true, where: '"isMobileVerified" = true' })
 export class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
 
-  @Column({ type: 'varchar', nullable: true, unique: true })
+  @Column({ type: 'varchar', nullable: true })
   mobileNumber?: string | null;
 
   @Column({ default: false })
