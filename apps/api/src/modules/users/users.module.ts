@@ -7,9 +7,11 @@ import { LearnerInstructorsController } from './controllers/learner-instructors.
 import { User } from '../../db/entities/user.entity';
 import { StorageModule } from '../storage/storage.module';
 
+import { PushNotificationsModule } from '../push-notifications/push-notifications.module';
+
 @Module({
   imports: [
-    
+    PushNotificationsModule,
     StorageModule,
   ],
   controllers: [AdminUsersController, ProfileController, LearnerInstructorsController],
