@@ -10,6 +10,8 @@ import { LoginFormUI } from './LoginFormUI';
 import { useLoginMutation, useSendOtpMutation } from '@/hooks/useAuthMutations';
 import { useAuthStore } from '@/store/useAuthStore';
 import { UserRole } from '@lms/shared-types';
+import { requestFCMToken } from '@/lib/firebase';
+import { getDeviceInfo } from '@/lib/deviceInfo';
 
 type LoginFormData = z.infer<ReturnType<typeof getLoginSchema>>;
 
@@ -55,7 +57,16 @@ export function LoginForm() {
     setResendError(null);
 
     try {
-      const response = await loginMutation.mutateAsync(data);
+      const deviceToken = await requestFCMToken();
+      const deviceInfo = getDeviceInfo();
+      
+      const payload = {
+        ...data,
+        deviceToken,
+        deviceInfo,
+      };
+
+      const response = await loginMutation.mutateAsync(payload);
       const { user, accessToken, refreshToken } = response;
       
       const themeChanged = sessionStorage.getItem('theme_changed_locally') === 'true';

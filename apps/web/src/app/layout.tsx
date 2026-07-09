@@ -5,6 +5,7 @@ import QueryProvider from "@/components/providers/QueryProvider";
 import { SnackbarProvider } from "@/components/ui/Snackbar";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { FCMProvider } from "@/components/providers/FCMProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-plus-jakarta-sans" });
@@ -57,7 +58,9 @@ export default async function RootLayout({
           <I18nProvider lang={lang}>
             <QueryProvider>
               <SnackbarProvider>
-                {children}
+                <FCMProvider>
+                  {children}
+                </FCMProvider>
               </SnackbarProvider>
             </QueryProvider>
           </I18nProvider>
