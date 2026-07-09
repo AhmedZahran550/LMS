@@ -1,4 +1,4 @@
-import {
+import { 
   Controller,
   Get,
   Post,
@@ -6,6 +6,7 @@ import {
   Param,
   Body,
   UseGuards,
+  ParseUUIDPipe
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { SubscriptionService } from '../services/subscription.service';
@@ -39,7 +40,7 @@ export class AdminSubscriptionsController {
   @Patch(':id/status')
   @SubscriptionsSwagger.updateSubscriptionStatus()
   async updateStatus(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body('status') status: SubscriptionStatus,
   ) {
     return this.subscriptionService.updateSubscriptionStatus(id, status);
@@ -65,7 +66,7 @@ export class AdminSubscriptionsController {
   @Patch('storage-plans/:id')
   @SubscriptionsSwagger.adminUpdateStoragePlan()
   async updateStoragePlan(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updates: any,
   ) {
     return this.subscriptionService.updateStoragePlan(id, updates);

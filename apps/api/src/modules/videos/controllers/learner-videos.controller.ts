@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {  Controller, Get, Param, UseGuards , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
@@ -20,7 +20,7 @@ export class LearnerContentController {
   @VideosSwagger.findAllLearnerContent()
   async findAll(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
     @Paginate() query: PaginateQuery,
   ) {
     return this.contentService.findLearnerPaginatedCourseContents(courseId, user.id, query);
@@ -30,8 +30,8 @@ export class LearnerContentController {
   @VideosSwagger.findOneLearnerContent()
   async findOne(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
-    @Param('contentId') contentId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('contentId', ParseUUIDPipe) contentId: string,
   ) {
     return this.contentService.findCourseContentById(courseId, contentId, user.id);
   }

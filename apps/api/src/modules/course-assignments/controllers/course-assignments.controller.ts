@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
@@ -18,7 +18,7 @@ export class CourseAssignmentsController {
   @CourseAssignmentsSwagger.assign()
   async assign(
     @CurrentUser('id') instructorId: string,
-    @Param('studentId') studentId: string,
+    @Param('studentId', ParseUUIDPipe) studentId: string,
     @Body() dto: AssignCourseDto,
   ) {
     const assignments = await this.service.assign(instructorId, studentId, dto.courseIds);
@@ -29,7 +29,7 @@ export class CourseAssignmentsController {
   @CourseAssignmentsSwagger.getAssignments()
   async getAssignments(
     @CurrentUser('id') instructorId: string,
-    @Param('studentId') studentId: string,
+    @Param('studentId', ParseUUIDPipe) studentId: string,
   ) {
     return this.service.getAssignments(instructorId, studentId);
   }

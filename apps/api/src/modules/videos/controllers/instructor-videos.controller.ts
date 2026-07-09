@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {  Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CourseContentService } from '../videos.service';
@@ -24,7 +24,7 @@ export class InstructorContentController {
   @VideosSwagger.findAllContent()
   async findAll(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
     @Paginate() query: PaginateQuery,
   ) {
     return this.contentService.findPaginatedCourseContents(courseId, user.id, query);
@@ -35,7 +35,7 @@ export class InstructorContentController {
   @VideosSwagger.uploadContent()
   async upload(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
     @Body() createDto: CreateVideoDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -46,7 +46,7 @@ export class InstructorContentController {
   @VideosSwagger.reorderContent()
   async reorder(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
     @Body() reorderDto: ReorderVideosDto,
   ) {
     return this.contentService.reorder(courseId, user.id, reorderDto);
@@ -56,8 +56,8 @@ export class InstructorContentController {
   @VideosSwagger.updateContent()
   async update(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
-    @Param('contentId') contentId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('contentId', ParseUUIDPipe) contentId: string,
     @Body() updateDto: UpdateVideoDto,
   ) {
     return this.contentService.updateCourseContent(courseId, contentId, user.id, updateDto);
@@ -67,8 +67,8 @@ export class InstructorContentController {
   @VideosSwagger.removeContent()
   async remove(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
-    @Param('contentId') contentId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Param('contentId', ParseUUIDPipe) contentId: string,
   ) {
     await this.contentService.removeCourseContent(courseId, contentId, user.id);
     return { contentId, deleted: true };

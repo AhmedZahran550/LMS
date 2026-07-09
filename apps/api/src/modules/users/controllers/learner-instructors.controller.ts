@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {  Controller, Get, Param, UseGuards , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { UsersService } from '../users.service';
@@ -26,7 +26,7 @@ export class LearnerInstructorsController {
 
   @Get(':id')
   @UsersSwagger.findOneInstructor()
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const user: any = await this.usersService.findByIdOrFail(id);
     
     if (user.role !== UserRole.INSTRUCTOR) {

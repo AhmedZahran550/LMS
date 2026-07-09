@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Body, UseGuards, Query } from '@nestjs/common';
+import {  Controller, Get, Patch, Param, Body, UseGuards, Query , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -57,7 +57,7 @@ export class AdminEnrollmentsController {
 
   @Patch(':id')
   @EnrollmentsSwagger.updateEnrollment()
-  async update(@Param('id') id: string, @Body() respondDto: RespondEnrollmentDto) {
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() respondDto: RespondEnrollmentDto) {
     const enrollment = await this.enrollmentsRepository.findOne({ where: { id } });
     if (enrollment) {
       enrollment.status = respondDto.status;

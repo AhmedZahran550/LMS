@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseGuards, ForbiddenException } from '@nestjs/common';
+import {  Controller, Get, Post, Param, UseGuards, ForbiddenException , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { EnrollmentsService } from '../enrollments.service';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
@@ -25,7 +25,7 @@ export class LearnerEnrollmentsController {
   @EnrollmentsSwagger.requestEnrollment()
   async requestEnrollment(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
   ) {
     return this.enrollmentsService.requestEnrollment(user.id, courseId);
   }
@@ -47,7 +47,7 @@ export class LearnerEnrollmentsController {
   @EnrollmentsSwagger.getMyCourseDetail()
   async getMyCourseDetail(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
   ) {
     const isEnrolled = await this.enrollmentsService.isEnrolled(user.id, courseId);
     if (!isEnrolled) {

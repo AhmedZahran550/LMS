@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Param, Query, UseGuards, Body,
+  Controller, Get, Post, Param, Query, UseGuards, Body, ParseUUIDPipe 
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
@@ -31,7 +31,7 @@ export class StudentInstructorsController {
   @InstructorStudentsSwagger.requestToJoin()
   async requestToJoin(
     @CurrentUser('id') studentId: string,
-    @Param('instructorId') instructorId: string,
+    @Param('instructorId', ParseUUIDPipe) instructorId: string,
   ) {
     const link = await this.service.requestToJoin(studentId, instructorId);
     return { success: true, data: { id: link.id, status: link.status } };
@@ -47,7 +47,7 @@ export class StudentInstructorsController {
   @Get('my-instructors/:instructorId/courses')
   async getInstructorCourses(
     @CurrentUser('id') studentId: string,
-    @Param('instructorId') instructorId: string,
+    @Param('instructorId', ParseUUIDPipe) instructorId: string,
   ) {
     const courses = await this.service.getInstructorCourses(studentId, instructorId);
     return { success: true, data: courses };

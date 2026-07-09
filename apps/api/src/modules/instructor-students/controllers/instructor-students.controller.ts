@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards,
+  Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, ParseUUIDPipe 
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
@@ -52,7 +52,7 @@ export class InstructorStudentsController {
   @InstructorStudentsSwagger.respondToRequest()
   async respondToRequest(
     @CurrentUser('id') instructorId: string,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: RespondRequestDto,
   ) {
     const link = await this.service.respondToRequest(instructorId, id, dto);
@@ -61,7 +61,7 @@ export class InstructorStudentsController {
 
   @Delete(':id')
   @InstructorStudentsSwagger.removeStudent()
-  async removeStudent(@CurrentUser('id') instructorId: string, @Param('id') id: string) {
+  async removeStudent(@CurrentUser('id') instructorId: string, @Param('id', ParseUUIDPipe) id: string) {
     const link = await this.service.removeStudent(instructorId, id);
     return { success: true, data: { id: link.id, status: link.status } };
   }

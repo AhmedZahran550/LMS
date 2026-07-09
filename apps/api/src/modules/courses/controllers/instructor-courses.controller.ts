@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {  Controller, Get, Post, Body, Patch, Param, Delete, UseGuards , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CoursesService } from '../courses.service';
@@ -44,7 +44,7 @@ export class InstructorCoursesController {
 
   @Get(':id')
   @CoursesSwagger.findOneCourse()
-  async findOne(@CurrentUser() user: any, @Param('id') id: string) {
+  async findOne(@CurrentUser() user: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.coursesService.findInstructorCourse(id, user.id);
   }
 
@@ -52,7 +52,7 @@ export class InstructorCoursesController {
   @CoursesSwagger.updateCourse()
   async update(
     @CurrentUser() user: any,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCourseDto: UpdateCourseDto,
   ) {
     return this.coursesService.update(id, updateCourseDto, user.id);
@@ -60,7 +60,7 @@ export class InstructorCoursesController {
 
   @Delete(':id')
   @CoursesSwagger.removeCourse()
-  async remove(@CurrentUser() user: any, @Param('id') id: string) {
+  async remove(@CurrentUser() user: any, @Param('id', ParseUUIDPipe) id: string) {
     await this.coursesService.remove(id, user.id);
     return { id, deleted: true };
   }

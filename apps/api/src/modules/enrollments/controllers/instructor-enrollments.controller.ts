@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {  Controller, Get, Post, Patch, Delete, Param, Body, UseGuards , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { EnrollmentsService } from '../enrollments.service';
 import { RespondEnrollmentDto } from '../dto/respond-enrollment.dto';
@@ -21,7 +21,7 @@ export class InstructorEnrollmentsController {
   @EnrollmentsSwagger.getCourseEnrollments()
   async getCourseEnrollments(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
   ) {
     const enrollments = await this.enrollmentsService.getCourseEnrollments(courseId, user.id);
     return enrollments.map(e => {
@@ -37,7 +37,7 @@ export class InstructorEnrollmentsController {
   @EnrollmentsSwagger.respondToEnrollment()
   async respond(
     @CurrentUser() user: any,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() respondDto: RespondEnrollmentDto,
   ) {
     return this.enrollmentsService.respondToEnrollment(id, user.id, respondDto);
@@ -47,7 +47,7 @@ export class InstructorEnrollmentsController {
   @EnrollmentsSwagger.inviteLearner()
   async invite(
     @CurrentUser() user: any,
-    @Param('courseId') courseId: string,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
     @Body() inviteDto: InviteLearnerDto,
   ) {
     return this.enrollmentsService.inviteLearner(courseId, user.id, inviteDto);
@@ -57,7 +57,7 @@ export class InstructorEnrollmentsController {
   @EnrollmentsSwagger.removeEnrollment()
   async remove(
     @CurrentUser() user: any,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     await this.enrollmentsService.removeLearner(id, user.id);
     return { id, deleted: true };
