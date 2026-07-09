@@ -4,3 +4,4 @@ export { default as jwtConfig } from './jwt.config';
 export { default as mailConfig } from './mail.config';
 export { default as storageConfig } from './storage.config';
 export { default as oauthConfig } from './oauth.config';
+export { default as firebaseConfig } from './firebase.config';

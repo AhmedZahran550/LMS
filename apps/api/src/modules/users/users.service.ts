@@ -22,6 +22,7 @@ export const USER_PAGINATION_CONFIG: PaginateConfig<User> = {
 
 import { DeviceToken } from '../../db/entities/device-token.entity';
 import { DeviceInfo } from '../../core/auth/dto/login.dto';
+import { PushNotificationService } from '../push-notifications/push-notifications.service';
 
 @Injectable()
 export class UsersService extends DBService<
@@ -34,6 +35,7 @@ export class UsersService extends DBService<
     private readonly usersRepository: Repository<User>,
     @InjectRepository(DeviceToken)
     private readonly deviceTokenRepository: Repository<DeviceToken>,
+    private readonly pushService: PushNotificationService,
   ) {
     super(usersRepository, USER_PAGINATION_CONFIG);
   }
@@ -49,7 +51,15 @@ export class UsersService extends DBService<
       });
     }
     deviceToken.deviceInfo = info;
-    return this.deviceTokenRepository.save(deviceToken);
+    const saved = await this.deviceTokenRepository.save(deviceToken);
+
+    // Subscribe to role-based topic for broadcasts (fire-and-forget)
+    const user = await this.findByIdOrFail(userId);
+    this.pushService
+      .subscribeToTopic([token], `role_${user.role}`)
+      .catch(() => {});
+
+    return saved;
   }
 
   async findByEmail(email: string): Promise<User | null> {

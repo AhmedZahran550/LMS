@@ -3,12 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '../../db/entities/notification.entity';
 import { NotificationType } from '@lms/shared-types';
+import { PushNotificationService } from '../push-notifications/push-notifications.service';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class NotificationsService {
+  private readonly logger = new Logger(NotificationsService.name);
+
   constructor(
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
+    private pushService: PushNotificationService,
   ) {}
 
   async create(
@@ -29,7 +34,26 @@ export class NotificationsService {
       relatedEntityType,
       relatedEntityId,
     });
-    return this.notificationsRepository.save(notification);
+    const saved = await this.notificationsRepository.save(notification);
+
+    // Fire-and-forget push — don't await to keep API fast
+    this.pushService.sendToUser(userId, {
+      title: subject,
+      body: message,
+      type,
+      data: {
+        notificationId: saved.id,
+        ...(relatedEntityType ? { relatedEntityType } : {}),
+        ...(relatedEntityId ? { relatedEntityId } : {}),
+        ...(metadata
+          ? Object.fromEntries(
+              Object.entries(metadata).map(([k, v]) => [k, String(v)]),
+            )
+          : {}),
+      },
+    }).catch((err) => this.logger.error('Push notification failed', err));
+
+    return saved;
   }
 
   async createMany(
@@ -52,7 +76,25 @@ export class NotificationsService {
         relatedEntityId,
       })
     );
-    return this.notificationsRepository.save(notifications);
+    const saved = await this.notificationsRepository.save(notifications);
+
+    // Fire-and-forget push to all recipients
+    this.pushService.sendToUsers(userIds, {
+      title: subject,
+      body: message,
+      type,
+      data: {
+        ...(relatedEntityType ? { relatedEntityType } : {}),
+        ...(relatedEntityId ? { relatedEntityId } : {}),
+        ...(metadata
+          ? Object.fromEntries(
+              Object.entries(metadata).map(([k, v]) => [k, String(v)]),
+            )
+          : {}),
+      },
+    }).catch((err) => this.logger.error('Bulk push notification failed', err));
+
+    return saved;
   }
 
   async findAllForUser(userId: string): Promise<Notification[]> {

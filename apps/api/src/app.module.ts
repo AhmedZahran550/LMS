@@ -19,6 +19,8 @@ import jwtConfig from './config/jwt.config';
 import mailConfig from './config/mail.config';
 import storageConfig from './config/storage.config';
 import oauthConfig from './config/oauth.config';
+import firebaseConfig from './config/firebase.config';
+import { PushNotificationsModule } from './modules/push-notifications/push-notifications.module';
 
 import { AdminApiModule } from './api/admin/admin-api.module';
 import { InstructorApiModule } from './api/instructor/instructor-api.module';
@@ -30,7 +32,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig, oauthConfig],
+      load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig, oauthConfig, firebaseConfig],
       envFilePath: '.env',
     }),
     DatabaseModule,
@@ -43,7 +45,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
     AdminApiModule,
     InstructorApiModule,
     LearnerApiModule,
-
+    PushNotificationsModule,
   ],
   controllers: [AppController],
   providers: [

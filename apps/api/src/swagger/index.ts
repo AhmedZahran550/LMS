@@ -7,3 +7,5 @@ export { VideosSwagger } from "./videos.swagger";
 export { NotificationsSwagger } from "./notifications.swagger";
 export { InstructorStudentsSwagger } from "./instructor-students.swagger";
 export { CourseAssignmentsSwagger } from "./course-assignments.swagger";
+export { PushNotificationsSwagger } from "./push-notifications.swagger";
+
