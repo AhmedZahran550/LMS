@@ -33,6 +33,7 @@ const MESSAGE_TO_ERROR_CODE: Record<string, string> = {
   "Email is already verified": "CONFLICT",
   "Invalid or expired password reset token": "INVALID_RESET_TOKEN",
   "Resource not found.": "RESOURCE_NOT_FOUND",
+  "Your session has expired. Please log in again.": "TOKEN_EXPIRED",
 };
 
 @Catch()

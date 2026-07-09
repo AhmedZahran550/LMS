@@ -1,13 +1,15 @@
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
+const urlParams = new URLSearchParams(location.search);
+
 firebase.initializeApp({
-  apiKey: "AIzaSyBn-0tVlU3P90qnZ6N62AynfHb_aNG3aSU",
-  authDomain: "lmsedu-39ea3.firebaseapp.com",
-  projectId: "lmsedu-39ea3",
-  storageBucket: "lmsedu-39ea3.firebasestorage.app",
-  messagingSenderId: "417630244428",
-  appId: "1:417630244428:web:279d5f1e4b2f88e0fdaee9"
+  apiKey: urlParams.get('apiKey'),
+  authDomain: urlParams.get('authDomain'),
+  projectId: urlParams.get('projectId'),
+  storageBucket: urlParams.get('storageBucket'),
+  messagingSenderId: urlParams.get('messagingSenderId'),
+  appId: urlParams.get('appId')
 });
 
 const messaging = firebase.messaging();

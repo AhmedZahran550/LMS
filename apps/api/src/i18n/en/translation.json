@@ -50,6 +50,7 @@
   },
   "errors": {
     "INVALID_CREDENTIALS": "Invalid credentials",
+    "TOKEN_EXPIRED": "Your session has expired. Please log in again.",
     "EMAIL_EXISTS": "Email already exists",
     "VERIFY_EMAIL": "Please verify your email before logging in",
     "ACCOUNT_INACTIVE": "Account is inactive",
