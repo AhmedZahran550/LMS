@@ -1,50 +1,42 @@
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
-// Listen for push messages when app is in background
-// We defer initialization until we actually receive a push to avoid errors
-// if config is missing, but FCM needs the sender ID at least.
+firebase.initializeApp({
+  apiKey: "AIzaSyBn-0tVlU3P90qnZ6N62AynfHb_aNG3aSU",
+  authDomain: "lmsedu-39ea3.firebaseapp.com",
+  projectId: "lmsedu-39ea3",
+  storageBucket: "lmsedu-39ea3.firebasestorage.app",
+  messagingSenderId: "417630244428",
+  appId: "1:417630244428:web:279d5f1e4b2f88e0fdaee9"
+});
 
-self.addEventListener('push', function (event) {
-  if (!firebase.apps.length) {
-    // We try to pull config from the query params of the registration URL if possible, 
-    // but the easiest way is to hardcode it or inject it during build.
-    // For simplicity, we initialize it if we have the config.
-    // Alternatively, just let the server send full notification payload and we show it.
-  }
+const messaging = firebase.messaging();
 
-  const data = event.data?.json() ?? {};
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
-  // If the server sends a full 'notification' object in the FCM payload, 
-  // Firebase will automatically show the notification and we don't strictly 
-  // need to call showNotification here unless it's a data-only message.
-  
-  if (data.notification) {
-    const title = data.notification.title;
-    const options = {
-      body: data.notification.body,
-      icon: '/next.svg', // Default icon
-      data: data.data,
+  if (payload.notification) {
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+      body: payload.notification.body,
+      icon: '/next.svg',
+      data: payload.data,
     };
-    event.waitUntil(self.registration.showNotification(title, options));
+    self.registration.showNotification(notificationTitle, notificationOptions);
   }
 });
 
 self.addEventListener('notificationclick', function (event) {
   event.notification.close();
 
-  // Try to open the app or focus the existing tab
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Focus if we already have it open
       for (const client of clientList) {
         if (client.url.startsWith(self.registration.scope) && 'focus' in client) {
           return client.focus();
         }
       }
-      // Otherwise open a new tab
       if (clients.openWindow) {
-        // Here we could use event.notification.data to navigate to specific page
         return clients.openWindow('/');
       }
     })
