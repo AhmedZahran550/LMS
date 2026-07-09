@@ -84,19 +84,22 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (!user.isEmailVerified) {
-      throw new HttpException(
-        { message: 'Please verify your email before logging in', errorCode: 'VERIFY_EMAIL' },
-        401,
-      );
-    }
+    // Admin users bypass all verification and restriction checks
+    if (user.role !== UserRole.ADMIN) {
+      if (!user.isEmailVerified) {
+        throw new HttpException(
+          { message: 'Please verify your email before logging in', errorCode: 'VERIFY_EMAIL' },
+          401,
+        );
+      }
 
-    if (!user.isActive) {
-      throw new UnauthorizedException('Account is inactive');
-    }
+      if (!user.isActive) {
+        throw new UnauthorizedException('Account is inactive');
+      }
 
-    if (loginDto.client === 'web' && user.role === 'learner') {
-      throw new UnauthorizedException('error.students_use_mobile');
+      if (loginDto.client === 'web' && user.role === 'learner') {
+        throw new UnauthorizedException('error.students_use_mobile');
+      }
     }
 
     const tokens = await this.generateTokens(user);

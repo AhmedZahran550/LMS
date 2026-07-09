@@ -84,8 +84,8 @@ async function seed() {
     const hashedPassword = await argon2.hash(password);
 
     await AppDataSource.query(
-      `INSERT INTO "user" (email, password, "firstName", "lastName", role, "isActive") VALUES ($1, $2, $3, $4, $5, $6)`,
-      [email, hashedPassword, firstName, lastName, UserRole.ADMIN, true],
+      `INSERT INTO "user" (email, password, "firstName", "lastName", role, "isActive", "isEmailVerified") VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [email, hashedPassword, firstName, lastName, UserRole.ADMIN, true, true],
     );
 
     console.log('Admin user created successfully.');

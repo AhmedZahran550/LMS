@@ -13,6 +13,7 @@ import { StorageAddon } from '../../../db/entities/storage-addon.entity';
 import {
   SubscriptionStatus,
   InstructorStudentStatus,
+  UserRole,
 } from '@lms/shared-types';
 import { ErrorCodes } from '../../../core/utils/error-codes';
 
@@ -44,7 +45,9 @@ export class SubscriptionGuardService {
     return subscription;
   }
 
-  async checkCourseCreation(instructorId: string): Promise<void> {
+  async checkCourseCreation(instructorId: string, userRole?: string): Promise<void> {
+    if (userRole === UserRole.ADMIN) return;
+
     const subscription = await this.getSubscriptionOrThrow(instructorId);
 
     if (subscription.status === SubscriptionStatus.EXPIRED) {
@@ -68,7 +71,10 @@ export class SubscriptionGuardService {
   async checkContentUpload(
     instructorId: string,
     fileSize: number,
+    userRole?: string,
   ): Promise<void> {
+    if (userRole === UserRole.ADMIN) return;
+
     const subscription = await this.getSubscriptionOrThrow(instructorId);
 
     if (subscription.status === SubscriptionStatus.EXPIRED) {
@@ -111,7 +117,9 @@ export class SubscriptionGuardService {
     }
   }
 
-  async checkStudentAcceptance(instructorId: string, _courseId?: string): Promise<void> {
+  async checkStudentAcceptance(instructorId: string, _courseId?: string, userRole?: string): Promise<void> {
+    if (userRole === UserRole.ADMIN) return;
+
     const subscription = await this.getSubscriptionOrThrow(instructorId);
 
     if (subscription.status === SubscriptionStatus.EXPIRED) {
