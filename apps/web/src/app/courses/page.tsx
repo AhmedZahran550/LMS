@@ -147,7 +147,7 @@ export default function CoursesPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex items-center gap-2 overflow-x-auto py-6 max-w-5xl mx-auto no-scrollbar justify-start md:justify-center"
+              className="flex flex-wrap items-center justify-center gap-2.5 py-6 max-w-4xl mx-auto"
             >
               {categories.map((cat) => {
                 const isActive = selectedCategory === cat;
