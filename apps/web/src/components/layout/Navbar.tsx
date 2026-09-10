@@ -135,30 +135,32 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                 )}
               </div>
 
-              <div className="max-h-64 overflow-y-auto py-1">
+              <div className="max-h-72 overflow-y-auto py-1">
                 {notifications.length === 0 ? (
-                  <div className="py-8 text-center text-xs text-[var(--sv-on-surface-variant)]">
-                    {t('No notifications yet.')}
+                  <div className="py-8 px-4 text-center">
+                    <span className="text-2xl mb-1 block">🎉</span>
+                    <p className="font-bold text-xs text-slate-800 dark:text-slate-200">{t("You're all caught up!")}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t("No new notifications at this moment.")}</p>
                   </div>
                 ) : (
                   notifications.map((notification: any) => (
                     <div
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
-                      className={"flex flex-col gap-1 rounded-lg px-4 py-2.5 text-start transition-colors cursor-pointer " + (
+                      className={"flex flex-col gap-1 rounded-xl mx-1 px-3.5 py-2.5 text-start transition-colors cursor-pointer " + (
                         notification.isRead
-                          ? 'text-[var(--sv-on-surface-variant)] hover:bg-[var(--sv-surface-container-high)]'
-                          : 'bg-[var(--sv-primary-container)]/10 text-[var(--sv-on-surface)] hover:bg-[var(--sv-primary-container)]/20'
+                          ? 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                          : 'bg-indigo-50/70 dark:bg-indigo-950/40 text-slate-900 dark:text-white hover:bg-indigo-100/70 dark:hover:bg-indigo-900/40'
                       )}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-[var(--sv-on-surface)]">{notification.subject}</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">{notification.subject}</span>
                         {!notification.isRead && (
-                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--sv-primary)]" />
+                          <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse" />
                         )}
                       </div>
                       <span className="text-xs leading-normal">{notification.message}</span>
-                      <span className="text-[10px] text-[var(--sv-on-surface-variant)]">
+                      <span className="text-[10px] text-slate-400">
                         {new Date(notification.createdAt).toLocaleDateString(i18n.language)}
                       </span>
                     </div>
@@ -169,18 +171,14 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           )}
         </div>
 
-        <div className="h-8 w-[1px] bg-[var(--sv-outline-variant)] mx-2 hidden md:block"></div>
+        <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2 hidden md:block"></div>
 
         <div className="relative" ref={userMenuRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center justify-center h-8 w-8 rounded-full bg-[var(--sv-primary)] text-[var(--sv-on-primary)] text-xs font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--sv-primary)]/20"
+            className="flex items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-transform active:scale-95 cursor-pointer"
           >
-            {user.profileImageUrl ? (
-              <Avatar src={user.profileImageUrl} firstName={user.firstName} lastName={user.lastName} size="sm" />
-            ) : (
-              <span>{user.firstName[0]?.toUpperCase()}{user.lastName[0]?.toUpperCase()}</span>
-            )}
+            <Avatar src={user.profileImageUrl} firstName={user.firstName} lastName={user.lastName} size="sm" isOnline={true} />
           </button>
 
           {showUserMenu && (
