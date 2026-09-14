@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PaginateConfig, FilterOperator } from 'nestjs-paginate';
+import { PaginateConfig, FilterOperator, PaginateQuery } from 'nestjs-paginate';
 import { DBService } from '../../db/db.service';
 import { Enrollment } from '../../db/entities/enrollment.entity';
 import { RespondEnrollmentDto } from './dto/respond-enrollment.dto';
@@ -186,21 +186,19 @@ export class EnrollmentsService extends DBService<Enrollment> {
     return this.enrollmentsRepository.save(enrollment);
   }
 
-  async getLearnerEnrollments(learnerId: string): Promise<Enrollment[]> {
-    return this.enrollmentsRepository.find({
+  async getLearnerEnrollments(learnerId: string, query: PaginateQuery) {
+    return this.findAll({
+      ...query,
       where: { learnerId },
-      relations: ['course', 'course.instructor'],
-      order: { createdAt: 'DESC' },
     });
   }
 
-  async getCourseEnrollments(courseId: string, instructorId: string): Promise<Enrollment[]> {
+  async getCourseEnrollments(courseId: string, instructorId: string, query: PaginateQuery) {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
 
-    return this.enrollmentsRepository.find({
+    return this.findAll({
+      ...query,
       where: { courseId },
-      relations: ['learner'],
-      order: { createdAt: 'DESC' },
     });
   }
 

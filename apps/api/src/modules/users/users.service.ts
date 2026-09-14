@@ -62,12 +62,45 @@ export class UsersService extends DBService<
     return saved;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email } });
+  async findByEmail(email: string, includeSensitive = false): Promise<User | null> {
+    if (!includeSensitive) {
+      return this.usersRepository.findOne({ where: { email } });
+    }
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect([
+        'user.password',
+        'user.provider',
+        'user.providerId',
+        'user.emailVerificationToken',
+        'user.emailVerificationOtpExpiresAt',
+        'user.mobileOtp',
+        'user.mobileOtpExpiresAt',
+        'user.hashedRefreshToken',
+        'user.resetPasswordToken',
+        'user.resetPasswordTokenExpiresAt',
+      ])
+      .where('user.email = :email', { email })
+      .getOne();
   }
 
-  async findByMobileNumber(mobileNumber: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { mobileNumber } });
+  async findByMobileNumber(mobileNumber: string, includeOtp = false): Promise<User | null> {
+    if (!includeOtp) {
+      return this.usersRepository.findOne({ where: { mobileNumber } });
+    }
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect(['user.mobileOtp', 'user.mobileOtpExpiresAt'])
+      .where('user.mobileNumber = :mobileNumber', { mobileNumber })
+      .getOne();
+  }
+
+  async findByIdWithRefreshToken(id: string): Promise<User | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.hashedRefreshToken')
+      .where('user.id = :id', { id })
+      .getOne();
   }
 
   async updateMobileNumber(id: string, mobileNumber: string): Promise<User> {
@@ -82,9 +115,11 @@ export class UsersService extends DBService<
   }
 
   async findByResetToken(token: string): Promise<User | null> {
-    return this.usersRepository.findOne({
-      where: { resetPasswordToken: token },
-    });
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect(['user.resetPasswordToken', 'user.resetPasswordTokenExpiresAt'])
+      .where('user.resetPasswordToken = :token', { token })
+      .getOne();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {

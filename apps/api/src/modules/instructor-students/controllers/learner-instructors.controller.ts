@@ -1,6 +1,7 @@
 import {
   Controller, Get, Post, Param, Query, UseGuards, Body, ParseUUIDPipe 
 } from '@nestjs/common';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
@@ -19,11 +20,13 @@ export class StudentInstructorsController {
   @Get('instructors')
   @InstructorStudentsSwagger.searchInstructors()
   async searchInstructors(
-    @Query('q') query: string,
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Paginate() query: PaginateQuery,
+    @Query('q') q?: string,
   ) {
-    return this.service.searchInstructors(query, +page, +limit);
+    if (q && !query.search) {
+      query.search = q;
+    }
+    return this.service.searchInstructors(query);
   }
 
   @Post('instructors/:instructorId/join')

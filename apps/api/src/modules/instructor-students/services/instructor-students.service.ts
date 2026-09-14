@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { I18nService } from 'nestjs-i18n';
+import { PaginateConfig, FilterOperator, PaginateQuery, paginate } from 'nestjs-paginate';
+import { DBService } from '../../../db/db.service';
 import { InstructorStudent } from '../../../db/entities/instructor-student.entity';
 import { User } from '../../../db/entities/user.entity';
 import { Course } from '../../../db/entities/course.entity';
@@ -11,8 +13,35 @@ import { InstructorStudentStatus, InvitedBy, UserRole } from '@lms/shared-types'
 import { InviteStudentDto } from '../dto/invite-student.dto';
 import { RespondRequestDto, RequestAction } from '../dto/respond-request.dto';
 
+export const INSTRUCTOR_STUDENT_PAGINATION_CONFIG: PaginateConfig<InstructorStudent> = {
+  sortableColumns: ['createdAt', 'status'],
+  nullSort: 'last',
+  defaultSortBy: [['createdAt', 'DESC']],
+  searchableColumns: [
+    'student.firstName',
+    'student.lastName',
+    'student.email',
+    'invitedEmail',
+  ],
+  filterableColumns: {
+    status: [FilterOperator.EQ],
+    instructorId: [FilterOperator.EQ],
+    studentId: [FilterOperator.EQ],
+  },
+  relations: ['student'],
+};
+
+export const INSTRUCTOR_SEARCH_PAGINATION_CONFIG: PaginateConfig<User> = {
+  sortableColumns: ['firstName', 'lastName', 'createdAt'],
+  nullSort: 'last',
+  defaultSortBy: [['firstName', 'ASC']],
+  searchableColumns: ['firstName', 'lastName'],
+  filterableColumns: {},
+  select: ['id', 'firstName', 'lastName', 'profileImageUrl'],
+};
+
 @Injectable()
-export class InstructorStudentsService {
+export class InstructorStudentsService extends DBService<InstructorStudent> {
   constructor(
     @InjectRepository(InstructorStudent)
     private readonly instructorStudentRepo: Repository<InstructorStudent>,
@@ -23,7 +52,9 @@ export class InstructorStudentsService {
     private readonly jwtService: JwtService,
     private readonly i18n: I18nService,
     private readonly mailService: MailService,
-  ) {}
+  ) {
+    super(instructorStudentRepo, INSTRUCTOR_STUDENT_PAGINATION_CONFIG);
+  }
 
   async invite(instructorId: string, dto: InviteStudentDto): Promise<InstructorStudent> {
     const instructor = await this.userRepo.findOne({ where: { id: instructorId } });
@@ -65,23 +96,21 @@ export class InstructorStudentsService {
     return saved;
   }
 
-  async listStudents(instructorId: string, status?: InstructorStudentStatus, page = 1, limit = 20) {
-    const where: any = { instructorId };
-    if (status) where.status = status;
+  async listStudents(instructorId: string, query: PaginateQuery) {
+    const qb = this.instructorStudentRepo
+      .createQueryBuilder('instructor_student')
+      .where('instructor_student.instructorId = :instructorId', { instructorId });
 
-    const [items, total] = await this.instructorStudentRepo.findAndCount({
-      where,
-      relations: ['student'],
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { createdAt: 'DESC' },
-    });
-
-    return { items, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return this.findAll(query, qb);
   }
 
-  async listRequests(instructorId: string, page = 1, limit = 20) {
-    return this.listStudents(instructorId, InstructorStudentStatus.REQUESTED, page, limit);
+  async listRequests(instructorId: string, query: PaginateQuery) {
+    const qb = this.instructorStudentRepo
+      .createQueryBuilder('instructor_student')
+      .where('instructor_student.instructorId = :instructorId', { instructorId })
+      .andWhere('instructor_student.status = :status', { status: InstructorStudentStatus.REQUESTED });
+
+    return this.findAll(query, qb);
   }
 
   async respondToRequest(instructorId: string, linkId: string, dto: RespondRequestDto): Promise<InstructorStudent> {
@@ -159,28 +188,13 @@ export class InstructorStudentsService {
     return this.instructorStudentRepo.save(link);
   }
 
-  async searchInstructors(query: string, page = 1, limit = 20) {
-    const [items, total] = await this.userRepo.findAndCount({
-      where: { role: UserRole.INSTRUCTOR, isActive: true } as any,
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+  async searchInstructors(query: PaginateQuery) {
+    const qb = this.userRepo
+      .createQueryBuilder('user')
+      .where('user.role = :role', { role: UserRole.INSTRUCTOR })
+      .andWhere('user.isActive = :isActive', { isActive: true });
 
-    const filtered = items.filter(
-      (u) =>
-        u.firstName.toLowerCase().includes(query.toLowerCase()) ||
-        u.lastName.toLowerCase().includes(query.toLowerCase()),
-    );
-
-    return {
-      items: filtered.map((u) => ({
-        id: u.id,
-        firstName: u.firstName,
-        lastName: u.lastName,
-        profileImageUrl: u.profileImageUrl,
-      })),
-      meta: { total: filtered.length, page, limit, totalPages: Math.ceil(filtered.length / limit) },
-    };
+    return paginate(query, qb, INSTRUCTOR_SEARCH_PAGINATION_CONFIG);
   }
 
   async getMyInstructors(studentId: string) {

@@ -74,7 +74,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findByEmail(loginDto.email);
+    const user = await this.usersService.findByEmail(loginDto.email, true);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -122,7 +122,7 @@ export class AuthService {
         secret: this.configService.get<string>('jwt.refreshSecret'),
       });
 
-      const user = await this.usersService.findById(payload.sub);
+      const user = await this.usersService.findByIdWithRefreshToken(payload.sub);
       if (!user || !user.hashedRefreshToken) {
         throw new UnauthorizedException('Invalid refresh token');
       }
@@ -143,7 +143,7 @@ export class AuthService {
   }
 
   async verifyEmail({ email, otp }: VerifyEmailDto) {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email, true);
     if (!user) {
       throw new BadRequestException('Invalid verification request');
     }
@@ -222,7 +222,7 @@ export class AuthService {
   }
 
   async verifyMobileOtp({ mobileNumber, otp, client, deviceToken, deviceInfo }: VerifyMobileOtpDto) {
-    const user = await this.usersService.findByMobileNumber(mobileNumber);
+    const user = await this.usersService.findByMobileNumber(mobileNumber, true);
     if (!user) {
       throw new BadRequestException('Invalid verification request');
     }

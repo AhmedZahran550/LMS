@@ -31,7 +31,7 @@ export class InstructorStudent extends BaseEntity {
   })
   invitedBy!: InvitedBy;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, select: false })
   invitationToken?: string | null;
 
   @Column({ type: 'timestamp', nullable: true })

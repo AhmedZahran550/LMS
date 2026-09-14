@@ -1,6 +1,7 @@
 import {
   Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, ParseUUIDPipe 
 } from '@nestjs/common';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
@@ -31,21 +32,22 @@ export class InstructorStudentsController {
   @InstructorStudentsSwagger.listStudents()
   async listStudents(
     @CurrentUser('id') instructorId: string,
+    @Paginate() query: PaginateQuery,
     @Query('status') status?: InstructorStudentStatus,
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
   ) {
-    return this.service.listStudents(instructorId, status, +page, +limit);
+    if (status && !query.filter?.status) {
+      query.filter = { ...query.filter, status };
+    }
+    return this.service.listStudents(instructorId, query);
   }
 
   @Get('requests')
   @InstructorStudentsSwagger.listRequests()
   async listRequests(
     @CurrentUser('id') instructorId: string,
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Paginate() query: PaginateQuery,
   ) {
-    return this.service.listRequests(instructorId, +page, +limit);
+    return this.service.listRequests(instructorId, query);
   }
 
   @Patch('requests/:id/respond')
