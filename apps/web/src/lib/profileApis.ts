@@ -5,7 +5,7 @@ export const profileApis = {
     const response = await api.get('/profile/me');
     return response.data;
   },
-  updateProfile: async (data: { firstName: string; lastName: string }) => {
+  updateProfile: async (data: { firstName: string; lastName: string; mobileNumber?: string }) => {
     const response = await api.patch('/profile/me', data);
     return response.data;
   },

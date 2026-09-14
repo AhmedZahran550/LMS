@@ -42,17 +42,16 @@ export class ProfileController {
       user.id,
       dto.firstName,
       dto.lastName,
+      dto.mobileNumber,
     );
-    const { password, hashedRefreshToken, ...safeUser } = dbUser;
-    return safeUser;
+    return dbUser;
   }
 
   @Patch("me/preferences")
   @UsersSwagger.updatePreferences()
   async updatePreferences(@CurrentUser() user: any, @Body() dto: UpdatePreferencesDto) {
     const dbUser = await this.usersService.updatePreferences(user.id, dto);
-    const { password, hashedRefreshToken, ...safeUser } = dbUser;
-    return safeUser;
+    return dbUser;
   }
 
   @Post("me/avatar")
@@ -73,7 +72,6 @@ export class ProfileController {
       user.id,
       uploadResult.url,
     );
-    const { password, hashedRefreshToken, ...safeUser } = dbUser;
-    return safeUser;
+    return dbUser;
   }
 }

@@ -1,43 +1,75 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
-import { I18nService } from 'nestjs-i18n';
-import { PaginateConfig, FilterOperator, PaginateQuery, paginate } from 'nestjs-paginate';
-import { DBService } from '../../../db/db.service';
-import { InstructorStudent } from '../../../db/entities/instructor-student.entity';
-import { User } from '../../../db/entities/user.entity';
-import { Course } from '../../../db/entities/course.entity';
-import { MailService } from '../../mail/mail.service';
-import { InstructorStudentStatus, InvitedBy, UserRole } from '@lms/shared-types';
-import { InviteStudentDto } from '../dto/invite-student.dto';
-import { RespondRequestDto, RequestAction } from '../dto/respond-request.dto';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { JwtService } from "@nestjs/jwt";
+import { I18nService } from "nestjs-i18n";
+import {
+  PaginateConfig,
+  FilterOperator,
+  PaginateQuery,
+  paginate,
+} from "nestjs-paginate";
+import { DBService } from "../../../db/db.service";
+import { InstructorStudent } from "../../../db/entities/instructor-student.entity";
+import { User } from "../../../db/entities/user.entity";
+import { Course } from "../../../db/entities/course.entity";
+import { MailService } from "../../mail/mail.service";
+import {
+  InstructorStudentStatus,
+  InvitedBy,
+  UserRole,
+} from "@lms/shared-types";
+import { InviteStudentDto } from "../dto/invite-student.dto";
+import { RespondRequestDto, RequestAction } from "../dto/respond-request.dto";
 
-export const INSTRUCTOR_STUDENT_PAGINATION_CONFIG: PaginateConfig<InstructorStudent> = {
-  sortableColumns: ['createdAt', 'status'],
-  nullSort: 'last',
-  defaultSortBy: [['createdAt', 'DESC']],
-  searchableColumns: [
-    'student.firstName',
-    'student.lastName',
-    'student.email',
-    'invitedEmail',
-  ],
-  filterableColumns: {
-    status: [FilterOperator.EQ],
-    instructorId: [FilterOperator.EQ],
-    studentId: [FilterOperator.EQ],
-  },
-  relations: ['student'],
-};
+export const INSTRUCTOR_STUDENT_PAGINATION_CONFIG: PaginateConfig<InstructorStudent> =
+  {
+    sortableColumns: ["createdAt", "status"],
+    nullSort: "last",
+    defaultSortBy: [["createdAt", "DESC"]],
+    searchableColumns: [
+      "student.firstName",
+      "student.lastName",
+      "student.email",
+      "invitedEmail",
+    ],
+    filterableColumns: {
+      status: [FilterOperator.EQ],
+      instructorId: [FilterOperator.EQ],
+      studentId: [FilterOperator.EQ],
+    },
+    relations: ["student"],
+    select: [
+      "id",
+      "createdAt",
+      "updatedAt",
+      "instructorId",
+      "studentId",
+      "invitedEmail",
+      "status",
+      "invitedBy",
+      "invitationSentAt",
+      "respondedAt",
+      "student.id",
+      "student.firstName",
+      "student.lastName",
+      "student.email",
+      "student.profileImageUrl",
+    ],
+  };
 
 export const INSTRUCTOR_SEARCH_PAGINATION_CONFIG: PaginateConfig<User> = {
-  sortableColumns: ['firstName', 'lastName', 'createdAt'],
-  nullSort: 'last',
-  defaultSortBy: [['firstName', 'ASC']],
-  searchableColumns: ['firstName', 'lastName'],
+  sortableColumns: ["firstName", "lastName", "createdAt"],
+  nullSort: "last",
+  defaultSortBy: [["firstName", "ASC"]],
+  searchableColumns: ["firstName", "lastName"],
   filterableColumns: {},
-  select: ['id', 'firstName', 'lastName', 'profileImageUrl'],
+  select: ["id", "firstName", "lastName", "profileImageUrl"],
 };
 
 @Injectable()
@@ -56,22 +88,29 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
     super(instructorStudentRepo, INSTRUCTOR_STUDENT_PAGINATION_CONFIG);
   }
 
-  async invite(instructorId: string, dto: InviteStudentDto): Promise<InstructorStudent> {
-    const instructor = await this.userRepo.findOne({ where: { id: instructorId } });
-    const student = await this.userRepo.findOne({ where: { email: dto.email } });
+  async invite(
+    instructorId: string,
+    dto: InviteStudentDto,
+  ): Promise<InstructorStudent> {
+    const instructor = await this.userRepo.findOne({
+      where: { id: instructorId },
+    });
+    const student = await this.userRepo.findOne({
+      where: { email: dto.email },
+    });
 
     if (student) {
       const existingLink = await this.instructorStudentRepo.findOne({
         where: { instructorId, studentId: student.id },
       });
       if (existingLink) {
-        throw new ConflictException(this.i18n.t('errors.ALREADY_LINKED'));
+        throw new ConflictException(this.i18n.t("errors.ALREADY_LINKED"));
       }
     }
 
     const token = this.jwtService.sign(
       { instructorId, email: dto.email },
-      { expiresIn: '7d' },
+      { expiresIn: "7d" },
     );
 
     const link = this.instructorStudentRepo.create({
@@ -89,7 +128,9 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
     const acceptUrl = `${process.env.APP_URL}/invitations/accept?token=${token}`;
     await this.mailService.sendStudentInvitation(
       dto.email,
-      instructor ? `${instructor.firstName} ${instructor.lastName}` : 'An instructor',
+      instructor
+        ? `${instructor.firstName} ${instructor.lastName}`
+        : "An instructor",
       acceptUrl,
     );
 
@@ -98,24 +139,37 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
 
   async listStudents(instructorId: string, query: PaginateQuery) {
     const qb = this.instructorStudentRepo
-      .createQueryBuilder('instructor_student')
-      .where('instructor_student.instructorId = :instructorId', { instructorId });
-
+      .createQueryBuilder("instructor_student")
+      .where("instructor_student.instructorId = :instructorId", {
+        instructorId,
+      });
     return this.findAll(query, qb);
   }
 
   async listRequests(instructorId: string, query: PaginateQuery) {
     const qb = this.instructorStudentRepo
-      .createQueryBuilder('instructor_student')
-      .where('instructor_student.instructorId = :instructorId', { instructorId })
-      .andWhere('instructor_student.status = :status', { status: InstructorStudentStatus.REQUESTED });
+      .createQueryBuilder("instructor_student")
+      .where("instructor_student.instructorId = :instructorId", {
+        instructorId,
+      })
+      .andWhere("instructor_student.status = :status", {
+        status: InstructorStudentStatus.REQUESTED,
+      });
 
     return this.findAll(query, qb);
   }
 
-  async respondToRequest(instructorId: string, linkId: string, dto: RespondRequestDto): Promise<InstructorStudent> {
+  async respondToRequest(
+    instructorId: string,
+    linkId: string,
+    dto: RespondRequestDto,
+  ): Promise<InstructorStudent> {
     const link = await this.instructorStudentRepo.findOne({
-      where: { id: linkId, instructorId, status: InstructorStudentStatus.REQUESTED },
+      where: {
+        id: linkId,
+        instructorId,
+        status: InstructorStudentStatus.REQUESTED,
+      },
     });
     if (!link) throw new NotFoundException();
 
@@ -129,9 +183,16 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
     return this.instructorStudentRepo.save(link);
   }
 
-  async removeStudent(instructorId: string, linkId: string): Promise<InstructorStudent> {
+  async removeStudent(
+    instructorId: string,
+    linkId: string,
+  ): Promise<InstructorStudent> {
     const link = await this.instructorStudentRepo.findOne({
-      where: { id: linkId, instructorId, status: InstructorStudentStatus.ACTIVE },
+      where: {
+        id: linkId,
+        instructorId,
+        status: InstructorStudentStatus.ACTIVE,
+      },
     });
     if (!link) throw new NotFoundException();
 
@@ -140,28 +201,45 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
     return this.instructorStudentRepo.save(link);
   }
 
-  async acceptInvitation(token: string, userId: string): Promise<InstructorStudent> {
+  async acceptInvitation(
+    token: string,
+    userId: string,
+  ): Promise<InstructorStudent> {
     let payload: { instructorId: string; email: string };
     try {
       payload = this.jwtService.verify(token);
     } catch {
-      throw new ForbiddenException(this.i18n.t('errors.INVALID_INVITATION_TOKEN'));
+      throw new ForbiddenException(
+        this.i18n.t("errors.INVALID_INVITATION_TOKEN"),
+      );
     }
 
     const student = await this.userRepo.findOne({ where: { id: userId } });
-    if (!student) throw new NotFoundException(this.i18n.t('errors.USER_NOT_FOUND'));
+    if (!student)
+      throw new NotFoundException(this.i18n.t("errors.USER_NOT_FOUND"));
 
     if (student.email !== payload.email) {
-      throw new ForbiddenException(this.i18n.t('errors.INVALID_INVITATION_TOKEN'));
+      throw new ForbiddenException(
+        this.i18n.t("errors.INVALID_INVITATION_TOKEN"),
+      );
     }
 
     const link = await this.instructorStudentRepo.findOne({
       where: [
-        { instructorId: payload.instructorId, studentId: userId, status: InstructorStudentStatus.INVITED },
-        { instructorId: payload.instructorId, invitedEmail: payload.email, status: InstructorStudentStatus.INVITED }
+        {
+          instructorId: payload.instructorId,
+          studentId: userId,
+          status: InstructorStudentStatus.INVITED,
+        },
+        {
+          instructorId: payload.instructorId,
+          invitedEmail: payload.email,
+          status: InstructorStudentStatus.INVITED,
+        },
       ],
     });
-    if (!link) throw new NotFoundException(this.i18n.t('errors.INVITATION_EXPIRED'));
+    if (!link)
+      throw new NotFoundException(this.i18n.t("errors.INVITATION_EXPIRED"));
 
     link.studentId = userId;
     link.status = InstructorStudentStatus.ACTIVE;
@@ -170,12 +248,15 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
     return this.instructorStudentRepo.save(link);
   }
 
-  async requestToJoin(studentId: string, instructorId: string): Promise<InstructorStudent> {
+  async requestToJoin(
+    studentId: string,
+    instructorId: string,
+  ): Promise<InstructorStudent> {
     const existingLink = await this.instructorStudentRepo.findOne({
       where: { instructorId, studentId },
     });
     if (existingLink) {
-      throw new ConflictException(this.i18n.t('errors.ALREADY_LINKED'));
+      throw new ConflictException(this.i18n.t("errors.ALREADY_LINKED"));
     }
 
     const link = this.instructorStudentRepo.create({
@@ -190,9 +271,9 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
 
   async searchInstructors(query: PaginateQuery) {
     const qb = this.userRepo
-      .createQueryBuilder('user')
-      .where('user.role = :role', { role: UserRole.INSTRUCTOR })
-      .andWhere('user.isActive = :isActive', { isActive: true });
+      .createQueryBuilder("user")
+      .where("user.role = :role", { role: UserRole.INSTRUCTOR })
+      .andWhere("user.isActive = :isActive", { isActive: true });
 
     return paginate(query, qb, INSTRUCTOR_SEARCH_PAGINATION_CONFIG);
   }
@@ -200,8 +281,8 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
   async getMyInstructors(studentId: string) {
     const links = await this.instructorStudentRepo.find({
       where: { studentId, status: InstructorStudentStatus.ACTIVE },
-      relations: ['instructor'],
-      order: { createdAt: 'DESC' },
+      relations: ["instructor"],
+      order: { createdAt: "DESC" },
     });
 
     return links.map((link) => ({
@@ -215,13 +296,17 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
 
   async getInstructorCourses(studentId: string, instructorId: string) {
     const link = await this.instructorStudentRepo.findOne({
-      where: { studentId, instructorId, status: InstructorStudentStatus.ACTIVE },
+      where: {
+        studentId,
+        instructorId,
+        status: InstructorStudentStatus.ACTIVE,
+      },
     });
     if (!link) throw new NotFoundException();
 
     const courses = await this.courseRepo.find({
       where: { instructorId },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
     });
 
     return courses.map((c) => ({
@@ -244,10 +329,14 @@ export class InstructorStudentsService extends DBService<InstructorStudent> {
     try {
       payload = this.jwtService.verify(token);
     } catch {
-      throw new ForbiddenException(this.i18n.t('errors.INVALID_INVITATION_TOKEN'));
+      throw new ForbiddenException(
+        this.i18n.t("errors.INVALID_INVITATION_TOKEN"),
+      );
     }
 
-    const instructor = await this.userRepo.findOne({ where: { id: payload.instructorId } });
+    const instructor = await this.userRepo.findOne({
+      where: { id: payload.instructorId },
+    });
     if (!instructor) throw new NotFoundException();
 
     return {

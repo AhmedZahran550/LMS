@@ -1,5 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { InstructorStudentStatus, InvitedBy } from '@lms/shared-types';
+import { Exclude } from 'class-transformer';
 import { User } from './user.entity';
 import { BaseEntity } from './base.entity';
 
@@ -32,6 +33,7 @@ export class InstructorStudent extends BaseEntity {
   invitedBy!: InvitedBy;
 
   @Column({ type: 'varchar', nullable: true, select: false })
+  @Exclude()
   invitationToken?: string | null;
 
   @Column({ type: 'timestamp', nullable: true })

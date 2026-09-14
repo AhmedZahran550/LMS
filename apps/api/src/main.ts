@@ -1,7 +1,7 @@
-import { NestFactory } from "@nestjs/core";
+import { NestFactory, Reflector } from "@nestjs/core";
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from "@nestjs/swagger";
 import { NestExpressApplication } from "@nestjs/platform-express";
-import { ValidationPipe, BadRequestException } from "@nestjs/common";
+import { ValidationPipe, BadRequestException, ClassSerializerInterceptor } from "@nestjs/common";
 import { ValidationError } from "class-validator";
 import { MetadataStorage, getFromContainer } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
@@ -90,7 +90,10 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector)),
+    new LoggingInterceptor(),
+  );
 
   const port = configService.get<number>("app.port", 5000);
   await app.listen(port, '0.0.0.0');

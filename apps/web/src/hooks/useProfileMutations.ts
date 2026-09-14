@@ -14,13 +14,14 @@ export const useUpdateProfileMutation = () => {
   const updateUserStore = useAuthStore((state) => state.updateUser);
 
   return useMutation({
-    mutationFn: (data: { firstName: string; lastName: string }) =>
+    mutationFn: (data: { firstName: string; lastName: string; mobileNumber?: string }) =>
       profileApis.updateProfile(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       updateUserStore({
         firstName: data.firstName,
         lastName: data.lastName,
+        mobileNumber: data.mobileNumber,
       });
     },
   });

@@ -140,10 +140,14 @@ export class UsersService extends DBService<
     id: string,
     firstName: string,
     lastName: string,
+    mobileNumber?: string,
   ): Promise<User> {
     const user = await this.findByIdOrFail(id);
     user.firstName = firstName;
     user.lastName = lastName;
+    if (mobileNumber !== undefined) {
+      user.mobileNumber = mobileNumber;
+    }
     return this.usersRepository.save(user);
   }
 

@@ -64,9 +64,14 @@ export function Avatar({
 
   const getFullUrl = (url?: string | null) => {
     if (!url) return null;
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
-    return `${baseUrl}/${url.replace(/^\//, '')}`;
+    let cleanUrl = url.trim();
+    if (cleanUrl.startsWith('undefined/')) {
+      cleanUrl = cleanUrl.replace(/^undefined\//, '');
+    }
+    if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) return cleanUrl;
+    const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const baseUrl = rawBaseUrl.replace(/\/api\/?$/, '');
+    return `${baseUrl}/${cleanUrl.replace(/^\//, '')}`;
   };
 
   const imageUrl = getFullUrl(src);
