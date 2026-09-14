@@ -58,26 +58,28 @@ export function LoginFormUI({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="w-full lg:max-w-5xl mx-auto bg-[var(--sv-bg-card)]/95 backdrop-blur-md shadow-lg border border-slate-200 rounded-2xl overflow-hidden lg:grid lg:grid-cols-2">
+    <div className="w-full lg:max-w-5xl mx-auto bg-[var(--sv-bg-card)]/95 backdrop-blur-md shadow-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl overflow-hidden lg:grid lg:grid-cols-2">
       {/* Left decorative panel */}
-      <div className="hidden lg:flex lg:flex-col relative bg-gradient-to-br from-[#3e32d3] via-[#2115b0] to-[#0a0045] p-8 text-white overflow-hidden">
+      <div className="hidden lg:flex lg:flex-col relative bg-gradient-to-br from-indigo-700 via-indigo-900 to-slate-950 p-10 text-white overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-20 -end-20 w-72 h-72 bg-[#818cf8]/20 blur-[80px] rounded-full"></div>
-          <div className="absolute -bottom-20 -start-20 w-72 h-72 bg-[#22d3ee]/20 blur-[80px] rounded-full"></div>
+          <div className="absolute -top-20 -end-20 w-72 h-72 bg-indigo-500/20 blur-[80px] rounded-full"></div>
+          <div className="absolute -bottom-20 -start-20 w-72 h-72 bg-cyan-400/20 blur-[80px] rounded-full"></div>
         </div>
 
         <div className="relative z-10 flex flex-col h-full">
           {/* Brand */}
-          <div className="flex items-center gap-2 mb-8">
-            <GraduationCap className="w-7 h-7" />
-            <span className="text-lg font-bold">{t('app.name')}</span>
+          <div className="flex items-center gap-2.5 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+              <GraduationCap className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl font-black tracking-tight">{t('app.name')}</span>
           </div>
 
           {/* Welcome */}
           <div className="mb-6">
-            <h2 className="text-2xl font-bold leading-tight mb-2">{t('Welcome back')}</h2>
-            <p className="text-[#c3c0ff] text-sm leading-relaxed">
-              {t('Sign in to continue your learning journey and track your progress.')}
+            <h2 className="text-3xl font-black leading-tight mb-2.5">{t('Welcome back')} 👋</h2>
+            <p className="text-indigo-200 text-sm leading-relaxed">
+              {t('Sign in to continue your learning journey, connect with mentors, and track your achievements.')}
             </p>
           </div>
 
@@ -128,8 +130,8 @@ export function LoginFormUI({
         </div>
 
         <div className="text-center lg:text-start mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">{t('Sign in to your account')}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t('Enter your credentials to access your account.')}</p>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">{t('Sign in to your account')}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('Welcome back! Please enter your details below.')}</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-5">
@@ -171,7 +173,7 @@ export function LoginFormUI({
           )}
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700 block" htmlFor="email">
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 block" htmlFor="email">
               {t('Email address')}
             </label>
             <div className="relative group">
@@ -191,10 +193,10 @@ export function LoginFormUI({
 
           <div className="space-y-1.5">
             <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-slate-700" htmlFor="password">
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-200" htmlFor="password">
                 {t('Password')}
               </label>
-              <Link href="/forgot-password" className="text-xs font-medium text-indigo-600 hover:underline transition-all">
+              <Link href="/forgot-password" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline transition-all">
                 {t('Forgot password?')}
               </Link>
             </div>
@@ -210,7 +212,7 @@ export function LoginFormUI({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
+                className="absolute inset-y-0 start-3 my-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none transition-colors"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
