@@ -1,5 +1,6 @@
 import {  Controller, Get, Post, Param, UseGuards, ForbiddenException , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { EnrollmentsService } from '../enrollments.service';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
@@ -32,15 +33,11 @@ export class LearnerEnrollmentsController {
 
   @Get('my-courses')
   @EnrollmentsSwagger.getMyCourses()
-  async getMyCourses(@CurrentUser() user: any) {
-    const enrollments = await this.enrollmentsService.getLearnerEnrollments(user.id);
-    return enrollments.map(e => {
-        if (e.course && e.course.instructor) {
-            const { password, hashedRefreshToken, ...safeUser } = e.course.instructor;
-            e.course.instructor = safeUser as any;
-        }
-        return e;
-    });
+  async getMyCourses(
+    @CurrentUser() user: any,
+    @Paginate() query: PaginateQuery,
+  ) {
+    return this.enrollmentsService.getLearnerEnrollments(user.id, query);
   }
 
   @Get('my-courses/:courseId')

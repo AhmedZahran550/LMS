@@ -34,8 +34,9 @@ implementation begins. The following rules are non-negotiable:
 - **CSRF protection**: State-changing endpoints (POST, PATCH, DELETE) MUST have
   CSRF protection when cookies are used for authentication.
 - **Sensitive data**: Passwords, tokens, and secrets MUST be hashed (argon2),
-  redacted in logs via `redact.util.ts`, and excluded from serialization via
-  `@Exclude()`.
+  redacted in logs via `redact.util.ts`, excluded from serialization via
+  `@Exclude()`, and marked with `{ select: false }` at the TypeORM entity column
+  level so they are never retrieved by default in queries, relations, or pagination.
 - **Security review gate**: No feature SHALL be released without a security review
   of its attack surface. All pull requests MUST verify compliance with these rules.
 
@@ -133,8 +134,18 @@ timestamp prefix (`{timestamp}-{PascalName}.ts`). Never commit entity changes
 without the corresponding migration file.
 - **Commit Messages**: MUST follow conventional commits format
 (`type(scope): description`), e.g., `feat(auth): add rate limiting`.
+- **Pagination Pattern**: All list and search endpoints returning collections MUST use
+  the `DBService.findAll()` base method with `nestjs-paginate`. Each service MUST
+  define a `PaginateConfig<T>` specifying `sortableColumns`, `filterableColumns`,
+  `searchableColumns`, and `relations`. Controllers MUST use the `@Paginate()`
+  decorator with `PaginateQuery`. Manual `findAndCount` with `skip/take` and
+  hand-crafted meta objects is NOT allowed. In-memory filtering/searching of database
+  records is NOT allowed — use QueryBuilder with `ILIKE` or `nestjs-paginate`
+  searchableColumns instead. Sensitive database columns (passwords, tokens, credentials)
+  MUST have `{ select: false }` on the entity so they are never retrieved by default
+  in paginated queries or relation joins.
 - **Test Coverage**: Security-critical paths (auth, authorization, input validation)
-MUST have unit and integration tests. Tests MUST fail before implementation.
+  MUST have unit and integration tests. Tests MUST fail before implementation.
 
 ## Governance
 
@@ -151,4 +162,4 @@ principle, the localization requirements, and the error handling architecture.
 The `AGENTS.md` file in the project root provides runtime development guidance
 and SHOULD be consulted by AI agents before making changes.
 
-**Version**: 1.2.0 | **Ratified**: 2026-06-29 | **Last Amended**: 2026-06-29
+**Version**: 1.3.0 | **Ratified**: 2026-06-29 | **Last Amended**: 2026-09-14

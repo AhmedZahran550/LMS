@@ -1,5 +1,6 @@
 import {  Controller, Get, Post, Patch, Delete, Param, Body, UseGuards , ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { EnrollmentsService } from '../enrollments.service';
 import { RespondEnrollmentDto } from '../dto/respond-enrollment.dto';
 import { InviteLearnerDto } from '../dto/invite-learner.dto';
@@ -22,15 +23,9 @@ export class InstructorEnrollmentsController {
   async getCourseEnrollments(
     @CurrentUser() user: any,
     @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Paginate() query: PaginateQuery,
   ) {
-    const enrollments = await this.enrollmentsService.getCourseEnrollments(courseId, user.id);
-    return enrollments.map(e => {
-      if (e.learner) {
-        const { password, hashedRefreshToken, ...safeUser } = e.learner;
-        e.learner = safeUser as any;
-      }
-      return e;
-    });
+    return this.enrollmentsService.getCourseEnrollments(courseId, user.id, query);
   }
 
   @Patch('enrollments/:id/respond')
