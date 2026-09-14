@@ -17,8 +17,11 @@ import { StorageService } from "../storage/storage.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { I18nService } from "nestjs-i18n";
 import { ReorderVideosDto } from "./dto/reorder-videos.dto";
-import { ContentType, EnrollmentStatus, NotificationType } from "@lms/shared-types";
-import { ForbiddenException } from "@nestjs/common";
+import {
+  ContentType,
+  EnrollmentStatus,
+  NotificationType,
+} from "@lms/shared-types";
 import { SubscriptionGuardService } from "../subscriptions/services/subscription-guard.service";
 
 export const CONTENT_PAGINATION_CONFIG: PaginateConfig<CourseContent> = {
@@ -74,8 +77,14 @@ export class CourseContentService extends DBService<
     createDto: CreateVideoDto,
     file: Express.Multer.File,
   ): Promise<CourseContent> {
-    await this.subscriptionGuard.checkContentUpload(instructorId, file?.size || 0);
-    const course = await this.coursesService.findInstructorCourse(courseId, instructorId);
+    await this.subscriptionGuard.checkContentUpload(
+      instructorId,
+      file?.size || 0,
+    );
+    const course = await this.coursesService.findInstructorCourse(
+      courseId,
+      instructorId,
+    );
 
     if (!file) {
       throw new BadRequestException("File is required");
@@ -122,13 +131,19 @@ export class CourseContentService extends DBService<
       }
 
       for (const [lang, userIds] of Object.entries(langGroups)) {
-        const subject = this.i18nService.translate("translation.notifications.subjects.new_content", { lang });
-        const message = this.i18nService.translate("translation.notifications.messages.new_content", {
-          lang,
-          args: { content: createDto.title, course: course.title },
-        });
+        const subject = this.i18nService.translate(
+          "translation.notifications.subjects.new_content",
+          { lang },
+        );
+        const message = this.i18nService.translate(
+          "translation.notifications.messages.new_content",
+          {
+            lang,
+            args: { content: createDto.title, course: course.title },
+          },
+        );
 
-        await this.notificationsService.createMany(
+        this.notificationsService.createMany(
           userIds,
           NotificationType.NEW_CONTENT,
           subject,

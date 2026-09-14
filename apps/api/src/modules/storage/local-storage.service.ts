@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { StorageService } from './storage.service';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as crypto from 'crypto';
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { StorageService } from "./storage.service";
+import * as fs from "fs";
+import * as path from "path";
+import * as crypto from "crypto";
 
 @Injectable()
 export class LocalStorageService extends StorageService {
@@ -12,13 +12,22 @@ export class LocalStorageService extends StorageService {
 
   constructor(private configService: ConfigService) {
     super();
-    this.uploadDir = this.configService.get<string>('storage.uploadDir') || './uploads';
+    this.uploadDir =
+      this.configService.get<string>("storage.uploadDir") || "./uploads";
     if (!fs.existsSync(this.uploadDir)) {
       fs.mkdirSync(this.uploadDir, { recursive: true });
     }
   }
 
-  async upload(file: Express.Multer.File, directory: string): Promise<{ url: string, filename: string, size: number, mimeType: string }> {
+  async upload(
+    file: Express.Multer.File,
+    directory: string,
+  ): Promise<{
+    url: string;
+    filename: string;
+    size: number;
+    mimeType: string;
+  }> {
     const ext = path.extname(file.originalname);
     const uniqueFilename = `${directory}/${crypto.randomUUID()}${ext}`;
     const fullPath = path.join(this.uploadDir, uniqueFilename);
@@ -29,7 +38,7 @@ export class LocalStorageService extends StorageService {
     }
 
     await fs.promises.writeFile(fullPath, file.buffer);
-    
+
     this.logger.log(`File saved locally: ${fullPath}`);
 
     return {
@@ -49,7 +58,7 @@ export class LocalStorageService extends StorageService {
   }
 
   getUrl(filename: string): string {
-    const apiUrl = this.configService.get<string>('app.apiUrl');
+    const apiUrl = this.configService.get<string>("app.apiUrl");
     return `${apiUrl}/uploads/${filename}`;
   }
 }
