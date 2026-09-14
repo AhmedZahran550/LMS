@@ -20,6 +20,7 @@ import mailConfig from './config/mail.config';
 import storageConfig from './config/storage.config';
 import oauthConfig from './config/oauth.config';
 import firebaseConfig from './config/firebase.config';
+import { validateEnv } from './config/env.validation';
 import { PushNotificationsModule } from './modules/push-notifications/push-notifications.module';
 
 import { AdminApiModule } from './api/admin/admin-api.module';
@@ -34,6 +35,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
       isGlobal: true,
       load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig, oauthConfig, firebaseConfig],
       envFilePath: '.env',
+      validate: validateEnv,
     }),
     DatabaseModule,
     AuthModule,

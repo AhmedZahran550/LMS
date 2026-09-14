@@ -55,7 +55,8 @@
     "rxjs": "^7.8.1",
     "stripe": "^22.3.0",
     "typeorm": "^0.3.20",
-    "uuid": "^14.0.1"
+    "uuid": "^14.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@lms/eslint-config": "workspace:*",
