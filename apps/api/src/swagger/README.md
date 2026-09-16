@@ -1,6 +1,6 @@
 # Swagger Documentation Guide & Integration Architecture
 
-This document explains the folder structure, decorator patterns, and integration mechanism of Swagger API documentation in the **Fixawy** application.
+This document explains the folder structure, decorator patterns, and integration mechanism of Swagger API documentation in the **Manara LMS** application.
 
 ---
 
@@ -22,20 +22,36 @@ All swagger files reside in `src/swagger/`. Every resource has its own swagger d
 src/
 └── swagger/
     ├── index.ts                     # Central export registry
-    ├── auth.swagger.ts              # Auth endpoints documentation
+    ├── auth.swagger.ts              # Auth & OTP endpoints documentation
     ├── users.swagger.ts             # Users and profile endpoints documentation
-    ├── logs.swagger.ts              # Logs endpoints documentation
-    └── craftsman-search.swagger.ts  # Craftsman search endpoints documentation
+    ├── courses.swagger.ts           # Courses management (instructor/admin/learner)
+    ├── videos.swagger.ts            # Video/content upload and streaming
+    ├── notifications.swagger.ts     # User notifications
+    ├── push-notifications.swagger.ts# Firebase push notification tokens
+    ├── universities.swagger.ts      # Public & Admin university academic hierarchy
+    ├── categories.swagger.ts        # Public & Admin course categories
+    ├── public-courses.swagger.ts    # Public course discovery & instructor search
+    ├── course-purchases.swagger.ts  # Student purchases & Instructor sales/revenue
+    ├── storage.swagger.ts           # Storage quota, 3-month plans & subscriptions
+    └── payments.swagger.ts          # Kashier payment webhooks
 ```
 
 ### The Central Registry (`src/swagger/index.ts`)
-All swagger files must export a single, consolidated object (e.g., `AuthSwagger`, `UsersSwagger`). These objects are exported from the folder through `index.ts`:
+All swagger files must export a single, consolidated object (e.g., `AuthSwagger`, `CoursesSwagger`). These objects are exported from the folder through `index.ts`:
 
 ```typescript
 export { AuthSwagger } from "./auth.swagger";
 export { UsersSwagger } from "./users.swagger";
-export { LogsSwagger } from "./logs.swagger";
-export { CraftsmanSearchSwagger } from "./craftsman-search.swagger";
+export { CoursesSwagger } from "./courses.swagger";
+export { VideosSwagger } from "./videos.swagger";
+export { NotificationsSwagger } from "./notifications.swagger";
+export { PushNotificationsSwagger } from "./push-notifications.swagger";
+export { UniversitiesSwagger } from "./universities.swagger";
+export { CategoriesSwagger } from "./categories.swagger";
+export { PublicCoursesSwagger } from "./public-courses.swagger";
+export { CoursePurchasesSwagger } from "./course-purchases.swagger";
+export { StorageSwagger } from "./storage.swagger";
+export { PaymentsSwagger } from "./payments.swagger";
 ```
 
 ---

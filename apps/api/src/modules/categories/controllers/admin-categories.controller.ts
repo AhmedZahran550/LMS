@@ -9,7 +9,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CategoriesService } from '../categories.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { UserRole } from '@lms/shared-types';
+import { CategoriesSwagger } from '../../../swagger';
 
 @ApiTags('Admin Categories')
 @Controller('admin/categories')
@@ -27,25 +28,25 @@ export class AdminCategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new course category' })
+  @CategoriesSwagger.create()
   async create(@Body() createDto: CreateCategoryDto) {
     return this.categoriesService.create(createDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Paginated list of categories for admin' })
+  @CategoriesSwagger.findAllAdmin()
   async findAll(@Paginate() query: PaginateQuery) {
     return this.categoriesService.findAll(query);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get category by ID' })
+  @CategoriesSwagger.findOneAdmin()
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.categoriesService.findByIdOrFail(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update category' })
+  @CategoriesSwagger.updateAdmin()
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDto: UpdateCategoryDto,
@@ -54,7 +55,7 @@ export class AdminCategoriesController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Soft delete category' })
+  @CategoriesSwagger.removeAdmin()
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     await this.categoriesService.remove(id);
     return { id, deleted: true };

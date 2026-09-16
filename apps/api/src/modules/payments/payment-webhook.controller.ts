@@ -9,10 +9,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { KashierService } from './kashier.service';
 import { CoursePurchasesService } from '../course-purchases/course-purchases.service';
 import { StorageSubscriptionsService } from '../storage/services/storage-subscriptions.service';
+import { PaymentsSwagger } from '../../swagger';
 
 @ApiTags('Payments')
 @Controller('webhooks/kashier')
@@ -26,7 +27,7 @@ export class PaymentWebhookController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Kashier payment gateway webhook callback' })
+  @PaymentsSwagger.handleWebhook()
   async handleWebhook(
     @Body() payload: any,
     @Headers('x-kashier-signature') signatureHeader?: string,

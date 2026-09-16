@@ -5,7 +5,7 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { StorageQuotaGuardService } from '../services/storage-quota-guard.service';
 import { StorageSubscriptionsService } from '../services/storage-subscriptions.service';
 import { SubscribeStoragePlanDto } from '../dto/storage-plan.dto';
@@ -14,6 +14,7 @@ import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole } from '@lms/shared-types';
+import { StorageSwagger } from '../../../swagger';
 
 @ApiTags('Instructor Storage')
 @Controller('instructor/storage')
@@ -26,7 +27,7 @@ export class InstructorStorageController {
   ) {}
 
   @Get('usage')
-  @ApiOperation({ summary: 'Get instructor storage quota breakdown (5GB free base + active subscriptions + used bytes)' })
+  @StorageSwagger.getStorageUsage()
   async getStorageUsage(@CurrentUser() user: any) {
     const usage = await this.quotaGuard.getStorageUsage(user.id);
     const activeSubscriptions = await this.subscriptionsService.getInstructorActiveSubscriptions(user.id);
@@ -50,13 +51,13 @@ export class InstructorStorageController {
   }
 
   @Get('plans')
-  @ApiOperation({ summary: 'Get all purchasable 3-month storage expansion tiers' })
+  @StorageSwagger.getPlans()
   async getPlans() {
     return this.subscriptionsService.getActivePlans();
   }
 
   @Post('subscribe')
-  @ApiOperation({ summary: 'Initiate a 3-month storage plan expansion via Kashier' })
+  @StorageSwagger.subscribe()
   async subscribe(
     @CurrentUser() user: any,
     @Body() dto: SubscribeStoragePlanDto,

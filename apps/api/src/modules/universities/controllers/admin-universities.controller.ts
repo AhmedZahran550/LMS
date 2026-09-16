@@ -9,7 +9,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { UniversitiesService } from '../universities.service';
 import { CreateUniversityDto } from '../dto/create-university.dto';
@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { UserRole } from '@lms/shared-types';
+import { UniversitiesSwagger } from '../../../swagger';
 
 @ApiTags('Admin Universities')
 @Controller('admin/universities')
@@ -27,25 +28,25 @@ export class AdminUniversitiesController {
   constructor(private readonly universitiesService: UniversitiesService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create new university with faculties hierarchy' })
+  @UniversitiesSwagger.create()
   async create(@Body() createDto: CreateUniversityDto) {
     return this.universitiesService.create(createDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Paginated list of universities for admin' })
+  @UniversitiesSwagger.findAllAdmin()
   async findAll(@Paginate() query: PaginateQuery) {
     return this.universitiesService.findAll(query);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get university by ID' })
+  @UniversitiesSwagger.findOneAdmin()
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.universitiesService.findByIdOrFail(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update university or its faculties JSONB data' })
+  @UniversitiesSwagger.updateAdmin()
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDto: UpdateUniversityDto,
@@ -54,7 +55,7 @@ export class AdminUniversitiesController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Soft delete university' })
+  @UniversitiesSwagger.removeAdmin()
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     await this.universitiesService.remove(id);
     return { id, deleted: true };

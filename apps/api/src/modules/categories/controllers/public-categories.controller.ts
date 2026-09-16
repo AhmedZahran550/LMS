@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { CategoriesService } from '../categories.service';
+import { CategoriesSwagger } from '../../../swagger';
 
 @ApiTags('Public Categories')
 @Controller('public/categories')
@@ -8,7 +9,7 @@ export class PublicCategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all active course categories' })
+  @CategoriesSwagger.findAllPublic()
   async findAll() {
     return this.categoriesService.findAllActive();
   }
