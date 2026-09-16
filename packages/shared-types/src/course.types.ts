@@ -1,7 +1,7 @@
 import { CourseVisibility } from './enums';
 import { UserProfile } from './user.types';
 import { CategoryResponseDto } from './category.types';
-import { VideoDto } from './video.types';
+import { CourseContentDto } from './course-content.types';
 
 export interface CourseDto {
   id: string;
@@ -16,7 +16,7 @@ export interface CourseDto {
   isActive: boolean;
   instructorId: string;
   instructor?: UserProfile;
-  contents?: VideoDto[];
+  contents?: CourseContentDto[];
   createdAt: string;
 }
 
@@ -32,7 +32,7 @@ export interface CoursePublicResponse {
   isActive: boolean;
   instructorId: string;
   instructor?: Partial<UserProfile>;
-  previewContents?: VideoDto[];
+  previewContents?: CourseContentDto[];
   totalLessons?: number;
   createdAt: string;
 }

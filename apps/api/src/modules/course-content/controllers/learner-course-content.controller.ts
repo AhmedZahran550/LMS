@@ -1,23 +1,23 @@
-import {  Controller, Get, Param, UseGuards , ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
-import { CourseContentService } from '../videos.service';
+import { CourseContentService } from '../course-content.service';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
 import { UserRole } from '@lms/shared-types';
-import { VideosSwagger } from '../../../swagger/videos.swagger';
+import { CourseContentSwagger } from '../../../swagger/course-content.swagger';
 
 @ApiTags("Learner Content")
 @Controller('learner/my-courses/:courseId/content')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.LEARNER)
-export class LearnerContentController {
+export class LearnerCourseContentController {
   constructor(private readonly contentService: CourseContentService) {}
 
   @Get()
-  @VideosSwagger.findAllLearnerContent()
+  @CourseContentSwagger.findAllLearnerContent()
   async findAll(
     @CurrentUser() user: any,
     @Param('courseId', ParseUUIDPipe) courseId: string,
@@ -27,7 +27,7 @@ export class LearnerContentController {
   }
 
   @Get(':contentId')
-  @VideosSwagger.findOneLearnerContent()
+  @CourseContentSwagger.findOneLearnerContent()
   async findOne(
     @CurrentUser() user: any,
     @Param('courseId', ParseUUIDPipe) courseId: string,
@@ -36,3 +36,5 @@ export class LearnerContentController {
     return this.contentService.findCourseContentById(courseId, contentId, user.id);
   }
 }
+
+export { LearnerCourseContentController as LearnerContentController };

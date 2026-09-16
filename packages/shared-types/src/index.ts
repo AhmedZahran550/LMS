@@ -2,6 +2,7 @@ export * from './enums';
 export * from './api-response.types';
 export * from './user.types';
 export * from './course.types';
+export * from './course-content.types';
 export * from './video.types';
 export * from './enrollment.types';
 export * from './notification.types';

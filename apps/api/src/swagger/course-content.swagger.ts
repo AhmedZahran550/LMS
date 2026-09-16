@@ -1,10 +1,10 @@
 import { applyDecorators } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiConsumes } from "@nestjs/swagger";
-import { CreateVideoDto } from "../modules/videos/dto/create-video.dto";
-import { UpdateVideoDto } from "../modules/videos/dto/update-video.dto";
-import { ReorderVideosDto } from "../modules/videos/dto/reorder-videos.dto";
+import { CreateCourseContentDto } from "../modules/course-content/dto/create-course-content.dto";
+import { UpdateCourseContentDto } from "../modules/course-content/dto/update-course-content.dto";
+import { ReorderCourseContentDto } from "../modules/course-content/dto/reorder-course-content.dto";
 
-export const VideosSwagger = {
+export const CourseContentSwagger = {
   findAllContent: () =>
     applyDecorators(
       ApiOperation({ summary: "List course content (Instructor)", description: "Returns paginated list of course content items. Instructor only." }),
@@ -14,10 +14,10 @@ export const VideosSwagger = {
 
   uploadContent: () =>
     applyDecorators(
-      ApiOperation({ summary: "Upload content (Instructor)", description: "Uploads a new content item (video, PDF, etc.) to a course. Instructor only." }),
+      ApiOperation({ summary: "Upload content (Instructor)", description: "Uploads a new content item (video, PDF, image, presentation) to a course. Instructor only." }),
       ApiBearerAuth(),
       ApiConsumes("multipart/form-data"),
-      ApiBody({ type: CreateVideoDto }),
+      ApiBody({ type: CreateCourseContentDto }),
       ApiResponse({ status: 201, description: "Content uploaded" }),
     ),
 
@@ -25,7 +25,7 @@ export const VideosSwagger = {
     applyDecorators(
       ApiOperation({ summary: "Reorder content (Instructor)", description: "Reorders content items within a course. Instructor only." }),
       ApiBearerAuth(),
-      ApiBody({ type: ReorderVideosDto }),
+      ApiBody({ type: ReorderCourseContentDto }),
       ApiResponse({ status: 200, description: "Content reordered" }),
     ),
 
@@ -33,7 +33,7 @@ export const VideosSwagger = {
     applyDecorators(
       ApiOperation({ summary: "Update content (Instructor)", description: "Updates a content item's metadata. Instructor only." }),
       ApiBearerAuth(),
-      ApiBody({ type: UpdateVideoDto }),
+      ApiBody({ type: UpdateCourseContentDto }),
       ApiResponse({ status: 200, description: "Content updated" }),
     ),
 
@@ -59,3 +59,5 @@ export const VideosSwagger = {
       ApiResponse({ status: 404, description: "Content not found" }),
     ),
 };
+
+export const VideosSwagger = CourseContentSwagger;

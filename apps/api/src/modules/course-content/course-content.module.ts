@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-
-import { CourseContentService } from './videos.service';
-import { InstructorContentController } from './controllers/instructor-videos.controller';
-import { LearnerContentController } from './controllers/learner-videos.controller';
+import { CourseContentService } from './course-content.service';
+import { InstructorCourseContentController } from './controllers/instructor-course-content.controller';
+import { LearnerCourseContentController } from './controllers/learner-course-content.controller';
 import { CourseContent } from '../../db/entities/course-content.entity';
 import { CoursesModule } from '../courses/courses.module';
 import { StorageModule } from '../storage/storage.module';
 import { NotificationsModule } from '../notifications/notifications.module';
-
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoursePurchase } from '../../db/entities/course-purchase.entity';
 import { User } from '../../db/entities/user.entity';
@@ -19,9 +17,10 @@ import { User } from '../../db/entities/user.entity';
     StorageModule,
     NotificationsModule,
   ],
-
-  controllers: [InstructorContentController, LearnerContentController],
+  controllers: [InstructorCourseContentController, LearnerCourseContentController],
   providers: [CourseContentService],
   exports: [CourseContentService],
 })
-export class ContentModule {}
+export class CourseContentModule {}
+
+export { CourseContentModule as ContentModule };

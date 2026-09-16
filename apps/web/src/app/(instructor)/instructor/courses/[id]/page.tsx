@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { courseApis } from '@/lib/courseApis';
 import { CourseVisibility } from '@lms/shared-types';
-import { Users, Settings, Video as VideoIcon, ChevronDown } from 'lucide-react';
+import { Users, Settings, FileText, ChevronDown } from 'lucide-react';
 import { CourseContentTab } from './components/CourseContentTab';
 import { CourseStudentsTab } from './components/CourseStudentsTab';
 import { CourseSettingsTab } from './components/CourseSettingsTab';
@@ -85,7 +85,7 @@ export default function InstructorCourseDetailPage() {
           className={`flex items-center px-4 py-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'content' ? 'border-[var(--sv-primary)] text-[var(--sv-primary)]' : 'border-transparent text-[var(--sv-text-muted)] hover:text-[var(--sv-text-primary)] hover:border-[var(--sv-border)]'}`}
           onClick={() => setActiveTab('content')}
         >
-          <VideoIcon className="w-4 h-4 me-2" />
+          <FileText className="w-4 h-4 me-2" />
           {t('Course Content')}
         </button>
         <button 

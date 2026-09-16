@@ -83,7 +83,7 @@ export class CoursesService extends DBService<
   }
 
   async getDashboardStats(instructorId: string) {
-    const [totalCourses, videosResult, studentsResult] = await Promise.all([
+    const [totalCourses, contentResult, studentsResult] = await Promise.all([
       this.coursesRepository.count({
         where: { instructorId },
       }),
@@ -92,7 +92,6 @@ export class CoursesService extends DBService<
         .from("course_content", "content")
         .innerJoin("course", "course", "content.courseId = course.id")
         .where("course.instructorId = :instructorId", { instructorId })
-        .andWhere("content.contentType = :type", { type: ContentType.VIDEO })
         .getRawOne(),
       this.coursesRepository.manager.createQueryBuilder()
         .select("COUNT(DISTINCT purchase.studentId)", "total")
@@ -103,9 +102,12 @@ export class CoursesService extends DBService<
         .getRawOne(),
     ]);
 
+    const totalContentCount = parseInt(contentResult?.total || "0", 10);
+
     return {
       totalCourses,
-      totalVideos: parseInt(videosResult?.total || "0", 10),
+      totalContent: totalContentCount,
+      totalVideos: totalContentCount,
       totalStudents: parseInt(studentsResult?.total || "0", 10),
     };
   }

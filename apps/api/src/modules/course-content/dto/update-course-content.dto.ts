@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsBoolean } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class UpdateVideoDto {
+export class UpdateCourseContentDto {
   @IsString()
   @IsOptional()
   title?: string;
@@ -15,3 +15,5 @@ export class UpdateVideoDto {
   @IsBoolean()
   isPreview?: boolean;
 }
+
+export { UpdateCourseContentDto as UpdateVideoDto };

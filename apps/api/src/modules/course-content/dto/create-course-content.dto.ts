@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString, IsBoolean } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class CreateVideoDto {
+export class CreateCourseContentDto {
   @IsString()
   @IsNotEmpty()
   title!: string;
@@ -15,3 +15,6 @@ export class CreateVideoDto {
   @IsBoolean()
   isPreview?: boolean;
 }
+
+// Backward-compatible alias
+export { CreateCourseContentDto as CreateVideoDto };

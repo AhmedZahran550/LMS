@@ -10,14 +10,14 @@ import { DBService } from "../../db/db.service";
 import { CourseContent } from "../../db/entities/course-content.entity";
 import { CoursePurchase } from "../../db/entities/course-purchase.entity";
 import { User } from "../../db/entities/user.entity";
-import { CreateVideoDto } from "./dto/create-video.dto";
-import { UpdateVideoDto } from "./dto/update-video.dto";
+import { CreateCourseContentDto } from "./dto/create-course-content.dto";
+import { UpdateCourseContentDto } from "./dto/update-course-content.dto";
+import { ReorderCourseContentDto } from "./dto/reorder-course-content.dto";
 import { CoursesService } from "../courses/courses.service";
 import { StorageService } from "../storage/storage.service";
 import { StorageQuotaGuardService } from "../storage/services/storage-quota-guard.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { I18nService } from "nestjs-i18n";
-import { ReorderVideosDto } from "./dto/reorder-videos.dto";
 import {
   ContentType,
   PurchaseStatus,
@@ -53,8 +53,8 @@ function inferContentType(mimeType: string): ContentType {
 @Injectable()
 export class CourseContentService extends DBService<
   CourseContent,
-  CreateVideoDto,
-  UpdateVideoDto
+  CreateCourseContentDto,
+  UpdateCourseContentDto
 > {
   constructor(
     @InjectRepository(CourseContent)
@@ -75,7 +75,7 @@ export class CourseContentService extends DBService<
   async upload(
     courseId: string,
     instructorId: string,
-    createDto: CreateVideoDto,
+    createDto: CreateCourseContentDto,
     file: Express.Multer.File,
   ): Promise<CourseContent> {
     if (!file) {
@@ -241,7 +241,7 @@ export class CourseContentService extends DBService<
     courseId: string,
     contentId: string,
     instructorId: string,
-    updateDto: UpdateVideoDto,
+    updateDto: UpdateCourseContentDto,
   ): Promise<CourseContent> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
 
@@ -268,19 +268,24 @@ export class CourseContentService extends DBService<
   async reorder(
     courseId: string,
     instructorId: string,
-    reorderDto: ReorderVideosDto,
+    reorderDto: ReorderCourseContentDto,
   ): Promise<CourseContent[]> {
     await this.coursesService.findInstructorCourse(courseId, instructorId);
 
     const contents = await this.findCourseContents(courseId);
+    const ids = reorderDto.contentIds || reorderDto.videoIds;
 
-    if (contents.length !== reorderDto.videoIds.length) {
+    if (!ids || ids.length === 0) {
+      throw new BadRequestException("Must provide contentIds to reorder");
+    }
+
+    if (contents.length !== ids.length) {
       throw new BadRequestException("Must provide all content IDs to reorder");
     }
 
     const contentMap = new Map(contents.map((c) => [c.id, c]));
 
-    const updatedContents = reorderDto.videoIds.map((id, index) => {
+    const updatedContents = ids.map((id, index) => {
       const content = contentMap.get(id);
       if (!content)
         throw new BadRequestException("Content ID " + id + " is invalid");

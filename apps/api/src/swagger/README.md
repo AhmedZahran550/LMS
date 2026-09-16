@@ -25,7 +25,7 @@ src/
     ├── auth.swagger.ts              # Auth & OTP endpoints documentation
     ├── users.swagger.ts             # Users and profile endpoints documentation
     ├── courses.swagger.ts           # Courses management (instructor/admin/learner)
-    ├── videos.swagger.ts            # Video/content upload and streaming
+    ├── course-content.swagger.ts    # Course content upload, streaming & management
     ├── notifications.swagger.ts     # User notifications
     ├── push-notifications.swagger.ts# Firebase push notification tokens
     ├── universities.swagger.ts      # Public & Admin university academic hierarchy
@@ -43,7 +43,7 @@ All swagger files must export a single, consolidated object (e.g., `AuthSwagger`
 export { AuthSwagger } from "./auth.swagger";
 export { UsersSwagger } from "./users.swagger";
 export { CoursesSwagger } from "./courses.swagger";
-export { VideosSwagger } from "./videos.swagger";
+export { CourseContentSwagger, VideosSwagger } from "./course-content.swagger";
 export { NotificationsSwagger } from "./notifications.swagger";
 export { PushNotificationsSwagger } from "./push-notifications.swagger";
 export { UniversitiesSwagger } from "./universities.swagger";
