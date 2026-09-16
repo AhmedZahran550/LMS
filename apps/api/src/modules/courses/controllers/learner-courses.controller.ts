@@ -8,8 +8,8 @@ import { Roles } from "../../../core/decorators/roles.decorator";
 import {
   UserRole,
   PaginatedResponse,
-  CourseVisibility,
 } from "@lms/shared-types";
+
 import { CoursesSwagger } from "../../../swagger/courses.swagger";
 
 @ApiTags("Learner Courses")
@@ -24,8 +24,9 @@ export class LearnerCoursesController {
   async findAll(@Paginate() query: PaginateQuery) {
     return this.coursesService.findAll({
       ...query,
-      where: { visibility: CourseVisibility.PUBLIC },
+      where: { isActive: true },
     });
+
   }
 
   @Get(":id")

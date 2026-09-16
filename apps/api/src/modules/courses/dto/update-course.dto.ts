@@ -1,5 +1,4 @@
-import { IsEnum, IsOptional, IsString, IsUrl, IsBoolean } from 'class-validator';
-import { CourseVisibility } from '@lms/shared-types';
+import { IsOptional, IsString, IsUrl, IsBoolean, IsNumber, Min, IsUUID } from 'class-validator';
 
 export class UpdateCourseDto {
   @IsString()
@@ -10,9 +9,18 @@ export class UpdateCourseDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(CourseVisibility)
+  @IsNumber()
+  @Min(0)
   @IsOptional()
-  visibility?: CourseVisibility;
+  price?: number;
+
+  @IsString()
+  @IsOptional()
+  currency?: string;
+
+  @IsUUID()
+  @IsOptional()
+  categoryId?: string;
 
   @IsUrl()
   @IsOptional()

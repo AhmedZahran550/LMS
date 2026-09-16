@@ -10,7 +10,9 @@ import { AuthModule } from './core/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { LogsModule } from './modules/logs/logs.module';
-import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { CoursePurchasesModule } from './modules/course-purchases/course-purchases.module';
+import { SystemConfigModule } from './modules/system-config/system-config.module';
 import { I18nModule } from './i18n/i18n.module';
 
 import appConfig from './config/app.config';
@@ -20,9 +22,11 @@ import mailConfig from './config/mail.config';
 import storageConfig from './config/storage.config';
 import oauthConfig from './config/oauth.config';
 import firebaseConfig from './config/firebase.config';
+import kashierConfig from './config/kashier.config';
 import { validateEnv } from './config/env.validation';
 import { PushNotificationsModule } from './modules/push-notifications/push-notifications.module';
 
+import { PublicApiModule } from './api/public/public-api.module';
 import { AdminApiModule } from './api/admin/admin-api.module';
 import { InstructorApiModule } from './api/instructor/instructor-api.module';
 import { LearnerApiModule } from './api/learner/learner-api.module';
@@ -33,7 +37,16 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, jwtConfig, mailConfig, storageConfig, oauthConfig, firebaseConfig],
+      load: [
+        appConfig,
+        databaseConfig,
+        jwtConfig,
+        mailConfig,
+        storageConfig,
+        oauthConfig,
+        firebaseConfig,
+        kashierConfig,
+      ],
       envFilePath: '.env',
       validate: validateEnv,
     }),
@@ -42,8 +55,11 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
     MailModule,
     StorageModule,
     LogsModule,
+    PaymentsModule,
+    CoursePurchasesModule,
+    SystemConfigModule,
     I18nModule,
-    SubscriptionsModule,
+    PublicApiModule,
     AdminApiModule,
     InstructorApiModule,
     LearnerApiModule,

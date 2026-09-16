@@ -12,5 +12,22 @@ export class UpdateProfileDto {
   @IsString()
   @IsOptional()
   mobileNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  universityId?: string;
+
+  @IsString()
+  @IsOptional()
+  faculty?: string;
+
+  @IsString()
+  @IsOptional()
+  department?: string;
+
+  @IsString()
+  @IsOptional()
+  year?: string;
 }
+
 

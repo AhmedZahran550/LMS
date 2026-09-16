@@ -1,5 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
-import { CourseVisibility } from '@lms/shared-types';
+import { IsNotEmpty, IsOptional, IsString, IsUrl, IsNumber, Min, IsUUID } from 'class-validator';
 
 export class CreateCourseDto {
   @IsString()
@@ -10,9 +9,18 @@ export class CreateCourseDto {
   @IsNotEmpty()
   description!: string;
 
-  @IsEnum(CourseVisibility)
+  @IsNumber()
+  @Min(0)
+  @IsNotEmpty()
+  price!: number;
+
+  @IsString()
   @IsOptional()
-  visibility?: CourseVisibility;
+  currency?: string;
+
+  @IsUUID()
+  @IsOptional()
+  categoryId?: string;
 
   @IsUrl()
   @IsOptional()

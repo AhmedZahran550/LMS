@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateVideoDto {
   @IsString()
@@ -8,4 +9,9 @@ export class CreateVideoDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  isPreview?: boolean;
 }

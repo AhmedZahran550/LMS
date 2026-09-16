@@ -8,5 +8,7 @@ export interface VideoDto {
   size: number;
   orderIndex: number;
   courseId: string;
+  isPreview?: boolean;
   createdAt: string;
 }
+

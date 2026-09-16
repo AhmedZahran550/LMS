@@ -38,14 +38,10 @@ export class ProfileController {
   @Patch("me")
   @UsersSwagger.updateProfile()
   async updateProfile(@CurrentUser() user: any, @Body() dto: UpdateProfileDto) {
-    const dbUser = await this.usersService.updateProfile(
-      user.id,
-      dto.firstName,
-      dto.lastName,
-      dto.mobileNumber,
-    );
+    const dbUser = await this.usersService.updateProfile(user.id, dto);
     return dbUser;
   }
+
 
   @Patch("me/preferences")
   @UsersSwagger.updatePreferences()

@@ -1,31 +1,33 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { InstructorSubscription } from './instructor-subscription.entity';
+import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { User } from './user.entity';
 import { BaseEntity } from './base.entity';
 
-@Entity()
+@Entity('storage_addons')
+@Index(['instructorId', 'isActive'])
 export class StorageAddon extends BaseEntity {
   @Column()
-  instructorSubscriptionId!: string;
+  instructorId!: string;
 
   @Column({ type: 'bigint' })
   additionalBytes!: string;
 
   @Column({ type: 'varchar', nullable: true })
-  stripePriceId?: string | null;
+  @Index()
+  kashierOrderId?: string | null;
 
   @Column({ type: 'varchar', nullable: true })
-  stripeInvoiceId?: string | null;
+  kashierPaymentId?: string | null;
 
   @Column({ type: 'timestamp' })
   startDate!: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
-  endDate?: Date | null;
+  @Column({ type: 'timestamp' })
+  endDate!: Date; // 90 days validity
 
   @Column({ default: true })
   isActive!: boolean;
 
-  @ManyToOne(() => InstructorSubscription, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'instructorSubscriptionId' })
-  instructorSubscription!: InstructorSubscription;
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'instructorId' })
+  instructor!: User;
 }

@@ -5,8 +5,8 @@ import * as crypto from 'crypto';
 import * as argon2 from 'argon2';
 import { UsersService } from '../../modules/users/users.service';
 import { MailService } from '../../modules/mail/mail.service';
-import { SubscriptionService } from '../../modules/subscriptions/services/subscription.service';
 import { ClientType, UserRole } from '@lms/shared-types';
+
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -25,8 +25,8 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private mailService: MailService,
-    private subscriptionService: SubscriptionService,
   ) {}
+
 
   private generateOtp(): string {
     // TODO: Use random OTP for production
@@ -55,7 +55,12 @@ export class AuthService {
       firstName: registerDto.firstName,
       lastName: registerDto.lastName,
       role,
+      universityId: registerDto.universityId,
+      faculty: registerDto.faculty,
+      department: registerDto.department,
+      year: registerDto.year,
     });
+
 
     const otp = this.generateOtp();
     const expiresAt = new Date();
@@ -318,25 +323,7 @@ export class AuthService {
     await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
 
     let subscription: any = null;
-    if (user.role === 'instructor') {
-      try {
-        const usage = await this.subscriptionService.getUsage(user.id);
-        if (usage) {
-          subscription = {
-            plan: usage.plan?.name || null,
-            status: usage.subscription?.status || null,
-            totalStudents: usage.totalStudents,
-            totalStorageBytes: usage.totalStorageBytes,
-            maxTotalStudents: usage.plan?.maxTotalStudents || 0,
-            pricePerStudent: usage.plan?.pricePerStudent || 0,
-            baseStorageBytes: usage.baseStorageBytes,
-            totalAddonStorageBytes: usage.totalAddonStorageBytes,
-          };
-        }
-      } catch {
-        subscription = null;
-      }
-    }
+
 
     const userProfile = {
       id: user.id,

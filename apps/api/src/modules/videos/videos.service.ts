@@ -8,21 +8,21 @@ import { Repository } from "typeorm";
 import { PaginateConfig, FilterOperator, PaginateQuery } from "nestjs-paginate";
 import { DBService } from "../../db/db.service";
 import { CourseContent } from "../../db/entities/course-content.entity";
-import { Enrollment } from "../../db/entities/enrollment.entity";
+import { CoursePurchase } from "../../db/entities/course-purchase.entity";
 import { User } from "../../db/entities/user.entity";
 import { CreateVideoDto } from "./dto/create-video.dto";
 import { UpdateVideoDto } from "./dto/update-video.dto";
 import { CoursesService } from "../courses/courses.service";
 import { StorageService } from "../storage/storage.service";
+import { StorageQuotaGuardService } from "../storage/services/storage-quota-guard.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { I18nService } from "nestjs-i18n";
 import { ReorderVideosDto } from "./dto/reorder-videos.dto";
 import {
   ContentType,
-  EnrollmentStatus,
+  PurchaseStatus,
   NotificationType,
 } from "@lms/shared-types";
-import { SubscriptionGuardService } from "../subscriptions/services/subscription-guard.service";
 
 export const CONTENT_PAGINATION_CONFIG: PaginateConfig<CourseContent> = {
   sortableColumns: ["createdAt", "orderIndex", "title"],
@@ -32,6 +32,7 @@ export const CONTENT_PAGINATION_CONFIG: PaginateConfig<CourseContent> = {
   filterableColumns: {
     courseId: [FilterOperator.EQ],
     contentType: [FilterOperator.EQ],
+    isPreview: [FilterOperator.EQ],
   },
 };
 
@@ -58,15 +59,15 @@ export class CourseContentService extends DBService<
   constructor(
     @InjectRepository(CourseContent)
     private readonly contentRepository: Repository<CourseContent>,
-    @InjectRepository(Enrollment)
-    private readonly enrollmentRepository: Repository<Enrollment>,
+    @InjectRepository(CoursePurchase)
+    private readonly purchaseRepository: Repository<CoursePurchase>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly coursesService: CoursesService,
     private readonly storageService: StorageService,
+    private readonly storageQuotaGuard: StorageQuotaGuardService,
     private readonly notificationsService: NotificationsService,
     private readonly i18nService: I18nService,
-    private readonly subscriptionGuard: SubscriptionGuardService,
   ) {
     super(contentRepository, CONTENT_PAGINATION_CONFIG);
   }
@@ -77,18 +78,20 @@ export class CourseContentService extends DBService<
     createDto: CreateVideoDto,
     file: Express.Multer.File,
   ): Promise<CourseContent> {
-    await this.subscriptionGuard.checkContentUpload(
+    if (!file) {
+      throw new BadRequestException("File is required");
+    }
+
+    // Check 5GB base quota + active 3-month subscriptions
+    await this.storageQuotaGuard.checkUploadAllowed(
       instructorId,
-      file?.size || 0,
+      file.size || 0,
     );
+
     const course = await this.coursesService.findInstructorCourse(
       courseId,
       instructorId,
     );
-
-    if (!file) {
-      throw new BadRequestException("File is required");
-    }
 
     const lastContent = await this.contentRepository.findOne({
       where: { courseId },
@@ -112,22 +115,24 @@ export class CourseContentService extends DBService<
       size: uploadResult.size,
       orderIndex,
       contentType,
+      isPreview: createDto.isPreview ?? false,
     });
 
     const saved = await this.contentRepository.save(content);
 
-    const approvedEnrollments = await this.enrollmentRepository.find({
-      where: { courseId, status: EnrollmentStatus.APPROVED },
-      relations: ["learner"],
+    // Notify students who purchased this course
+    const completedPurchases = await this.purchaseRepository.find({
+      where: { courseId, status: PurchaseStatus.COMPLETED },
+      relations: ["student"],
     });
 
-    if (approvedEnrollments.length > 0) {
+    if (completedPurchases.length > 0) {
       const langGroups: Record<string, string[]> = {};
 
-      for (const enrollment of approvedEnrollments) {
-        const lang = (enrollment.learner as any)?.preferences?.lang || "ar";
+      for (const purchase of completedPurchases) {
+        const lang = (purchase.student as any)?.preferences?.lang || "ar";
         if (!langGroups[lang]) langGroups[lang] = [];
-        langGroups[lang].push(enrollment.learnerId);
+        langGroups[lang].push(purchase.studentId);
       }
 
       for (const [lang, userIds] of Object.entries(langGroups)) {
@@ -165,6 +170,13 @@ export class CourseContentService extends DBService<
     });
   }
 
+  async findPreviewCourseContents(courseId: string): Promise<CourseContent[]> {
+    return this.contentRepository.find({
+      where: { courseId, isPreview: true },
+      order: { orderIndex: "ASC" },
+    });
+  }
+
   async findPaginatedCourseContents(
     courseId: string,
     instructorId: string,
@@ -183,11 +195,11 @@ export class CourseContentService extends DBService<
   ) {
     const qb = this.contentRepository.createQueryBuilder("content");
     qb.leftJoin("content.course", "course")
-      .leftJoin("course.enrollments", "enrollment")
+      .leftJoin("course.purchases", "purchase")
       .where("content.courseId = :courseId", { courseId })
-      .andWhere("enrollment.learnerId = :learnerId", { learnerId })
-      .andWhere("enrollment.status = :status", {
-        status: EnrollmentStatus.APPROVED,
+      .andWhere("purchase.studentId = :learnerId", { learnerId })
+      .andWhere("purchase.status = :status", {
+        status: PurchaseStatus.COMPLETED,
       });
     return this.findAll({ ...query }, qb);
   }
@@ -198,15 +210,31 @@ export class CourseContentService extends DBService<
     learnerId?: string,
   ): Promise<CourseContent> {
     const qb = this.contentRepository.createQueryBuilder("content");
-    qb.leftJoin("content.course", "course")
-      .leftJoin("course.enrollments", "enrollment")
-      .where("content.courseId = :courseId", { courseId })
-      .andWhere("content.id = :contentId", { contentId })
-      .andWhere("enrollment.learnerId = :learnerId", { learnerId })
-      .andWhere("enrollment.status = :status", {
-        status: EnrollmentStatus.APPROVED,
-      });
-    return qb.getOneOrFail();
+    qb.leftJoin("content.course", "course");
+
+    if (learnerId) {
+      qb.leftJoin("course.purchases", "purchase")
+        .where("content.courseId = :courseId", { courseId })
+        .andWhere("content.id = :contentId", { contentId })
+        .andWhere(
+          "(content.isPreview = true OR (purchase.studentId = :learnerId AND purchase.status = :status))",
+          {
+            learnerId,
+            status: PurchaseStatus.COMPLETED,
+          },
+        );
+    } else {
+      qb.where("content.courseId = :courseId", { courseId }).andWhere(
+        "content.id = :contentId",
+        { contentId },
+      );
+    }
+
+    const content = await qb.getOne();
+    if (!content) {
+      throw new NotFoundException("Course content not found or access denied");
+    }
+    return content;
   }
 
   async updateCourseContent(

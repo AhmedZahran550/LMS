@@ -11,11 +11,10 @@ import { DBService } from '../../db/db.service';
 import { Course } from '../../db/entities/course.entity';
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
-import { CourseVisibility, PaginatedResponse, ContentType } from "@lms/shared-types";
-import { SubscriptionGuardService } from '../subscriptions/services/subscription-guard.service';
+import { ContentType, PurchaseStatus } from "@lms/shared-types";
 
 export const COURSE_PAGINATION_CONFIG: PaginateConfig<Course> = {
-  sortableColumns: ["createdAt", "title"],
+  sortableColumns: ["createdAt", "title", "price"],
   nullSort: "last",
   defaultSortBy: [["createdAt", "DESC"]],
   searchableColumns: [
@@ -26,11 +25,11 @@ export const COURSE_PAGINATION_CONFIG: PaginateConfig<Course> = {
     "instructor.email",
   ],
   filterableColumns: {
-    visibility: [FilterOperator.EQ],
     isActive: [FilterOperator.EQ],
     instructorId: [FilterOperator.EQ],
+    categoryId: [FilterOperator.EQ],
   },
-  relations: ["instructor"],
+  relations: ["instructor", "category"],
 };
 
 @Injectable()
@@ -42,20 +41,16 @@ export class CoursesService extends DBService<
   constructor(
     @InjectRepository(Course)
     private readonly coursesRepository: Repository<Course>,
-    private readonly subscriptionGuard: SubscriptionGuardService,
   ) {
     super(coursesRepository, COURSE_PAGINATION_CONFIG);
   }
 
   async create(createDto: CreateCourseDto, additionalData?: DeepPartial<Course>): Promise<Course> {
-    if (additionalData?.instructorId) {
-      await this.subscriptionGuard.checkCourseCreation(additionalData.instructorId as string);
-    }
     return super.create(createDto, additionalData);
   }
 
   async findById(id: string): Promise<Course> {
-    return super.findByIdOrFail(id, { relations: ["instructor", "contents"] });
+    return super.findByIdOrFail(id, { relations: ["instructor", "contents", "category"] });
   }
 
   async findInstructorCourse(
@@ -100,11 +95,12 @@ export class CoursesService extends DBService<
         .andWhere("content.contentType = :type", { type: ContentType.VIDEO })
         .getRawOne(),
       this.coursesRepository.manager.createQueryBuilder()
-        .select("COUNT(DISTINCT enrollment.learnerId)", "total")
-        .from("enrollment", "enrollment")
-        .innerJoin("course", "course", "enrollment.courseId = course.id")
+        .select("COUNT(DISTINCT purchase.studentId)", "total")
+        .from("course_purchases", "purchase")
+        .innerJoin("course", "course", "purchase.courseId = course.id")
         .where("course.instructorId = :instructorId", { instructorId })
-        .getRawOne()
+        .andWhere("purchase.status = :status", { status: PurchaseStatus.COMPLETED })
+        .getRawOne(),
     ]);
 
     return {

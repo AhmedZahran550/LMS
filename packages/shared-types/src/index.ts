@@ -7,3 +7,7 @@ export * from './enrollment.types';
 export * from './notification.types';
 export * from './subscription.types';
 export * from './instructor-student.types';
+export * from './university.types';
+export * from './category.types';
+export * from './course-purchase.types';
+

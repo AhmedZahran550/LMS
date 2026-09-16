@@ -35,4 +35,21 @@ export class RegisterDto {
   @IsOptional()
   @IsEnum(ClientType)
   client?: ClientType;
+
+  @IsString()
+  @IsNotEmpty()
+  universityId!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  faculty!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  department!: string;
+
+  @IsOptional()
+  @IsString()
+  year?: string;
 }
+

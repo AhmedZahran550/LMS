@@ -72,3 +72,22 @@ export enum InvitedBy {
   INSTRUCTOR = 'instructor',
   STUDENT = 'student',
 }
+
+export enum PurchaseStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  REFUNDED = 'refunded',
+  FAILED = 'failed',
+}
+
+export enum StorageSubscriptionStatus {
+  ACTIVE = 'active',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+}
+
+export enum CommissionType {
+  FIXED = 'fixed',
+  PERCENTAGE = 'percentage',
+}
+
