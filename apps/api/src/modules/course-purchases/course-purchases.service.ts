@@ -75,6 +75,7 @@ export class CoursePurchasesService {
       const saved = await this.purchaseRepository.save(purchase);
       return {
         isFree: true,
+        status: PurchaseStatus.COMPLETED,
         purchaseId: saved.id,
       };
     }
@@ -108,6 +109,7 @@ export class CoursePurchasesService {
 
     return {
       isFree: false,
+      status: PurchaseStatus.PENDING,
       purchaseId: purchase.id,
       orderId,
       checkoutUrl: session.checkoutUrl,

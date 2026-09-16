@@ -335,6 +335,11 @@ export class AuthService {
       isActive: user.isActive,
       profileImageUrl: user.profileImageUrl,
       preferences: user.preferences || { lang: 'ar', mode: 'light' },
+      universityId: user.universityId,
+      faculty: user.faculty,
+      department: user.department,
+      year: user.year,
+      storageQuotaBytes: user.storageQuotaBytes,
       createdAt: user.createdAt.toISOString(),
       subscription,
     };

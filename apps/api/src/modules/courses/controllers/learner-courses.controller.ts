@@ -33,7 +33,7 @@ export class LearnerCoursesController {
   @CoursesSwagger.findOnePublicCourse()
   async findOne(@Param("id") id: string) {
     const course: any = await this.coursesService.findById(id);
-    course.videos = [];
+    course.contents = (course.contents || []).filter((c: any) => c.isPreview);
     if (course.instructor) {
       const { password, hashedRefreshToken, ...safeUser } = course.instructor;
       course.instructor = safeUser as any;
