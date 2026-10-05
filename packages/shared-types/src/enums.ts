@@ -91,3 +91,10 @@ export enum CommissionType {
   PERCENTAGE = 'percentage',
 }
 
+export enum UploadSessionStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  ABORTED = 'aborted',
+  EXPIRED = 'expired',
+}
+

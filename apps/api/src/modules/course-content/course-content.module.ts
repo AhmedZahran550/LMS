@@ -6,6 +6,7 @@ import { CourseContent } from '../../db/entities/course-content.entity';
 import { CoursesModule } from '../courses/courses.module';
 import { StorageModule } from '../storage/storage.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { UploadModule } from '../upload/upload.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoursePurchase } from '../../db/entities/course-purchase.entity';
 import { User } from '../../db/entities/user.entity';
@@ -15,6 +16,7 @@ import { User } from '../../db/entities/user.entity';
     TypeOrmModule.forFeature([CourseContent, CoursePurchase, User]),
     CoursesModule,
     StorageModule,
+    UploadModule,
     NotificationsModule,
   ],
   controllers: [InstructorCourseContentController, LearnerCourseContentController],

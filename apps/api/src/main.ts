@@ -6,7 +6,6 @@ import { ValidationError } from "class-validator";
 import { MetadataStorage, getFromContainer } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 import { ConfigService } from "@nestjs/config";
-import { join } from "path";
 import { AppModule } from "./app.module";
 import { LoggingInterceptor } from "./core/interceptors/logging.interceptor";
 
@@ -14,10 +13,6 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
-
-  app.useStaticAssets(join(process.cwd(), "uploads"), {
-    prefix: "/uploads",
-  });
 
   app.setGlobalPrefix("api");
 
