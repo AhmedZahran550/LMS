@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { StorageService } from './storage.service';
+import { StorageService, DirectUploadSessionResult } from './storage.service';
 import { v2 as cloudinary } from 'cloudinary';
 import * as crypto from 'crypto';
 import * as stream from 'stream';
@@ -54,6 +54,77 @@ export class CloudinaryStorageService extends StorageService {
       bufferStream.end(file.buffer);
       bufferStream.pipe(uploadStream);
     });
+  }
+
+  async createDirectUploadSession(
+    sessionId: string,
+    directory: string,
+    filename: string,
+    mimeType: string,
+    fileSize: number,
+  ): Promise<DirectUploadSessionResult> {
+    const cloudName = this.configService.get<string>('storage.cloudinary.cloudName');
+    const apiKey = this.configService.get<string>('storage.cloudinary.apiKey');
+    const apiSecret = this.configService.get<string>('storage.cloudinary.apiSecret');
+
+    const timestamp = Math.round(Date.now() / 1000);
+    const publicId = `${directory}/${crypto.randomUUID()}`;
+
+    let resourceType = 'auto';
+    if (mimeType.startsWith('video/')) {
+      resourceType = 'video';
+    } else if (mimeType.startsWith('image/')) {
+      resourceType = 'image';
+    } else if (mimeType === 'application/pdf' || mimeType.includes('presentation') || mimeType.includes('document')) {
+      resourceType = 'raw';
+    }
+
+    const paramsToSign: Record<string, any> = {
+      folder: directory,
+      public_id: publicId,
+      timestamp,
+    };
+
+    const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret!);
+
+    return {
+      provider: 'cloudinary',
+      uploadUrl: `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+      httpMethod: 'POST',
+      fields: {
+        api_key: apiKey,
+        timestamp,
+        signature,
+        folder: directory,
+        public_id: publicId,
+        resource_type: resourceType,
+      },
+      headers: {
+        'X-Unique-Upload-Id': sessionId,
+      },
+      chunkSize: 10 * 1024 * 1024,
+      publicId,
+    };
+  }
+
+  async verifyUploadedAsset(publicId: string, resourceType = 'auto'): Promise<{
+    url: string;
+    filename: string;
+    size: number;
+    mimeType: string;
+  } | null> {
+    try {
+      const result = await cloudinary.api.resource(publicId, { resource_type: resourceType });
+      return {
+        url: result.secure_url,
+        filename: result.public_id,
+        size: result.bytes,
+        mimeType: result.resource_type === 'image' ? `image/${result.format}` : (result.resource_type === 'video' ? `video/${result.format}` : 'application/octet-stream'),
+      };
+    } catch (err: any) {
+      this.logger.warn(`Could not verify Cloudinary resource ${publicId}: ${err?.message}`);
+      return null;
+    }
   }
 
   async delete(filename: string): Promise<void> {

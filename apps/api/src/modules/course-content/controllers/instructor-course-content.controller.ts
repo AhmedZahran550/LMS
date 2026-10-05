@@ -5,6 +5,9 @@ import { CourseContentService } from '../course-content.service';
 import { CreateCourseContentDto } from '../dto/create-course-content.dto';
 import { UpdateCourseContentDto } from '../dto/update-course-content.dto';
 import { ReorderCourseContentDto } from '../dto/reorder-course-content.dto';
+import { InitUploadSessionDto } from '../../upload/dto/init-upload-session.dto';
+import { CompleteCourseContentUploadDto } from '../dto/complete-course-content-upload.dto';
+import { UploadService } from '../../upload/upload.service';
 import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../core/auth/guards/roles.guard';
 import { Roles } from '../../../core/decorators/roles.decorator';
@@ -12,13 +15,17 @@ import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { UserRole } from '@lms/shared-types';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CourseContentSwagger } from '../../../swagger/course-content.swagger';
+import { UploadSwagger } from '../../../swagger/upload.swagger';
 
 @ApiTags("Instructor Content")
 @Controller('instructor/courses/:courseId/content')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.INSTRUCTOR)
 export class InstructorCourseContentController {
-  constructor(private readonly contentService: CourseContentService) {}
+  constructor(
+    private readonly contentService: CourseContentService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get()
   @CourseContentSwagger.findAllContent()
@@ -28,6 +35,26 @@ export class InstructorCourseContentController {
     @Paginate() query: PaginateQuery,
   ) {
     return this.contentService.findPaginatedCourseContents(courseId, user.id, query);
+  }
+
+  @Post('upload-session')
+  @UploadSwagger.initSession()
+  async initUploadSession(
+    @CurrentUser() user: any,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Body() dto: InitUploadSessionDto,
+  ) {
+    return this.uploadService.initiateCourseContentSession(user.id, courseId, dto);
+  }
+
+  @Post('complete-upload')
+  @UploadSwagger.completeUpload()
+  async completeUpload(
+    @CurrentUser() user: any,
+    @Param('courseId', ParseUUIDPipe) courseId: string,
+    @Body() dto: CompleteCourseContentUploadDto,
+  ) {
+    return this.contentService.completeDirectUpload(courseId, user.id, dto);
   }
 
   @Post()

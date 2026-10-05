@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -13,15 +14,20 @@ import { User } from "../../db/entities/user.entity";
 import { CreateCourseContentDto } from "./dto/create-course-content.dto";
 import { UpdateCourseContentDto } from "./dto/update-course-content.dto";
 import { ReorderCourseContentDto } from "./dto/reorder-course-content.dto";
+import { CompleteCourseContentUploadDto } from "./dto/complete-course-content-upload.dto";
 import { CoursesService } from "../courses/courses.service";
 import { StorageService } from "../storage/storage.service";
+import { LocalStorageService } from "../storage/local-storage.service";
+import { CloudinaryStorageService } from "../storage/cloudinary-storage.service";
 import { StorageQuotaGuardService } from "../storage/services/storage-quota-guard.service";
 import { NotificationsService } from "../notifications/notifications.service";
+import { UploadService } from "../upload/upload.service";
 import { I18nService } from "nestjs-i18n";
 import {
   ContentType,
   PurchaseStatus,
   NotificationType,
+  UploadSessionStatus,
 } from "@lms/shared-types";
 
 export const CONTENT_PAGINATION_CONFIG: PaginateConfig<CourseContent> = {
@@ -67,9 +73,158 @@ export class CourseContentService extends DBService<
     private readonly storageService: StorageService,
     private readonly storageQuotaGuard: StorageQuotaGuardService,
     private readonly notificationsService: NotificationsService,
+    private readonly uploadService: UploadService,
     private readonly i18nService: I18nService,
   ) {
     super(contentRepository, CONTENT_PAGINATION_CONFIG);
+  }
+
+  async completeDirectUpload(
+    courseId: string,
+    instructorId: string,
+    dto: CompleteCourseContentUploadDto,
+  ): Promise<CourseContent> {
+    const course = await this.coursesService.findInstructorCourse(courseId, instructorId);
+
+    const session = await this.uploadService.findSessionById(dto.sessionId);
+
+    if (session.courseId !== courseId || session.instructorId !== instructorId) {
+      throw new ForbiddenException('Invalid upload session for this course');
+    }
+
+    if (session.status === UploadSessionStatus.COMPLETED) {
+      throw new BadRequestException('Upload session has already been completed');
+    }
+
+    if (session.status !== UploadSessionStatus.PENDING) {
+      throw new BadRequestException(`Cannot complete upload. Session status is ${session.status}`);
+    }
+
+    if (session.expiresAt && new Date(session.expiresAt) < new Date()) {
+      session.status = UploadSessionStatus.EXPIRED;
+      await this.uploadService.saveSession(session);
+      throw new BadRequestException('Upload session has expired');
+    }
+
+    let finalUrl = '';
+    let finalFilename = '';
+    let finalSize = 0;
+    let finalMimeType = session.mimeType;
+
+    if (session.provider === 'local') {
+      if (this.storageService instanceof LocalStorageService) {
+        const finalized = await this.storageService.finalizeLocalFile(
+          session.id,
+          session.folder,
+          session.fileName,
+        );
+        finalUrl = finalized.url;
+        finalFilename = finalized.filename;
+        finalSize = finalized.size;
+      } else {
+        throw new BadRequestException('Configured storage provider does not match session provider');
+      }
+    } else {
+      // Cloudinary provider
+      const publicId = dto.cloudinaryResult?.publicId || session.publicId;
+      if (!publicId) {
+        throw new BadRequestException('Cloudinary public ID is required to complete upload');
+      }
+
+      if (this.storageService instanceof CloudinaryStorageService) {
+        const verified = await this.storageService.verifyUploadedAsset(
+          publicId,
+          dto.cloudinaryResult?.resourceType || 'auto',
+        );
+        if (verified) {
+          finalUrl = verified.url;
+          finalFilename = verified.filename;
+          finalSize = verified.size;
+          finalMimeType = verified.mimeType;
+        } else if (dto.cloudinaryResult?.secureUrl) {
+          finalUrl = dto.cloudinaryResult.secureUrl;
+          finalFilename = dto.cloudinaryResult.publicId || publicId;
+          finalSize = dto.cloudinaryResult.bytes || Number(session.fileSize);
+        } else {
+          throw new BadRequestException('Could not verify Cloudinary uploaded asset');
+        }
+      } else if (dto.cloudinaryResult?.secureUrl) {
+        finalUrl = dto.cloudinaryResult.secureUrl;
+        finalFilename = dto.cloudinaryResult.publicId || publicId;
+        finalSize = dto.cloudinaryResult.bytes || Number(session.fileSize);
+      } else {
+        throw new BadRequestException('Could not verify Cloudinary uploaded asset');
+      }
+    }
+
+    const contentType = inferContentType(finalMimeType);
+
+    const lastContent = await this.contentRepository.findOne({
+      where: { courseId },
+      order: { orderIndex: 'DESC' },
+    });
+    const orderIndex = lastContent ? lastContent.orderIndex + 1 : 0;
+
+    const content = this.contentRepository.create({
+      courseId,
+      title: dto.title,
+      description: dto.description,
+      url: finalUrl,
+      filename: finalFilename,
+      mimeType: finalMimeType,
+      size: finalSize,
+      orderIndex,
+      contentType,
+      isPreview: dto.isPreview ?? false,
+    });
+
+    const saved = await this.contentRepository.save(content);
+
+    session.status = UploadSessionStatus.COMPLETED;
+    session.uploadedBytes = String(finalSize);
+    await this.uploadService.saveSession(session);
+
+    // Notify students who purchased this course
+    const completedPurchases = await this.purchaseRepository.find({
+      where: { courseId, status: PurchaseStatus.COMPLETED },
+      relations: ['student'],
+    });
+
+    if (completedPurchases.length > 0) {
+      const langGroups: Record<string, string[]> = {};
+
+      for (const purchase of completedPurchases) {
+        const lang = (purchase.student as any)?.preferences?.lang || 'ar';
+        if (!langGroups[lang]) langGroups[lang] = [];
+        langGroups[lang].push(purchase.studentId);
+      }
+
+      for (const [lang, userIds] of Object.entries(langGroups)) {
+        const subject = this.i18nService.translate(
+          'translation.notifications.subjects.new_content',
+          { lang },
+        );
+        const message = this.i18nService.translate(
+          'translation.notifications.messages.new_content',
+          {
+            lang,
+            args: { content: dto.title, course: course.title },
+          },
+        );
+
+        this.notificationsService.createMany(
+          userIds,
+          NotificationType.NEW_CONTENT,
+          subject,
+          message,
+          { courseId, contentId: saved.id, title: dto.title },
+          'content',
+          saved.id,
+        );
+      }
+    }
+
+    return saved;
   }
 
   async upload(

@@ -10,3 +10,4 @@ export { PublicCoursesSwagger } from "./public-courses.swagger";
 export { CoursePurchasesSwagger } from "./course-purchases.swagger";
 export { StorageSwagger } from "./storage.swagger";
 export { PaymentsSwagger } from "./payments.swagger";
+export { UploadSwagger } from "./upload.swagger";

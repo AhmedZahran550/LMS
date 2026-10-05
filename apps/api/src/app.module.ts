@@ -25,6 +25,7 @@ import firebaseConfig from './config/firebase.config';
 import kashierConfig from './config/kashier.config';
 import { validateEnv } from './config/env.validation';
 import { PushNotificationsModule } from './modules/push-notifications/push-notifications.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 import { PublicApiModule } from './api/public/public-api.module';
 import { AdminApiModule } from './api/admin/admin-api.module';
@@ -54,6 +55,7 @@ import { LoggerMiddleware } from './core/middlewares/logger.middleware';
     AuthModule,
     MailModule,
     StorageModule,
+    UploadModule,
     LogsModule,
     PaymentsModule,
     CoursePurchasesModule,

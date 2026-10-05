@@ -13,6 +13,7 @@ import { SystemConfig } from "./entities/system-config.entity";
 import { DeviceToken } from "./entities/device-token.entity";
 import { Log } from "./entities/log.entity";
 import { Notification } from "./entities/notification.entity";
+import { UploadSession } from "./entities/upload-session.entity";
 import { AppDataSource } from "./datasource";
 
 @Global()
@@ -33,6 +34,7 @@ import { AppDataSource } from "./datasource";
       DeviceToken,
       Log,
       Notification,
+      UploadSession,
     ]),
   ],
   exports: [TypeOrmModule],
