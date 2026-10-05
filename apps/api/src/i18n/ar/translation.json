@@ -77,6 +77,8 @@
     "COURSE_LIMIT_REACHED": "الدورات غير محدودة في خطتك.",
     "STORAGE_LIMIT_REACHED": "لقد وصلت إلى حد التخزين. قم بترقية خطتك.",
     "STUDENT_LIMIT_REACHED": "لقد وصلت إلى حد الطلاب. قم بترقية خطتك.",
-    "ACTIVE_SUBSCRIPTION_EXISTS": "لديك بالفعل اشتراك نشط."
+    "ACTIVE_SUBSCRIPTION_EXISTS": "لديك بالفعل اشتراك نشط.",
+    "STUDENTS_USE_MOBILE": "تسجيل دخول الطلاب متاح عبر تطبيق الهاتف فقط",
+    "DB_ERROR": "حدث خطأ في قاعدة البيانات"
   }
 }

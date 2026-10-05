@@ -34,6 +34,7 @@ const MESSAGE_TO_ERROR_CODE: Record<string, string> = {
   "Invalid or expired password reset token": "INVALID_RESET_TOKEN",
   "Resource not found.": "RESOURCE_NOT_FOUND",
   "Your session has expired. Please log in again.": "TOKEN_EXPIRED",
+  "error.students_use_mobile": "STUDENTS_USE_MOBILE",
 };
 
 @Catch()
@@ -79,7 +80,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         errorCode = STATUS_TO_ERROR_CODE[status] || "INTERNAL_ERROR";
       }
 
-      const translated = this.i18nService.translate("translation.errors." + errorCode, { lang });
+      let translated = this.i18nService.translate("translation.errors." + errorCode, { lang });
+      if (typeof translated === "string" && translated.startsWith("translation.errors.")) {
+        translated = typeof rawMessage === "string" && rawMessage !== errorCode ? rawMessage : (STATUS_TO_ERROR_CODE[status] || "Error");
+      }
 
       if (errors && Array.isArray(errors)) {
         errors = errors.map((err: any) => {

@@ -77,6 +77,8 @@
     "COURSE_LIMIT_REACHED": "Courses are unlimited on your plan.",
     "STORAGE_LIMIT_REACHED": "Storage limit reached. Upgrade your plan.",
     "STUDENT_LIMIT_REACHED": "Student limit reached. Upgrade your plan.",
-    "ACTIVE_SUBSCRIPTION_EXISTS": "You already have an active subscription."
+    "ACTIVE_SUBSCRIPTION_EXISTS": "You already have an active subscription.",
+    "STUDENTS_USE_MOBILE": "Students must use the mobile application to log in",
+    "DB_ERROR": "Database operation failed"
   }
 }

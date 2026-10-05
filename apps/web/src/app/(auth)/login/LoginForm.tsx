@@ -117,9 +117,10 @@ export function LoginForm() {
         }
       } else {
         setServerError({
-          message: data?.message === 'error.students_use_mobile' 
-            ? t('Students must use the mobile app to log in.') 
-            : data?.message || t('Login failed. Please check your credentials.'),
+          message:
+            data?.message === 'error.students_use_mobile' || data?.errorCode === 'STUDENTS_USE_MOBILE'
+              ? (data?.message && data.message !== 'error.students_use_mobile' ? data.message : t('Students must use the mobile app to log in.'))
+              : data?.message || t('Login failed. Please check your credentials.'),
           code: data?.errorCode,
         });
       }
