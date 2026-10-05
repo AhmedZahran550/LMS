@@ -30,7 +30,13 @@ export interface UserProfile {
   isActive: boolean;
   profileImageUrl?: string | null;
   preferences?: UserPreferences;
+  universityId?: string | null;
+  faculty?: string | null;
+  department?: string | null;
+  year?: string | null;
+  storageQuotaBytes?: string | number;
   createdAt: string;
   subscription?: SubscriptionInfo | null;
 }
+
 

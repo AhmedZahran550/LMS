@@ -8,8 +8,8 @@ import { Roles } from "../../../core/decorators/roles.decorator";
 import {
   UserRole,
   PaginatedResponse,
-  CourseVisibility,
 } from "@lms/shared-types";
+
 import { CoursesSwagger } from "../../../swagger/courses.swagger";
 
 @ApiTags("Learner Courses")
@@ -24,15 +24,16 @@ export class LearnerCoursesController {
   async findAll(@Paginate() query: PaginateQuery) {
     return this.coursesService.findAll({
       ...query,
-      where: { visibility: CourseVisibility.PUBLIC },
+      where: { isActive: true },
     });
+
   }
 
   @Get(":id")
   @CoursesSwagger.findOnePublicCourse()
   async findOne(@Param("id") id: string) {
     const course: any = await this.coursesService.findById(id);
-    course.videos = [];
+    course.contents = (course.contents || []).filter((c: any) => c.isPreview);
     if (course.instructor) {
       const { password, hashedRefreshToken, ...safeUser } = course.instructor;
       course.instructor = safeUser as any;

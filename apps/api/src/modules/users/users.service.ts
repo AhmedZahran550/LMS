@@ -8,6 +8,8 @@ import { User } from '../../db/entities/user.entity';
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UpdatePreferencesDto } from "./dto/update-preferences.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
+
 
 export const USER_PAGINATION_CONFIG: PaginateConfig<User> = {
   sortableColumns: ["createdAt", "firstName", "lastName", "email"],
@@ -138,18 +140,29 @@ export class UsersService extends DBService<
 
   async updateProfile(
     id: string,
-    firstName: string,
-    lastName: string,
-    mobileNumber?: string,
+    dto: UpdateProfileDto,
   ): Promise<User> {
     const user = await this.findByIdOrFail(id);
-    user.firstName = firstName;
-    user.lastName = lastName;
-    if (mobileNumber !== undefined) {
-      user.mobileNumber = mobileNumber;
+    user.firstName = dto.firstName;
+    user.lastName = dto.lastName;
+    if (dto.mobileNumber !== undefined) {
+      user.mobileNumber = dto.mobileNumber;
+    }
+    if (dto.universityId !== undefined) {
+      user.universityId = dto.universityId;
+    }
+    if (dto.faculty !== undefined) {
+      user.faculty = dto.faculty;
+    }
+    if (dto.department !== undefined) {
+      user.department = dto.department;
+    }
+    if (dto.year !== undefined) {
+      user.year = dto.year;
     }
     return this.usersRepository.save(user);
   }
+
 
   async updatePreferences(id: string, dto: UpdatePreferencesDto): Promise<User> {
     const user = await this.findByIdOrFail(id);

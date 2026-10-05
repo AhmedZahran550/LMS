@@ -1,11 +1,12 @@
 export { AuthSwagger } from "./auth.swagger";
 export { UsersSwagger } from "./users.swagger";
 export { CoursesSwagger } from "./courses.swagger";
-export { EnrollmentsSwagger } from "./enrollments.swagger";
-export { SubscriptionsSwagger } from "./subscriptions.swagger";
-export { VideosSwagger } from "./videos.swagger";
+export { CourseContentSwagger, VideosSwagger } from "./course-content.swagger";
 export { NotificationsSwagger } from "./notifications.swagger";
-export { InstructorStudentsSwagger } from "./instructor-students.swagger";
-export { CourseAssignmentsSwagger } from "./course-assignments.swagger";
 export { PushNotificationsSwagger } from "./push-notifications.swagger";
-
+export { UniversitiesSwagger } from "./universities.swagger";
+export { CategoriesSwagger } from "./categories.swagger";
+export { PublicCoursesSwagger } from "./public-courses.swagger";
+export { CoursePurchasesSwagger } from "./course-purchases.swagger";
+export { StorageSwagger } from "./storage.swagger";
+export { PaymentsSwagger } from "./payments.swagger";

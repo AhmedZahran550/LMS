@@ -1,13 +1,12 @@
 <!--
   SYNC IMPACT REPORT
-  Version: 1.1.0 → 1.2.0 (MINOR bump)
+  Version: 1.3.0 → 1.4.0 (MINOR bump)
   Modified principles:
-    - "Security & Authentication" → "Security-First Development" (moved to Principle I, expanded with rate limiting, helmet, sanitization, file validation, env validation, CSRF)
-    - All subsequent principles renumbered (II ↔ previously I, III ↔ previously II, etc.)
+    - Updated Principle III: "Layered Monorepo Structure" with public API module and marketplace domains
+    - Added Principle VIII: "Marketplace Commerce & Storage Quota Governance"
   Added sections: none
   Removed sections: none
-  Templates requiring updates: plan-template.md ✅ (no constitution gates changed),
-    spec-template.md ✅, tasks-template.md ✅, checklist-template.md ✅
+  Templates requiring updates: none
   Follow-up TODOs: none
 -->
 
@@ -50,10 +49,13 @@ lean and focused on HTTP routing and validation.
 ### III. Layered Monorepo Structure
 The project is a pnpm monorepo with three application layers and a shared package:
 
-- **API** (`apps/api/`): NestJS application with `modules/` (feature modules),
-`core/` (shared infrastructure, auth, guards, filters, interceptors),
-`swagger/` (decoupled documentation), `db/` (entities, migrations, datasource),
-`i18n/` (translation files), `config/`, and `api/` (route modules by role).
+- **API** (`apps/api/`): NestJS application with `modules/` (feature modules:
+`courses`, `videos`, `course-purchases`, `payments`, `storage`, `universities`,
+`categories`, `public-courses`, `system-config`, `users`, `mail`, `logs`,
+`push-notifications`), `core/` (shared infrastructure, auth, guards, filters,
+interceptors), `swagger/` (decoupled documentation), `db/` (entities, migrations,
+datasource, seeds), `i18n/` (translation files), `config/`, and `api/` (route
+modules by role: `admin`, `instructor`, `learner`, and `public`).
 - **Web** (`apps/web/`): Next.js App Router application with `app/` (route groups:
 `(auth)`, `(instructor)`, `(learner)`), `components/` (UI and feature components),
 `lib/` (Axios API client, utility functions), `store/` (Zustand stores),
@@ -113,6 +115,38 @@ maps PostgreSQL error codes to standard HTTP exceptions, and delegates to
 errors, performs silent token refresh, and logs the user out on failure.
 Errors are surfaced to users via the `Snackbar` component.
 
+### VIII. Marketplace Commerce & Storage Quota Governance
+The platform operates as an open course marketplace replacing invitation-only mechanics:
+
+- **Public Discovery & Content Segregation**: Course catalog, instructor directories,
+and university hierarchies MUST be publicly queryable without authentication. For
+course content, preview lessons (`isPreview: true`) MUST be segregated from private
+lessons (`isPreview: false`). Unauthenticated public endpoints MUST NEVER leak private
+lesson URLs, media streams, or downloadable file resources.
+- **Payment Gateway & Order Routing**: Kashier MUST be used as the primary payment
+gateway for Egyptian and regional payment processing. All payment webhook callbacks
+(`POST /webhooks/kashier`) MUST verify HMAC-SHA256 signatures with the configured secret.
+Merchant order IDs MUST use deterministic prefixes: `course_` for student course purchases
+and `storage_` for instructor storage expansion subscriptions.
+- **Platform Commission & Revenue Integrity**: Platform commissions per course purchase
+are fixed fees managed dynamically in the `system_config` table (default: 20 EGP).
+Commission calculations MUST follow:
+  $$\text{Platform Commission} = \min(\text{Price}, \text{Fixed Commission})$$
+  $$\text{Teacher Net Revenue} = \text{Price} - \text{Platform Commission}$$
+  Free courses (`price = 0`) MUST bypass the payment gateway, enrolling learners
+  instantly with zero commission.
+- **Storage Governance & Multi-Tier Quotas**: Every instructor account MUST permanently
+receive 5 GB base storage upon creation (`storageQuotaBytes = 5368709120`). Storage
+expansion MUST be provisioned as time-bounded (90-day / 3-month) subscriptions or
+add-ons. Upload endpoints MUST validate the instructor's aggregate storage before
+persisting files:
+  $$\text{Used Storage} + \text{File Size} \le 5\text{ GB} + \sum \text{Active Subscription Bytes} + \sum \text{Active Add-on Bytes}$$
+  Uploads exceeding this threshold MUST be rejected with HTTP 403 and
+  `STORAGE_LIMIT_EXCEEDED`. Byte arithmetic MUST use `BigInt` to prevent integer overflow.
+- **Standardized Academic Hierarchy**: Both teacher and student registrations MUST
+mandate academic affiliation (`universityId`, `faculty`, `department`, and `year` for
+learners), linked to the structured Egyptian university catalog stored as JSONB.
+
 ## Development Standards
 
 - **Naming Conventions**: Files in `swagger/` use kebab-case (`auth.swagger.ts`).
@@ -144,6 +178,11 @@ without the corresponding migration file.
   searchableColumns instead. Sensitive database columns (passwords, tokens, credentials)
   MUST have `{ select: false }` on the entity so they are never retrieved by default
   in paginated queries or relation joins.
+- **Financial & Webhook Idempotency**: Payment webhook handlers MUST be idempotent,
+  handling duplicate or repeated gateway events without double-crediting storage or revenue.
+- **BigInt Byte Arithmetic**: All byte calculations for storage quotas, subscription
+  extensions, and file sizes MUST use native `BigInt` in business logic and database
+  entities to prevent precision loss.
 - **Test Coverage**: Security-critical paths (auth, authorization, input validation)
   MUST have unit and integration tests. Tests MUST fail before implementation.
 
@@ -162,4 +201,4 @@ principle, the localization requirements, and the error handling architecture.
 The `AGENTS.md` file in the project root provides runtime development guidance
 and SHOULD be consulted by AI agents before making changes.
 
-**Version**: 1.3.0 | **Ratified**: 2026-06-29 | **Last Amended**: 2026-09-14
+**Version**: 1.4.0 | **Ratified**: 2026-06-29 | **Last Amended**: 2026-09-16

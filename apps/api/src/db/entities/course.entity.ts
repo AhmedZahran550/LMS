@@ -6,15 +6,14 @@ import {
   JoinColumn,
   Index,
 } from "typeorm";
-import { CourseVisibility } from "@lms/shared-types";
-import { User } from "../../db/entities/user.entity";
+import { User } from "./user.entity";
 import { CourseContent } from "./course-content.entity";
-import { Enrollment } from "./enrollment.entity";
-import { CourseAssignment } from "./course-assignment.entity";
+import { Category } from "./category.entity";
 import { BaseEntity } from "./base.entity";
 
 @Entity()
 @Index(["instructorId"])
+@Index(["categoryId"])
 export class Course extends BaseEntity {
   @Column()
   title!: string;
@@ -22,12 +21,21 @@ export class Course extends BaseEntity {
   @Column("text")
   description!: string;
 
-  @Column({
-    type: "enum",
-    enum: CourseVisibility,
-    default: CourseVisibility.PRIVATE,
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  price!: number;
+
+  @Column({ default: "egp" })
+  currency!: string;
+
+  @Column({ nullable: true })
+  categoryId?: string | null;
+
+  @ManyToOne(() => Category, (category) => category.courses, {
+    nullable: true,
+    onDelete: "SET NULL",
   })
-  visibility!: CourseVisibility;
+  @JoinColumn({ name: "categoryId" })
+  category?: Category | null;
 
   @Column({ nullable: true })
   thumbnailUrl?: string;
@@ -45,9 +53,6 @@ export class Course extends BaseEntity {
   @OneToMany(() => CourseContent, (content) => content.course)
   contents!: CourseContent[];
 
-  @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
-  enrollments!: Enrollment[];
-
-  @OneToMany(() => CourseAssignment, (assignment) => assignment.course)
-  assignments!: CourseAssignment[];
+  @OneToMany("CoursePurchase", (purchase: any) => purchase.course)
+  purchases!: any[];
 }

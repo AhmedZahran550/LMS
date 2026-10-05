@@ -37,8 +37,12 @@ export class CourseContent extends BaseEntity {
   @Column({ default: 0 })
   orderIndex!: number;
 
+  @Column({ default: false })
+  isPreview!: boolean;
+
   @Column()
   courseId!: string;
+
 
   @ManyToOne(() => Course, (course) => course.contents, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'courseId' })

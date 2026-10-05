@@ -1,4 +1,4 @@
-import { Entity, Column, Unique, OneToMany, Index } from "typeorm";
+import { Entity, Column, Unique, OneToMany, ManyToOne, JoinColumn, Index } from "typeorm";
 import { DeviceToken } from "./device-token.entity";
 import { UserRole, AuthProvider } from "@lms/shared-types";
 import { Exclude } from "class-transformer";
@@ -86,10 +86,30 @@ export class User extends BaseEntity {
   @Column("jsonb", { default: { lang: "ar", mode: "light" } })
   preferences!: { lang: "ar" | "en"; mode: "light" | "dark" };
 
-  @Column({ default: false })
-  hasUsedFreePlan!: boolean;
+  @Column({ nullable: true })
+  universityId?: string | null;
+
+  @ManyToOne('University', (university: any) => university.users, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'universityId' })
+  university?: any;
+
+  @Column({ type: "varchar", nullable: true })
+  faculty?: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  department?: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  year?: string | null;
+
+  @Column({ type: "bigint", default: "5368709120" })
+  storageQuotaBytes!: string;
 
   @OneToMany(() => DeviceToken, (deviceToken) => deviceToken.user)
   @Exclude()
   deviceTokens!: DeviceToken[];
 }
+

@@ -2,6 +2,13 @@
   "app": {
     "name": "منارة"
   },
+  "marketplace": {
+    "purchase_success": "تم شراء الكورس بنجاح",
+    "course_free_enrolled": "تم التسجيل في الكورس المجاني بنجاح",
+    "storage_subscribed": "تم تفعيل باقة التخزين بنجاح",
+    "preview_available": "معاينة مجانية متاحة"
+  },
+
   "auth": {
     "register_success": "تم التسجيل بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.",
     "invalid_credentials": "بيانات الدخول غير صحيحة",

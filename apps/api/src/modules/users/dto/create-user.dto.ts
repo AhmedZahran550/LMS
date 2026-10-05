@@ -31,4 +31,21 @@ export class CreateUserDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsString()
+  @IsOptional()
+  universityId?: string;
+
+  @IsString()
+  @IsOptional()
+  faculty?: string;
+
+  @IsString()
+  @IsOptional()
+  department?: string;
+
+  @IsString()
+  @IsOptional()
+  year?: string;
 }
+

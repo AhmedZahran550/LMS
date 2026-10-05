@@ -2,6 +2,13 @@
   "app": {
     "name": "manara"
   },
+  "marketplace": {
+    "purchase_success": "Course purchased successfully",
+    "course_free_enrolled": "Enrolled in free course successfully",
+    "storage_subscribed": "Storage plan activated successfully",
+    "preview_available": "Preview lesson available"
+  },
+
   "auth": {
     "register_success": "Registration successful. Please check your email to verify your account.",
     "invalid_credentials": "Invalid credentials",

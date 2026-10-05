@@ -2,8 +2,13 @@ export * from './enums';
 export * from './api-response.types';
 export * from './user.types';
 export * from './course.types';
+export * from './course-content.types';
 export * from './video.types';
 export * from './enrollment.types';
 export * from './notification.types';
 export * from './subscription.types';
 export * from './instructor-student.types';
+export * from './university.types';
+export * from './category.types';
+export * from './course-purchase.types';
+

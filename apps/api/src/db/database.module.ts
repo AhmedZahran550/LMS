@@ -1,20 +1,18 @@
 import { Module, Global } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "../db/entities/user.entity";
-import { Course } from "../db/entities/course.entity";
-import { Enrollment } from "../db/entities/enrollment.entity";
-import { Log } from "../db/entities/log.entity";
-import { Notification } from "../db/entities/notification.entity";
+import { User } from "./entities/user.entity";
+import { Course } from "./entities/course.entity";
 import { CourseContent } from "./entities/course-content.entity";
-import { SubscriptionPlan } from "./entities/subscription-plan.entity";
-import { InstructorSubscription } from "./entities/instructor-subscription.entity";
-import { Payment } from "./entities/payment.entity";
-import { InstructorStudent } from "./entities/instructor-student.entity";
-import { CourseAssignment } from "./entities/course-assignment.entity";
+import { CoursePurchase } from "./entities/course-purchase.entity";
+import { University } from "./entities/university.entity";
+import { Category } from "./entities/category.entity";
+import { StorageSubscription } from "./entities/storage-subscription.entity";
 import { StorageAddon } from "./entities/storage-addon.entity";
 import { StoragePlan } from "./entities/storage-plan.entity";
 import { SystemConfig } from "./entities/system-config.entity";
 import { DeviceToken } from "./entities/device-token.entity";
+import { Log } from "./entities/log.entity";
+import { Notification } from "./entities/notification.entity";
 import { AppDataSource } from "./datasource";
 
 @Global()
@@ -24,19 +22,17 @@ import { AppDataSource } from "./datasource";
     TypeOrmModule.forFeature([
       User,
       Course,
-      Enrollment,
-      Log,
-      Notification,
       CourseContent,
-      SubscriptionPlan,
-      InstructorSubscription,
-      Payment,
-      InstructorStudent,
-      CourseAssignment,
+      CoursePurchase,
+      University,
+      Category,
+      StorageSubscription,
       StorageAddon,
       StoragePlan,
       SystemConfig,
       DeviceToken,
+      Log,
+      Notification,
     ]),
   ],
   exports: [TypeOrmModule],

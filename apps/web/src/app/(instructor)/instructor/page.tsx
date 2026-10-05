@@ -4,7 +4,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { courseApis } from '@/lib/courseApis';
 import { subscriptionApis } from '@/lib/subscriptionApis';
-import { Video, Users, BookOpen, HardDrive, Calendar, Plus, UserPlus, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { FileText, Users, BookOpen, HardDrive, Calendar, Plus, UserPlus, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
@@ -132,18 +132,18 @@ export default function InstructorDashboard() {
           </p>
         </div>
 
-        {/* Total Videos */}
+        {/* Total Content */}
         <div className="bg-[var(--sv-bg-card)] rounded-2xl p-6 shadow-sm hover:shadow-md border border-slate-200/80 dark:border-slate-800/80 transition-all group">
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              {t('Video Lessons')}
+              {t('Course Contents')}
             </span>
             <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
-              <Video className="h-5 w-5" />
+              <FileText className="h-5 w-5" />
             </div>
           </div>
           <div className="text-3xl font-black text-slate-900 dark:text-white mb-1">
-            {stats?.totalVideos || 0}
+            {stats?.totalContent ?? stats?.totalVideos ?? 0}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {t('Total lecture content uploaded')}
