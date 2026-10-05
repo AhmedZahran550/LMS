@@ -1,4 +1,4 @@
-import { roleApi } from "./api";
+import { roleApi, api } from "./api";
 
 export const courseApis = {
   getCourses: async (params?: any) => {
@@ -29,12 +29,48 @@ export const courseApis = {
     const response = await roleApi.get(`/courses/${courseId}/content`, { params });
     return response.data;
   },
-  uploadContent: async (courseId: string, formData: FormData, config?: any) => {
+  initUploadSession: async (courseId: string, params: {
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    title: string;
+    description?: string;
+    isPreview?: boolean;
+  }) => {
     const response = await roleApi.post(
-      `/courses/${courseId}/content`,
-      formData,
-      config,
+      `/courses/${courseId}/content/upload-session`,
+      params,
     );
+    return response.data;
+  },
+  completeUpload: async (
+    courseId: string,
+    data: {
+      sessionId: string;
+      title: string;
+      description?: string;
+      isPreview?: boolean;
+      cloudinaryResult?: {
+        publicId: string;
+        secureUrl: string;
+        bytes?: number;
+        resourceType?: string;
+        format?: string;
+      };
+    },
+  ) => {
+    const response = await roleApi.post(
+      `/courses/${courseId}/content/complete-upload`,
+      data,
+    );
+    return response.data;
+  },
+  getUploadStatus: async (sessionId: string) => {
+    const response = await api.get(`/uploads/session/${sessionId}/status`);
+    return response.data;
+  },
+  abortUploadSession: async (sessionId: string) => {
+    const response = await api.delete(`/uploads/session/${sessionId}`);
     return response.data;
   },
   deleteContent: async (courseId: string, contentId: string) => {

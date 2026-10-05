@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StorageService } from './storage.service';
-import { LocalStorageService } from './local-storage.service';
 import { CloudinaryStorageService } from './cloudinary-storage.service';
 import { User } from '../../db/entities/user.entity';
 import { CourseContent } from '../../db/entities/course-content.entity';
@@ -33,11 +32,18 @@ import { PaymentsModule } from '../payments/payments.module';
     {
       provide: StorageService,
       useFactory: (configService: ConfigService) => {
-        const provider = configService.get<string>('storage.provider');
-        if (provider === 'cloudinary') {
-          return new CloudinaryStorageService(configService);
+        const provider = configService.get<string>('storage.provider') || 'cloudinary';
+        switch (provider) {
+          case 's3':
+            // return new S3StorageService(configService);
+            throw new Error("STORAGE_PROVIDER 's3' is not implemented yet. Use 'cloudinary'.");
+          case 'gcs':
+            // return new GcsStorageService(configService);
+            throw new Error("STORAGE_PROVIDER 'gcs' is not implemented yet. Use 'cloudinary'.");
+          case 'cloudinary':
+          default:
+            return new CloudinaryStorageService(configService);
         }
-        return new LocalStorageService(configService);
       },
       inject: [ConfigService],
     },

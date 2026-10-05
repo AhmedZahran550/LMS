@@ -9,7 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan } from 'typeorm';
 import { UploadSession } from '../../db/entities/upload-session.entity';
 import { StorageService } from '../storage/storage.service';
-import { LocalStorageService } from '../storage/local-storage.service';
 import { StorageQuotaGuardService } from '../storage/services/storage-quota-guard.service';
 import { CoursesService } from '../courses/courses.service';
 import { InitUploadSessionDto } from './dto/init-upload-session.dto';
@@ -18,6 +17,12 @@ import {
   UploadStatusResponseDto,
 } from './dto/upload-session-response.dto';
 import { UploadSessionStatus } from '@lms/shared-types';
+
+/**
+ * Grace period after a session expires before its orphaned cloud asset is purged.
+ * Protects against races with a client that just finished transmitting the file.
+ */
+const CLOUD_ASSET_PURGE_GRACE_MS = 6 * 60 * 60 * 1000;
 
 @Injectable()
 export class UploadService {
@@ -108,20 +113,27 @@ export class UploadService {
       throw new ForbiddenException('You do not have access to this upload session');
     }
 
-    let uploadedBytes = Number(session.uploadedBytes || 0);
     const totalBytes = Number(session.fileSize);
+    let uploadedBytes = Number(session.uploadedBytes || 0);
 
-    // If local provider, check actual bytes written to disk
-    if (session.provider === 'local' && this.storageService instanceof LocalStorageService) {
-      const localStatus = await this.storageService.getChunkStatus(sessionId, totalBytes);
-      uploadedBytes = localStatus.uploadedBytes;
-      if (session.uploadedBytes !== String(uploadedBytes)) {
-        session.uploadedBytes = String(uploadedBytes);
-        await this.sessionRepository.save(session);
+    // Direct-to-cloud providers only materialise an asset once transmission
+    // completes, so polling the provider tells the client whether the file landed.
+    if (session.status === UploadSessionStatus.PENDING && session.publicId) {
+      const verified = await this.storageService.verifyUploadedAsset(
+        session.publicId,
+        { resourceType: session.mimeType },
+      );
+      if (verified) {
+        uploadedBytes = verified.size;
+        if (session.uploadedBytes !== String(uploadedBytes)) {
+          session.uploadedBytes = String(uploadedBytes);
+          await this.sessionRepository.save(session);
+        }
       }
     }
 
-    const percentage = totalBytes > 0 ? parseFloat(((uploadedBytes / totalBytes) * 100).toFixed(2)) : 0;
+    const percentage =
+      totalBytes > 0 ? parseFloat(((uploadedBytes / totalBytes) * 100).toFixed(2)) : 0;
 
     return {
       sessionId: session.id,
@@ -131,58 +143,6 @@ export class UploadService {
       nextByteOffset: uploadedBytes,
       percentage,
     };
-  }
-
-  async appendLocalChunk(
-    sessionId: string,
-    userId: string,
-    contentRangeHeader: string | undefined,
-    chunkBuffer: Buffer,
-  ): Promise<{ bytesReceived: number; totalBytes: number; isComplete: boolean }> {
-    const session = await this.sessionRepository.findOne({
-      where: { id: sessionId },
-    });
-
-    if (!session) {
-      throw new NotFoundException('Upload session not found');
-    }
-
-    if (session.instructorId !== userId) {
-      throw new ForbiddenException('You do not have access to this upload session');
-    }
-
-    if (session.status !== UploadSessionStatus.PENDING) {
-      throw new BadRequestException(`Cannot upload chunk. Session status is ${session.status}`);
-    }
-
-    if (session.provider !== 'local' || !(this.storageService instanceof LocalStorageService)) {
-      throw new BadRequestException('Local chunk uploads are only valid when storage provider is local');
-    }
-
-    let startOffset = 0;
-    const totalBytes = Number(session.fileSize);
-
-    if (contentRangeHeader) {
-      // Content-Range: bytes <start>-<end>/<total>
-      const match = contentRangeHeader.match(/bytes\s+(\d+)-(\d+)\/(\d+)/i);
-      if (match && match[1]) {
-        startOffset = parseInt(match[1], 10);
-      }
-    } else {
-      startOffset = Number(session.uploadedBytes || 0);
-    }
-
-    const result = await this.storageService.appendChunk(
-      sessionId,
-      chunkBuffer,
-      startOffset,
-      totalBytes,
-    );
-
-    session.uploadedBytes = String(result.bytesReceived);
-    await this.sessionRepository.save(session);
-
-    return result;
   }
 
   async abortSession(
@@ -201,9 +161,15 @@ export class UploadService {
       throw new ForbiddenException('You do not have access to this upload session');
     }
 
-    if (session.provider === 'local' && this.storageService instanceof LocalStorageService) {
-      await this.storageService.cleanupTempSession(sessionId);
+    if (session.status === UploadSessionStatus.COMPLETED) {
+      throw new BadRequestException(
+        'Cannot abort an upload session that has already been completed',
+      );
     }
+
+    // An explicit cancel means the teacher is done: drop the asset immediately
+    // so the reserved quota is genuinely released.
+    await this.purgeOrphanedAsset(session, true);
 
     session.status = UploadSessionStatus.ABORTED;
     await this.sessionRepository.save(session);
@@ -239,9 +205,7 @@ export class UploadService {
     });
 
     for (const session of expiredSessions) {
-      if (session.provider === 'local' && this.storageService instanceof LocalStorageService) {
-        await this.storageService.cleanupTempSession(session.id);
-      }
+      await this.purgeOrphanedAsset(session);
       session.status = UploadSessionStatus.EXPIRED;
       await this.sessionRepository.save(session);
     }
@@ -251,5 +215,36 @@ export class UploadService {
     }
 
     return expiredSessions.length;
+  }
+
+  /**
+   * Best-effort removal of a cloud asset that was transmitted but never committed
+   * to a CourseContent record. Never throws: cleanup failures must not block the
+   * session state transition.
+   *
+   * `immediate` skips the grace period and is used when the teacher explicitly
+   * cancels. Completed sessions are always protected so live course media can
+   * never be destroyed by session cleanup.
+   */
+  private async purgeOrphanedAsset(
+    session: UploadSession,
+    immediate = false,
+  ): Promise<void> {
+    if (!session.publicId) return;
+    if (session.status === UploadSessionStatus.COMPLETED) return;
+
+    if (!immediate) {
+      const expiresAt = session.expiresAt ? new Date(session.expiresAt).getTime() : 0;
+      if (Date.now() - expiresAt < CLOUD_ASSET_PURGE_GRACE_MS) return;
+    }
+
+    try {
+      await this.storageService.delete(session.publicId);
+      this.logger.log(`Purged orphaned cloud asset ${session.publicId}`);
+    } catch (err: any) {
+      this.logger.warn(
+        `Could not purge orphaned cloud asset ${session.publicId}: ${err?.message}`,
+      );
+    }
   }
 }

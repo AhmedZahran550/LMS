@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { StorageService, DirectUploadSessionResult } from './storage.service';
+import {
+  StorageService,
+  DirectUploadSessionResult,
+  VerifiedAssetResult,
+} from './storage.service';
 import { v2 as cloudinary } from 'cloudinary';
 import * as crypto from 'crypto';
 import * as stream from 'stream';
@@ -22,7 +26,10 @@ export class CloudinaryStorageService extends StorageService {
     cloudinary.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret });
   }
 
-  async upload(file: Express.Multer.File, directory: string): Promise<{ url: string; filename: string; size: number; mimeType: string }> {
+  async upload(
+    file: Express.Multer.File,
+    directory: string,
+  ): Promise<VerifiedAssetResult> {
     const ext = file.originalname.split('.').pop();
     const publicId = directory + '/' + crypto.randomUUID();
 
@@ -107,37 +114,64 @@ export class CloudinaryStorageService extends StorageService {
     };
   }
 
-  async verifyUploadedAsset(publicId: string, resourceType = 'auto'): Promise<{
-    url: string;
-    filename: string;
-    size: number;
-    mimeType: string;
-  } | null> {
+  async verifyUploadedAsset(
+    publicId: string,
+    metadata?: Record<string, any>,
+  ): Promise<VerifiedAssetResult | null> {
+    const resourceType = (metadata?.resourceType as string) || 'auto';
     try {
-      const result = await cloudinary.api.resource(publicId, { resource_type: resourceType });
+      const result = await cloudinary.api.resource(publicId, {
+        resource_type: resourceType,
+      });
       return {
         url: result.secure_url,
         filename: result.public_id,
         size: result.bytes,
-        mimeType: result.resource_type === 'image' ? `image/${result.format}` : (result.resource_type === 'video' ? `video/${result.format}` : 'application/octet-stream'),
+        mimeType:
+          result.resource_type === 'image'
+            ? `image/${result.format}`
+            : result.resource_type === 'video'
+              ? `video/${result.format}`
+              : 'application/octet-stream',
       };
     } catch (err: any) {
-      this.logger.warn(`Could not verify Cloudinary resource ${publicId}: ${err?.message}`);
+      this.logger.warn(
+        `Could not verify Cloudinary resource ${publicId}: ${err?.message}`,
+      );
       return null;
     }
   }
 
-  async delete(filename: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(filename, (error, result) => {
-        if (error) {
-          this.logger.error('Cloudinary delete failed: ' + error.message);
-          reject(error);
-          return;
-        }
-        this.logger.log('File deleted from Cloudinary: ' + filename);
-        resolve();
+  async delete(identifier: string): Promise<void> {
+    // Resolve the concrete resource type so raw/video assets are removed too.
+    let resourceType = 'image';
+    try {
+      const meta = await cloudinary.api.resource(identifier, {
+        resource_type: 'auto',
       });
+      if (meta?.resource_type) {
+        resourceType = meta.resource_type;
+      }
+    } catch {
+      resourceType = 'raw';
+    }
+
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.destroy(
+        identifier,
+        { resource_type: resourceType, invalidate: true },
+        (error, result) => {
+          if (error) {
+            this.logger.error('Cloudinary delete failed: ' + error.message);
+            reject(error);
+            return;
+          }
+          this.logger.log(
+            `Asset deleted from Cloudinary: ${identifier} (${result?.resource_type ?? resourceType})`,
+          );
+          resolve();
+        },
+      );
     });
   }
 

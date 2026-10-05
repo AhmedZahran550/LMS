@@ -17,9 +17,6 @@ import { ReorderCourseContentDto } from "./dto/reorder-course-content.dto";
 import { CompleteCourseContentUploadDto } from "./dto/complete-course-content-upload.dto";
 import { CoursesService } from "../courses/courses.service";
 import { StorageService } from "../storage/storage.service";
-import { LocalStorageService } from "../storage/local-storage.service";
-import { CloudinaryStorageService } from "../storage/cloudinary-storage.service";
-import { StorageQuotaGuardService } from "../storage/services/storage-quota-guard.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { UploadService } from "../upload/upload.service";
 import { I18nService } from "nestjs-i18n";
@@ -71,7 +68,6 @@ export class CourseContentService extends DBService<
     private readonly userRepository: Repository<User>,
     private readonly coursesService: CoursesService,
     private readonly storageService: StorageService,
-    private readonly storageQuotaGuard: StorageQuotaGuardService,
     private readonly notificationsService: NotificationsService,
     private readonly uploadService: UploadService,
     private readonly i18nService: I18nService,
@@ -111,50 +107,41 @@ export class CourseContentService extends DBService<
     let finalSize = 0;
     let finalMimeType = session.mimeType;
 
-    if (session.provider === 'local') {
-      if (this.storageService instanceof LocalStorageService) {
-        const finalized = await this.storageService.finalizeLocalFile(
-          session.id,
-          session.folder,
-          session.fileName,
-        );
-        finalUrl = finalized.url;
-        finalFilename = finalized.filename;
-        finalSize = finalized.size;
-      } else {
-        throw new BadRequestException('Configured storage provider does not match session provider');
-      }
-    } else {
-      // Cloudinary provider
-      const publicId = dto.cloudinaryResult?.publicId || session.publicId;
-      if (!publicId) {
-        throw new BadRequestException('Cloudinary public ID is required to complete upload');
-      }
+    const publicId = dto.cloudinaryResult?.publicId || session.publicId;
+    if (!publicId) {
+      throw new BadRequestException(
+        'Upload session has no assigned asset identifier',
+      );
+    }
 
-      if (this.storageService instanceof CloudinaryStorageService) {
-        const verified = await this.storageService.verifyUploadedAsset(
-          publicId,
-          dto.cloudinaryResult?.resourceType || 'auto',
-        );
-        if (verified) {
-          finalUrl = verified.url;
-          finalFilename = verified.filename;
-          finalSize = verified.size;
-          finalMimeType = verified.mimeType;
-        } else if (dto.cloudinaryResult?.secureUrl) {
-          finalUrl = dto.cloudinaryResult.secureUrl;
-          finalFilename = dto.cloudinaryResult.publicId || publicId;
-          finalSize = dto.cloudinaryResult.bytes || Number(session.fileSize);
-        } else {
-          throw new BadRequestException('Could not verify Cloudinary uploaded asset');
-        }
-      } else if (dto.cloudinaryResult?.secureUrl) {
-        finalUrl = dto.cloudinaryResult.secureUrl;
-        finalFilename = dto.cloudinaryResult.publicId || publicId;
-        finalSize = dto.cloudinaryResult.bytes || Number(session.fileSize);
-      } else {
-        throw new BadRequestException('Could not verify Cloudinary uploaded asset');
-      }
+    // The client must never be able to commit an asset it was not granted.
+    if (
+      session.publicId &&
+      dto.cloudinaryResult?.publicId &&
+      dto.cloudinaryResult.publicId !== session.publicId
+    ) {
+      throw new ForbiddenException(
+        'Uploaded asset does not match the pre-flight assigned identifier',
+      );
+    }
+
+    const verified = await this.storageService.verifyUploadedAsset(publicId, {
+      resourceType: dto.cloudinaryResult?.resourceType || session.mimeType,
+    });
+
+    if (verified) {
+      finalUrl = verified.url;
+      finalFilename = verified.filename;
+      finalSize = verified.size;
+      finalMimeType = verified.mimeType;
+    } else if (dto.cloudinaryResult?.secureUrl) {
+      finalUrl = dto.cloudinaryResult.secureUrl;
+      finalFilename = dto.cloudinaryResult.publicId || publicId;
+      finalSize = dto.cloudinaryResult.bytes || Number(session.fileSize);
+    } else {
+      throw new BadRequestException(
+        'Could not verify the uploaded asset in cloud storage',
+      );
     }
 
     const contentType = inferContentType(finalMimeType);
@@ -219,97 +206,6 @@ export class CourseContentService extends DBService<
           message,
           { courseId, contentId: saved.id, title: dto.title },
           'content',
-          saved.id,
-        );
-      }
-    }
-
-    return saved;
-  }
-
-  async upload(
-    courseId: string,
-    instructorId: string,
-    createDto: CreateCourseContentDto,
-    file: Express.Multer.File,
-  ): Promise<CourseContent> {
-    if (!file) {
-      throw new BadRequestException("File is required");
-    }
-
-    // Check 5GB base quota + active 3-month subscriptions
-    await this.storageQuotaGuard.checkUploadAllowed(
-      instructorId,
-      file.size || 0,
-    );
-
-    const course = await this.coursesService.findInstructorCourse(
-      courseId,
-      instructorId,
-    );
-
-    const lastContent = await this.contentRepository.findOne({
-      where: { courseId },
-      order: { orderIndex: "DESC" },
-    });
-    const orderIndex = lastContent ? lastContent.orderIndex + 1 : 0;
-
-    const uploadResult = await this.storageService.upload(
-      file,
-      "courses/" + courseId,
-    );
-
-    const contentType = inferContentType(uploadResult.mimeType);
-
-    const content = this.contentRepository.create({
-      ...createDto,
-      courseId,
-      url: uploadResult.url,
-      filename: uploadResult.filename,
-      mimeType: uploadResult.mimeType,
-      size: uploadResult.size,
-      orderIndex,
-      contentType,
-      isPreview: createDto.isPreview ?? false,
-    });
-
-    const saved = await this.contentRepository.save(content);
-
-    // Notify students who purchased this course
-    const completedPurchases = await this.purchaseRepository.find({
-      where: { courseId, status: PurchaseStatus.COMPLETED },
-      relations: ["student"],
-    });
-
-    if (completedPurchases.length > 0) {
-      const langGroups: Record<string, string[]> = {};
-
-      for (const purchase of completedPurchases) {
-        const lang = (purchase.student as any)?.preferences?.lang || "ar";
-        if (!langGroups[lang]) langGroups[lang] = [];
-        langGroups[lang].push(purchase.studentId);
-      }
-
-      for (const [lang, userIds] of Object.entries(langGroups)) {
-        const subject = this.i18nService.translate(
-          "translation.notifications.subjects.new_content",
-          { lang },
-        );
-        const message = this.i18nService.translate(
-          "translation.notifications.messages.new_content",
-          {
-            lang,
-            args: { content: createDto.title, course: course.title },
-          },
-        );
-
-        this.notificationsService.createMany(
-          userIds,
-          NotificationType.NEW_CONTENT,
-          subject,
-          message,
-          { courseId, contentId: saved.id, title: createDto.title },
-          "content",
           saved.id,
         );
       }

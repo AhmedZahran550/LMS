@@ -11,7 +11,7 @@ const baseSchema = z.object({
 });
 
 /**
- * Additional variables required when STORAGE_PROVIDER=cloudinary.
+ * Cloudinary is the only supported provider today, so its credentials are ALWAYS required.
  */
 const cloudinarySchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string().min(1, 'CLOUDINARY_CLOUD_NAME is required'),
@@ -29,12 +29,8 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
   // 1. Always-required variables
   const baseResult = baseSchema.safeParse(config);
 
-  // 2. Conditionally-required Cloudinary variables
-  const storageProvider = (config['STORAGE_PROVIDER'] as string) || 'local';
-  const cloudinaryResult =
-    storageProvider === 'cloudinary'
-      ? cloudinarySchema.safeParse(config)
-      : null;
+  // 2. Cloudinary credentials (mandatory for direct-to-cloud uploads)
+  const cloudinaryResult = cloudinarySchema.safeParse(config);
 
   // 3. Collect all errors
   const errors: string[] = [];
@@ -45,7 +41,7 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
     }
   }
 
-  if (cloudinaryResult && !cloudinaryResult.success) {
+  if (!cloudinaryResult.success) {
     for (const issue of cloudinaryResult.error.issues) {
       errors.push(`${issue.path.join('.')}: ${issue.message}`);
     }

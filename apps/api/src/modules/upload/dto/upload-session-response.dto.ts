@@ -1,18 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UploadSessionStatus } from '@lms/shared-types';
+import { StorageProviderType } from '../../storage/storage.service';
 
 export class UploadSessionResponseDto {
   @ApiProperty({ description: 'Unique upload session ID', example: 'a1b2c3d4-e5f6-7890-abcd-1234567890ab' })
   sessionId!: string;
 
-  @ApiProperty({ description: 'Target storage provider', enum: ['cloudinary', 'local'], example: 'cloudinary' })
-  provider!: 'cloudinary' | 'local';
+  @ApiProperty({ description: 'Target storage provider', enum: ['cloudinary', 's3', 'gcs'], example: 'cloudinary' })
+  provider!: StorageProviderType;
 
-  @ApiProperty({ description: 'Target URL to upload chunks directly to', example: 'https://api.cloudinary.com/v1_1/my-cloud/video/upload' })
+  @ApiProperty({ description: 'Target URL to upload the file directly to', example: 'https://api.cloudinary.com/v1_1/my-cloud/video/upload' })
   uploadUrl!: string;
 
-  @ApiProperty({ description: 'HTTP method to use when uploading chunk', example: 'POST' })
-  httpMethod!: string;
+  @ApiProperty({ description: 'HTTP method to use when uploading the file', enum: ['POST', 'PUT'], example: 'POST' })
+  httpMethod!: 'POST' | 'PUT';
 
   @ApiProperty({ description: 'Recommended chunk size in bytes (e.g. 10MB)', example: 10485760 })
   chunkSize!: number;

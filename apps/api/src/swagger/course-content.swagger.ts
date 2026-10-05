@@ -1,6 +1,5 @@
 import { applyDecorators } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiConsumes } from "@nestjs/swagger";
-import { CreateCourseContentDto } from "../modules/course-content/dto/create-course-content.dto";
+import { ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from "@nestjs/swagger";
 import { UpdateCourseContentDto } from "../modules/course-content/dto/update-course-content.dto";
 import { ReorderCourseContentDto } from "../modules/course-content/dto/reorder-course-content.dto";
 
@@ -10,15 +9,6 @@ export const CourseContentSwagger = {
       ApiOperation({ summary: "List course content (Instructor)", description: "Returns paginated list of course content items. Instructor only." }),
       ApiBearerAuth(),
       ApiResponse({ status: 200, description: "Paginated content list" }),
-    ),
-
-  uploadContent: () =>
-    applyDecorators(
-      ApiOperation({ summary: "Upload content (Instructor)", description: "Uploads a new content item (video, PDF, image, presentation) to a course. Instructor only." }),
-      ApiBearerAuth(),
-      ApiConsumes("multipart/form-data"),
-      ApiBody({ type: CreateCourseContentDto }),
-      ApiResponse({ status: 201, description: "Content uploaded" }),
     ),
 
   reorderContent: () =>

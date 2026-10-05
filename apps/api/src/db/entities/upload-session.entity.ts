@@ -1,6 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { UploadSessionStatus } from '@lms/shared-types';
 import { BaseEntity } from './base.entity';
+import { StorageProviderType } from '../../modules/storage/storage.service';
 import { User } from './user.entity';
 import { Course } from './course.entity';
 
@@ -37,8 +38,8 @@ export class UploadSession extends BaseEntity {
   @Column({ nullable: true })
   publicId?: string;
 
-  @Column({ type: 'varchar', default: 'local' })
-  provider!: 'cloudinary' | 'local';
+  @Column({ type: 'varchar', default: 'cloudinary' })
+  provider!: StorageProviderType;
 
   @Column({
     type: 'enum',

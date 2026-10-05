@@ -1,8 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { CourseContentService } from '../course-content.service';
-import { CreateCourseContentDto } from '../dto/create-course-content.dto';
 import { UpdateCourseContentDto } from '../dto/update-course-content.dto';
 import { ReorderCourseContentDto } from '../dto/reorder-course-content.dto';
 import { InitUploadSessionDto } from '../../upload/dto/init-upload-session.dto';
@@ -55,18 +53,6 @@ export class InstructorCourseContentController {
     @Body() dto: CompleteCourseContentUploadDto,
   ) {
     return this.contentService.completeDirectUpload(courseId, user.id, dto);
-  }
-
-  @Post()
-  @UseInterceptors(FileInterceptor('file'))
-  @CourseContentSwagger.uploadContent()
-  async upload(
-    @CurrentUser() user: any,
-    @Param('courseId', ParseUUIDPipe) courseId: string,
-    @Body() createDto: CreateCourseContentDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.contentService.upload(courseId, user.id, createDto, file);
   }
 
   @Patch('reorder')
