@@ -1,9 +1,10 @@
 <!--
   SYNC IMPACT REPORT
-  Version: 1.3.0 → 1.4.0 (MINOR bump)
+  Version: 1.4.0 → 1.5.0 (MINOR bump)
   Modified principles:
-    - Updated Principle III: "Layered Monorepo Structure" with public API module and marketplace domains
-    - Added Principle VIII: "Marketplace Commerce & Storage Quota Governance"
+    - Updated Principle I: "Security-First Development" (Direct-to-cloud upload security, pre-flight validation, restricting Multer to lightweight avatars)
+    - Updated Principle VIII: "Marketplace Commerce & Storage Quota Governance" (Direct-to-cloud paradigm, multi-cloud storage abstraction for Cloudinary/AWS S3/GCS, elimination of local storage and server-buffered uploads)
+    - Updated Development Standards: Added Direct Upload Lifecycle & Client UX standard
   Added sections: none
   Removed sections: none
   Templates requiring updates: none
@@ -24,9 +25,13 @@ implementation begins. The following rules are non-negotiable:
   (CSP, X-Frame-Options, HSTS, X-Content-Type-Options, etc.).
 - **Input sanitization**: All user-text fields (names, titles, descriptions) MUST
   be sanitized against XSS. Store sanitized text; never render unsanitized input.
-- **File upload validation**: Every file upload endpoint MUST validate file type
-  (server-side MIME detection), file size, and reject malicious content before
-  storage. Multer `limits` and `fileFilter` MUST be configured.
+- **File upload validation & Direct-to-Cloud Security**: Course media files (videos,
+  PDFs, documents) MUST NEVER be buffered in API server memory or routed through
+  server-side disk storage. Uploads MUST use the Direct-to-Cloud pattern: pre-flight
+  session creation validating quota and MIME type, issuing short-lived signed credentials,
+  direct client-to-storage transmission, and post-upload server-side asset verification.
+  Multer memory buffering is strictly restricted to small, low-frequency assets (e.g., user
+  profile avatars) with strict `limits` (≤ 5 MB) and `fileFilter` MIME validation.
 - **Environment variable validation**: A validation schema (Joi/Zod) MUST be
   provided in `ConfigModule.forRoot()`. No hardcoded fallback secrets allowed
   in production code.
@@ -138,11 +143,19 @@ Commission calculations MUST follow:
 - **Storage Governance & Multi-Tier Quotas**: Every instructor account MUST permanently
 receive 5 GB base storage upon creation (`storageQuotaBytes = 5368709120`). Storage
 expansion MUST be provisioned as time-bounded (90-day / 3-month) subscriptions or
-add-ons. Upload endpoints MUST validate the instructor's aggregate storage before
-persisting files:
+add-ons. Pre-flight upload session endpoints MUST validate the instructor's aggregate
+storage quota before issuing cloud upload credentials:
   $$\text{Used Storage} + \text{File Size} \le 5\text{ GB} + \sum \text{Active Subscription Bytes} + \sum \text{Active Add-on Bytes}$$
   Uploads exceeding this threshold MUST be rejected with HTTP 403 and
   `STORAGE_LIMIT_EXCEEDED`. Byte arithmetic MUST use `BigInt` to prevent integer overflow.
+- **Direct-to-Cloud Upload Paradigm & Multi-Cloud Provider Abstraction**: All course
+media MUST be uploaded directly from the client browser to the active cloud storage
+provider (currently Cloudinary). The backend MUST abstract storage through a unified
+`StorageService` strategy interface (`createDirectUploadSession`, `verifyUploadedAsset`,
+`delete`, `getUrl`) ensuring seamless, drop-in future migration to AWS S3 or Google Cloud
+Storage (GCS) without modifications to domain controllers or services. Server-buffered
+multipart course uploads and local chunking endpoints (`/api/v1/upload/local/*`) are
+prohibited in production and MUST NOT be used.
 - **Standardized Academic Hierarchy**: Both teacher and student registrations MUST
 mandate academic affiliation (`universityId`, `faculty`, `department`, and `year` for
 learners), linked to the structured Egyptian university catalog stored as JSONB.
@@ -183,6 +196,12 @@ without the corresponding migration file.
 - **BigInt Byte Arithmetic**: All byte calculations for storage quotas, subscription
   extensions, and file sizes MUST use native `BigInt` in business logic and database
   entities to prevent precision loss.
+- **Direct Upload Lifecycle & Client UX**: All course media additions MUST implement
+  the standard 3-phase lifecycle: (1) Pre-flight session initiation (`POST /content/upload-session`),
+  (2) Direct client-to-cloud upload with real-time progress reporting (`0%` to `100%`) and
+  cancellation/abort support, and (3) Post-upload completion and asset verification
+  (`POST /content/complete-upload`). Direct uploads MUST gracefully handle network retries,
+  track upload percentage, and clean up aborted sessions via `DELETE /upload/session/:sessionId`.
 - **Test Coverage**: Security-critical paths (auth, authorization, input validation)
   MUST have unit and integration tests. Tests MUST fail before implementation.
 
@@ -201,4 +220,4 @@ principle, the localization requirements, and the error handling architecture.
 The `AGENTS.md` file in the project root provides runtime development guidance
 and SHOULD be consulted by AI agents before making changes.
 
-**Version**: 1.4.0 | **Ratified**: 2026-06-29 | **Last Amended**: 2026-09-16
+**Version**: 1.5.0 | **Ratified**: 2026-06-29 | **Last Amended**: 2026-10-06
