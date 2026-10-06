@@ -9,8 +9,5 @@ allowBuilds:
   "@scarf/scarf": true
   argon2: true
   protobufjs: true
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
-
-onlyBuiltDependencies:
-  - argon2
+  sharp: true
+  unrs-resolver: true

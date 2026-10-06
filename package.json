@@ -18,7 +18,7 @@
     "db:migrate:create": "pnpm --filter @lms/api migration:create",
     "db:migrate:revert": "pnpm --filter @lms/api migration:revert",
     "db:seed": "pnpm --filter @lms/api seed",
-    "clean": "pnpm -r exec rm -rf node_modules dist .next"
+    "clean": "pnpm -r exec rimraf node_modules dist .next"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -28,5 +28,8 @@
     "approvedBuilds": {
       "argon2": "0.44.0"
     }
+  },
+  "dependencies": {
+    "next": "16.2.9"
   }
 }
