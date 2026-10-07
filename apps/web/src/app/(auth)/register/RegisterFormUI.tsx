@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Mail, Phone, BookOpen, ArrowLeft, ArrowRight, GraduationCap, Users, Globe, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { UseFormRegister, FieldErrors, Controller } from 'react-hook-form';
+import { UseFormRegister, FieldErrors, Controller, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { UserRole } from '@lms/shared-types';
 import { SocialLoginWithPopup } from '@/components/auth/SocialLoginWithPopup';
 import { PhoneInput } from '@/components/ui/PhoneInput';
+import { RoleSelector } from '@/components/auth/RoleSelector';
+import { AcademicHierarchySelect } from '@/components/auth/AcademicHierarchySelect';
 
 interface RegisterFormUIProps {
   register: UseFormRegister<any>;
@@ -18,6 +20,10 @@ interface RegisterFormUIProps {
   serverError: { message: string; code?: string } | null;
   isLoading: boolean;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+  selectedRole: UserRole;
+  onRoleChange: (role: UserRole) => void;
+  setValue: UseFormSetValue<any>;
+  watch: UseFormWatch<any>;
 }
 
 function GoogleIcon({ className = 'w-5 h-5' }: { className?: string }) {
@@ -39,7 +45,18 @@ function FacebookIcon({ className = 'w-5 h-5' }: { className?: string }) {
   );
 }
 
-export function RegisterFormUI({ register, control, errors, serverError, isLoading, onSubmit }: RegisterFormUIProps) {
+export function RegisterFormUI({
+  register,
+  control,
+  errors,
+  serverError,
+  isLoading,
+  onSubmit,
+  selectedRole,
+  onRoleChange,
+  setValue,
+  watch,
+}: RegisterFormUIProps) {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -62,7 +79,7 @@ export function RegisterFormUI({ register, control, errors, serverError, isLoadi
           <div className="mb-6">
             <h2 className="text-2xl font-bold leading-tight mb-2">{t('Create an account')}</h2>
             <p className="text-[#c3c0ff] text-sm leading-relaxed">
-              {t('Join our platform as an Instructor.')}
+              {t('Join our platform as a Learner or Instructor.')}
             </p>
           </div>
 
@@ -128,6 +145,12 @@ export function RegisterFormUI({ register, control, errors, serverError, isLoadi
             </div>
           )}
 
+          <RoleSelector
+            value={selectedRole}
+            onChange={onRoleChange}
+            disabled={isLoading}
+          />
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[var(--sv-text-primary)] block" htmlFor="firstName">{t('First name')}</label>
@@ -192,6 +215,14 @@ export function RegisterFormUI({ register, control, errors, serverError, isLoadi
             )}
           </div>
 
+          <AcademicHierarchySelect
+            register={register}
+            errors={errors}
+            role={selectedRole}
+            setValue={setValue}
+            watch={watch}
+          />
+
           <div className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[var(--sv-text-primary)] block" htmlFor="password">{t('Password')}</label>
@@ -254,7 +285,7 @@ export function RegisterFormUI({ register, control, errors, serverError, isLoadi
             <div className="flex-grow border-t border-[var(--sv-border)]"></div>
           </div>
 
-          <SocialLoginWithPopup role={UserRole.INSTRUCTOR} />
+          <SocialLoginWithPopup role={selectedRole} />
 
           <p className="text-sm text-center text-[var(--sv-text-secondary)] pt-1">
             {t('Already have an account?')}{' '}

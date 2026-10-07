@@ -27,4 +27,8 @@ export const authApis = {
     const response = await api.post('/auth/reset-password', { token, newPassword });
     return response.data;
   },
+  getUniversities: async () => {
+    const response = await api.get('/public/universities');
+    return response.data;
+  },
 };

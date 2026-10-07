@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { RegisterFormUI } from './RegisterFormUI';
 import { useRegisterMutation } from '@/hooks/useAuthMutations';
+import { UserRole } from '@lms/shared-types';
 
 function getRegisterSchema(t: (key: string) => string) {
   return z.object({
@@ -24,9 +25,22 @@ function getRegisterSchema(t: (key: string) => string) {
         t('Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character')
       ),
     confirmPassword: z.string().min(1, t('Please confirm your password')),
+    role: z.nativeEnum(UserRole),
+    universityId: z.string().min(1, t('auth.university.required')),
+    faculty: z.string().min(1, t('auth.faculty.required')),
+    department: z.string().min(1, t('auth.department.required')),
+    year: z.string().optional(),
   }).refine((data) => data.password === data.confirmPassword, {
     message: t("Passwords don't match"),
     path: ['confirmPassword'],
+  }).refine((data) => {
+    if (data.role === UserRole.LEARNER) {
+      return data.year && data.year.length > 0;
+    }
+    return true;
+  }, {
+    message: t('auth.year.required'),
+    path: ['year'],
   });
 }
 
@@ -44,10 +58,17 @@ export function RegisterForm() {
     register,
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(registerSchema) as any,
+    defaultValues: {
+      role: UserRole.INSTRUCTOR,
+    },
   });
+
+  const selectedRole = watch('role');
 
   const onSubmit = async (data: RegisterFormData) => {
     setServerError(null);
@@ -72,6 +93,10 @@ export function RegisterForm() {
       serverError={serverError}
       isLoading={registerMutation.isPending}
       onSubmit={handleSubmit(onSubmit)}
+      selectedRole={selectedRole}
+      onRoleChange={(role) => setValue('role', role)}
+      setValue={setValue}
+      watch={watch}
     />
   );
 }

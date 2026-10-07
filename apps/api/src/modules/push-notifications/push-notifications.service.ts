@@ -20,7 +20,7 @@ export class PushNotificationService implements OnModuleInit {
     private deviceTokenRepo: Repository<DeviceToken>,
     @InjectRepository(Notification)
     private notificationRepo: Repository<Notification>,
-  ) {}
+  ) { }
 
   // ─── Lifecycle ────────────────────────────────────────────
 
@@ -34,9 +34,8 @@ export class PushNotificationService implements OnModuleInit {
     }
 
     try {
-      const serviceAccount = JSON.parse(serviceAccountJson);
       this.firebaseApp = initializeApp({
-        credential: cert(serviceAccount),
+        credential: cert(serviceAccountJson),
       });
       this.isEnabled = true;
       this.logger.log('Firebase Admin SDK initialized successfully');
@@ -240,7 +239,7 @@ export class PushNotificationService implements OnModuleInit {
           if (
             resp.error &&
             (resp.error.code === 'messaging/registration-token-not-registered' ||
-             resp.error.code === 'messaging/invalid-registration-token')
+              resp.error.code === 'messaging/invalid-registration-token')
           ) {
             const token = batchTokens[idx];
             if (token) staleTokens.push(token);

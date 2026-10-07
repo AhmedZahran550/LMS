@@ -480,5 +480,20 @@
   "Every great achievement starts with the decision to try. Explore our courses and launch your learning path today.": "Every great achievement starts with the decision to try. Explore our courses and launch your learning path today.",
   "Sign in to continue your learning journey, connect with mentors, and track your achievements.": "Sign in to continue your learning journey, connect with mentors, and track your achievements.",
   "Welcome back! Please enter your details below.": "Welcome back! Please enter your details below.",
-  "Remember me on this device": "Remember me on this device"
+  "Remember me on this device": "Remember me on this device",
+  "auth.role.instructor": "Instructor",
+  "auth.role.student": "Student",
+  "auth.role.selectRole": "I want to join as:",
+  "auth.university.select": "Select your university",
+  "auth.faculty.select": "Select your faculty",
+  "auth.department.select": "Select your department",
+  "auth.year.select": "Select your academic year",
+  "auth.university.required": "University is required",
+  "auth.faculty.required": "Faculty is required",
+  "auth.department.required": "Department is required",
+  "auth.year.required": "Academic year is required",
+  "auth.academicHierarchy.title": "Academic Information",
+  "auth.academicHierarchy.loading": "Loading universities...",
+  "auth.academicHierarchy.error": "Failed to load universities. Please try again.",
+  "auth.academicHierarchy.retry": "Retry"
 }
